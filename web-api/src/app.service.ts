@@ -23,7 +23,8 @@ export class AppService {
     console.log("The lexing function returned", lexingData.data)
     */
     
-
+    // TODO: find way to have function URLs in some secret / vault. we do not want them to be exposed in source code
+    
     var res = await this.httpService.post(
       'https://hack3rz-functions-python.azurewebsites.net/api/predict?code=tBcDozZ5IATe/RJtBoa9iIfmJ4SElKT4pZL3KACg0oVmqYMGeHHnMw==',
       {
