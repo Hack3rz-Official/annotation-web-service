@@ -28,7 +28,7 @@ gradle azureFunctionsRun
 Trigger the function from the command line using the following cURL command in a new terminal window:
 
 ```bash
-curl -w "\n" http://localhost:7071/api/HttpExample --data AzureFunctions
+curl -w "\n" http://localhost:7071/api/JavaLex --data 'public static void main(String args[]){}'
 ```
 
 
