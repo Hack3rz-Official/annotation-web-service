@@ -1,0 +1,30 @@
+plugins {
+    id 'java-library'
+    id 'org.jetbrains.kotlin.jvm' version '1.6.10'
+    id 'java'
+    id 'antlr'
+}
+
+group 'org.example'
+version ''
+
+repositories {
+    mavenCentral()
+    mavenCentral()
+}
+
+dependencies {
+    implementation  "org.jetbrains.kotlin:kotlin-stdlib"
+    antlr 'org.antlr:antlr4:4.9.2'
+}
+
+generateGrammarSource {
+    arguments += ["-visitor", "-long-messages"]
+}
+compileKotlin.dependsOn(generateGrammarSource)
+
+jar {
+    from {
+        configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) }
+    }
+}
