@@ -1,7 +1,23 @@
 # annotation-web-service
 The repository containing all source code for the annotation web service.
 
-The code for the different parts of our architecture can be found in individual subfolders of this repo. All cloud-functions are in folders prefixed with `function-`. The `deliverables` can be found in a dedicated folder.
+
+| File/folder        | Description                                                                |
+|--------------------|----------------------------------------------------------------------------|
+| `deliverables`     | All deliverables for the respective submissions.                           |
+| `function-lex`     | The source code of the cloud function that handles the lexing of the code. |
+| `function-predict` | The source code of the cloud function that handles the prediction.         |
+| `web-api`          | The web API that acts as the primary entry point for the customers.        |
+| `.gitignore`       | Define what to ignore at commit time.                                      |
+| `README.md`        | This README file.                                                          |
+
+
+
+## Links
+- [Azure Workspace](https://portal.azure.com/#@uzh.onmicrosoft.com/dashboard/arm/subscriptions/48c1a3cf-793a-4ca1-97e3-0e93cc815cb4/resourcegroups/hack3rz/providers/microsoft.portal/dashboards/39f628bf-8b8f-45c7-868e-968f8b24f196)
+
+
+
 
 ### Branching Policy
 
