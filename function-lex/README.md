@@ -1,14 +1,120 @@
 # Lex Function
 
 ## Prerequisites
-1. Install Java Developer Kit (Version 8)
-2. Install Azure CLI
-3. Install Azure Functions Core Tools (version 2.6.666 or above)
-4. Install Gradle (version 6.8 and above)
+
+#### 1. Install Java Developer Kit (Version 8)
+
+#### 2. Install [Azure CLI](https://docs.microsoft.com/en-us/cli/azure/)
+
+For macOS: `brew update && brew install azure-cli` (make sure you have [Homebrew](https://brew.sh/) installed)
+
+#### 3. Install [Azure Functions Core Tools](https://docs.microsoft.com/en-us/azure/azure-functions/functions-run-local?tabs=v4%2Cmacos%2Ccsharp%2Cportal%2Cbash#v2) (version 2.6.666 or above)
+```bash
+brew tap azure/functions
+brew install azure-functions-core-tools@4
+# if upgrading on a machine that has 2.x or 3.x installed:
+brew link --overwrite azure-functions-core-tools@4
+```
+
+#### 4. Install [Gradle](https://gradle.org/install/) (version 6.8 and above)
+For macOs: `brew install gradle`
+
+## Run the Function Locally
+Run the following command to build then run the function project (make sure you're in the folder of the cloud function and not in the repo's root):
+```bash
+gradle jar --info
+gradle azureFunctionsRun
+```
+Trigger the function from the command line using the following cURL command in a new terminal window:
+
+```bash
+curl -w "\n" http://localhost:7071/api/HttpExample --data AzureFunctions
+```
 
 
+----
+Readme.md of Original Java Cloud Function Example of Azure
+----
+
+---
+page_type: sample
+languages:
+- java
+  products:
+- azure-functions
+- azure
+  description: "This repository contains sample for Azure Functions in Java"
+  urlFragment: "azure-functions-java"
+---
+
+# Azure Functions samples in Java
+
+This repository contains samples which show the basis usage of [Azure Functions](https://docs.microsoft.com/en-us/azure/azure-functions/) in Java.
+
+## Contents
+
+Outline the file contents of the repository. It helps users navigate the codebase, build configuration and any related assets.
+
+| File/folder    | Description                                      |
+|----------------|--------------------------------------------------|
+| `src`          | Sample source code.                              |
+| `.gitignore`   | Define what to ignore at commit time.            |
+| `build.gradle` | The gradle configuration to this sample.         |
+| `host.json`    | The host.json metadata file contains configuration options that affect all functions in a function app instance.  [Docs](https://github.com/Azure/azure-functions-host/wiki/host.json-(v2)) |
+| `README.md`    | This README file.                                |
+
+## Prerequisites
+
+- Gradle 4.10+
+- Latest [Function Core Tools](https://aka.ms/azfunc-install)
+- Azure CLI. This plugin use Azure CLI for authentication, please make sure you have Azure CLI installed and logged in.
+
+## Setup
+
+- ```cmd
+    az login
+    az account set -s <your subscription id>
+    ```
+- Update the Application settings in Azure portal with the required parameters as below
+    - AzureWebJobsStorage: Connection string to your storage account
+    - CosmosDBDatabaseName: Cosmos database name. Example: ItemCollectionIn
+    - CosmosDBCollectionName:Cosmos database collection name. Example: ItemDb
+    - AzureWebJobsCosmosDBConnectionString: Connection string to your Cosmos database
+    - AzureWebJobsEventGridOutputBindingTopicUriString: Event Grid URI
+    - AzureWebJobsEventGridOutputBindingTopicKeyString: Event Grid string
+    - AzureWebJobsEventHubSender, AzureWebJobsEventHubSender_2 : Event hub connection string
+    - AzureWebJobsServiceBus: Service bus connection string
+    - SBQueueName: Service bus queue name. Example: test-input-java
+    - SBTopicName: Service bus topic name. Example: javaworkercitopic2
+    - SBTopicSubName: Service bus topic name. Example: javaworkercisub
+- Update `host.json` with the right extension bundle version. `V3 - [1.*, 2.0.0) and V4 - [2.*, 3.0.0)`
+
+## Running the sample
+
+```cmd
+./mvnw clean package azure-functions:run
+```
+
+```cmd
+./gradlew clean azureFunctionsRun
+```
+
+## Deploy the sample on Azure
+
+
+```cmd
+./mvnw clean package azure-functions:deploy
+```
+
+```cmd
+./gradlew clean azureFunctionsDeploy
+```
+
+> NOTE: please replace '/' with '\\' when you are running on windows.
 
 ------
+Readme.md of original Java Library
+-----
 
 # ASE: Annotation Formal Model
 
