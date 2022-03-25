@@ -32,6 +32,19 @@ curl -w "\n" http://localhost:7071/api/JavaLex --data 'public static void main(S
 ```
 
 
+## Deployment
+Make sure that Azure CLI is installed and that you're authenticated (use `az login`)
+
+Package the function using:
+```bash
+gradle azureFunctionsPackageZip
+```
+Then deploy it using:
+```bash
+gradle azureFunctionsDeploy
+```
+This will use the app settings described in the `build.gradle` file.
+
 ----
 Readme.md of Original Java Cloud Function Example of Azure
 ----

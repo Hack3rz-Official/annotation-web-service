@@ -25,12 +25,12 @@ repositories {
 }
 
 azurefunctions {
-    resourceGroup = 'java-functions-group'
-    appName = 'function-lex'
+    resourceGroup = 'Hack3rz'
+    appName = 'hack3rz-functions-java'
     pricingTier = 'Consumption'
     region = 'switzerlandnorth'
     runtime {
-      os = 'Linux'
+      os = 'windows'
       javaVersion = 'Java 11'
     }
     auth {
