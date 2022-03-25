@@ -14,14 +14,12 @@ export class AppService {
     console.log(code)
 
     // call lexing function
-    /* 
     var res = await this.httpService.post(
-      'ENTER_LEXING_FUNCTION_URL_HERE',
-      {code: code}
+      'https://hack3rz-functions-java.azurewebsites.net/api/JavaLex',
+      { code: code }
     );
     var lexingData = await firstValueFrom(res)
     console.log("The lexing function returned", lexingData.data)
-    */
     
     // TODO: find way to have function URLs in some secret / vault. we do not want them to be exposed in source code
     
@@ -29,7 +27,7 @@ export class AppService {
       'https://hack3rz-functions-python.azurewebsites.net/api/predict?code=tBcDozZ5IATe/RJtBoa9iIfmJ4SElKT4pZL3KACg0oVmqYMGeHHnMw==',
       {
         lang_name: 'java', // TODO: parametrize
-        tok_ids: [22, 4, 33, 77, 8] // TODO: replace with output from lexing function
+        tok_ids: lexingData.data // use tok_ids received from lexing function
       }
     );
     var predictData = await firstValueFrom(res)
