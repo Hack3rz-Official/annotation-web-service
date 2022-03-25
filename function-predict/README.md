@@ -10,7 +10,7 @@ In order to run and deploy the azure function from localhost, you need to first 
 # activate virtual environment and install dependencies
 $ source venv.sh
 
-# init your local function workers
+# init your local function workers (if not already done)
 $ func init
 
 # run function
