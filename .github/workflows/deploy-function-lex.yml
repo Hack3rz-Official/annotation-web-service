@@ -3,7 +3,7 @@ on: [push]
 
 env:
   AZURE_FUNCTIONAPP_NAME: hack3rz-functions-java
-  JAVA_VERSION: '1.8.x'
+  JAVA_VERSION: '11'
   FUNCTION_NAME: function-lex
 
 jobs:
