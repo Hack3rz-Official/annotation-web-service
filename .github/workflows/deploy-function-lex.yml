@@ -20,9 +20,13 @@ jobs:
           distribution: 'microsoft'
           cache: gradle
 
+      - name: Make Gradle executable
+        run: chmod +x ./gradlew
+        working-directory: function-lex
+
       - name: 'Build function using gradle'
         shell: bash
-        run: gradlew azureFunctionsPackageZip
+        run: ./gradlew azureFunctionsPackageZip
         working-directory: function-lex
 
       - name: Deploy to Azure Function APP ${{ env.AZURE_FUNCTIONAPP_NAME }}
