@@ -11,6 +11,13 @@ export class AppService {
   }
 
   async highlight(code): Promise<any> {
+    // TODO: find way to hide function URLs in some secret / vault. we do not want them to be exposed in source code
+    // TODO: error handling in case functions return error
+    // TODO: leverage DTO (https://docs.nestjs.com/controllers#request-payloads) for payload
+    // TODO: "typescript-ify" code
+    // TODO: additional payload parameter for lang_name (java, python, kotlin) which gets passed to functions
+    // TODO: highlight controller and service could be moved to seperate files
+    
     console.log(code)
 
     // call lexing function
@@ -21,8 +28,7 @@ export class AppService {
     var lexingData = await firstValueFrom(res)
     console.log("The lexing function returned", lexingData.data)
     
-    // TODO: find way to have function URLs in some secret / vault. we do not want them to be exposed in source code
-    
+    // call predict function
     var res = await this.httpService.post(
       'https://hack3rz-functions-python.azurewebsites.net/api/predict?code=tBcDozZ5IATe/RJtBoa9iIfmJ4SElKT4pZL3KACg0oVmqYMGeHHnMw==',
       {
