@@ -15,12 +15,12 @@ export class AppService {
   }
 
   async highlight(code): Promise<any> {
-    // TODO: find way to hide function URLs in some secret / vault. we do not want them to be exposed in source code
-    // TODO: error handling in case functions return error
+    // TODO: Add dev/prod URLs in azure (Function > Settings > Configuration > add all necessary env variables)
     // TODO: leverage DTO (https://docs.nestjs.com/controllers#request-payloads) for payload
-    // TODO: "typescript-ify" code
     // TODO: additional payload parameter for lang_name (java, python, kotlin) which gets passed to functions
+    // TODO: Refactor await on non-promise (Observable)
     // TODO: highlight controller and service could be moved to seperate files
+    // TODO: error handling in case functions return error
 
     console.log(code)
 
