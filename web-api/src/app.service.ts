@@ -1,10 +1,14 @@
 import { Injectable } from '@nestjs/common';
 import { HttpService } from '@nestjs/axios';
+import { ConfigService } from '@nestjs/config';
 import { firstValueFrom } from 'rxjs';
 
 @Injectable()
 export class AppService {
-  constructor(private httpService: HttpService) {}
+  constructor(
+    private config: ConfigService,
+    private httpService: HttpService
+  ) {}
 
   defaultRouter(): string {
     return 'Congrats, you reached the defaultRouter of our API! 🎉';
@@ -22,7 +26,7 @@ export class AppService {
 
     // call lexing function
     const lexingResponse = await this.httpService.post(
-      'https://hack3rz-functions-java.azurewebsites.net/api/JavaLex',
+      this.config.get('lex.url'),
       { code: code }
     );
     const lexingData = await firstValueFrom(lexingResponse)
@@ -30,8 +34,8 @@ export class AppService {
 
     // call predict function
     const predictResponse = await this.httpService.post(
-      'https://hack3rz-functions-python.azurewebsites.net/api/predict?code=tBcDozZ5IATe/RJtBoa9iIfmJ4SElKT4pZL3KACg0oVmqYMGeHHnMw==',
-      {
+     this.config.get('predict.url'),
+     {
         lang_name: 'java', // TODO: parametrize
         tok_ids: lexingData.data // use tok_ids received from lexing function
       }
