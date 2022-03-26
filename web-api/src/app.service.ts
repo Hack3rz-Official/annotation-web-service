@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { HttpService } from '@nestjs/axios';
 import { ConfigService } from '@nestjs/config';
-import { firstValueFrom } from 'rxjs';
+import { firstValueFrom, Observable } from 'rxjs';
 import { HighlightRequestDto } from './dto/highlight-request.dto';
 
 @Injectable()
@@ -24,22 +24,22 @@ export class AppService {
     console.log(highlightRequestDto)
 
     // call lexing function
-    const lexingResponse = await this.httpService.post(
+    const lexingRequest: Observable<any> = this.httpService.post(
       this.config.get('lex.url'),
       { code: highlightRequestDto.code }
     );
-    const lexingData = await firstValueFrom(lexingResponse)
+    const lexingData = await firstValueFrom(lexingRequest)
     console.log("The lexing function returned", lexingData.data)
 
     // call predict function
-    const predictResponse = await this.httpService.post(
+    const predictRequest: Observable<any> = this.httpService.post(
      this.config.get('predict.url'),
      {
         lang_name: highlightRequestDto.language,
         tok_ids: lexingData.data // use tok_ids received from lexing function
       }
     );
-    const predictData = await firstValueFrom(predictResponse)
+    const predictData = await firstValueFrom(predictRequest)
     console.log("The predict function returned", predictData.data)
 
     return predictData.data
