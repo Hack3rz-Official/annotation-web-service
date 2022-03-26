@@ -1,5 +1,5 @@
 import { IsEnum, IsNotEmpty, IsString } from 'class-validator';
-import { SupportedLanguage } from '../constants/supported-languages.enum';
+import { SupportedLanguage } from '../../../constants/supported-languages.enum';
 
 export class HighlightRequestDto {
 
@@ -13,7 +13,7 @@ export class HighlightRequestDto {
       Object.keys(SupportedLanguage)
         .map(key => SupportedLanguage[key])
         .join(', ')
-    }`
+    }`,
   })
   language: SupportedLanguage
 }

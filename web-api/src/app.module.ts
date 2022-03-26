@@ -1,16 +1,12 @@
 import { Module } from '@nestjs/common';
-import { ConfigModule } from '@nestjs/config';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { HttpModule } from '@nestjs/axios';
-import configuration from './config/configuration';
+import { HighlightModule } from './modules/highlight/highlight.module';
 
 @Module({
-  imports: [
-    ConfigModule.forRoot({ load: [configuration] }),
-    HttpModule,
-  ],
+  imports: [HighlightModule],
   controllers: [AppController],
   providers: [AppService],
 })
-export class AppModule {}
+export class AppModule {
+}
