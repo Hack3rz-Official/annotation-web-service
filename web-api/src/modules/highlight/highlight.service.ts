@@ -18,15 +18,13 @@ export class HighlightService {
 
     console.log(highlightRequestDto)
 
-    // call lexing function
     const lexingRequest: Observable<any> = this.httpService.post(
       this.config.get('lex.url'),
-      {code: highlightRequestDto.code},
+      highlightRequestDto.code,
     );
     const lexingData = await firstValueFrom(lexingRequest)
     console.log('The lexing function returned', lexingData.data)
 
-    // call predict function
     const predictRequest: Observable<any> = this.httpService.post(
       this.config.get('predict.url'),
       {
