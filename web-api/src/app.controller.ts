@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Post } from '@nestjs/common';
+import { Body, Controller, Get, HttpCode, Post } from '@nestjs/common';
 import { AppService } from './app.service';
 
 @Controller()
@@ -15,6 +15,7 @@ export class AppController {
   }
 
   @Post('/highlight')
+  @HttpCode(200)
   highlight(@Body() code: string): Promise<any> {
     return this.appService.highlight(code);
   }
