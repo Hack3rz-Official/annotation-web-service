@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { HttpService } from '@nestjs/axios';
 import { ConfigService } from '@nestjs/config';
 import { firstValueFrom } from 'rxjs';
+import { HighlightRequestDto } from './dto/highlight-request.dto';
 
 @Injectable()
 export class AppService {
@@ -14,7 +15,7 @@ export class AppService {
     return 'Congrats, you reached the defaultRouter of our API! 🎉';
   }
 
-  async highlight(code): Promise<any> {
+  async highlight(highlightRequestDto: HighlightRequestDto): Promise<any> {
     // TODO: Add dev/prod URLs in azure (Function > Settings > Configuration > add all necessary env variables)
     // TODO: leverage DTO (https://docs.nestjs.com/controllers#request-payloads) for payload
     // TODO: additional payload parameter for lang_name (java, python, kotlin) which gets passed to functions
@@ -22,12 +23,12 @@ export class AppService {
     // TODO: highlight controller and service could be moved to seperate files
     // TODO: error handling in case functions return error
 
-    console.log(code)
+    console.log(highlightRequestDto)
 
     // call lexing function
     const lexingResponse = await this.httpService.post(
       this.config.get('lex.url'),
-      { code: code }
+      { code: highlightRequestDto.code }
     );
     const lexingData = await firstValueFrom(lexingResponse)
     console.log("The lexing function returned", lexingData.data)
@@ -36,7 +37,7 @@ export class AppService {
     const predictResponse = await this.httpService.post(
      this.config.get('predict.url'),
      {
-        lang_name: 'java', // TODO: parametrize
+        lang_name: highlightRequestDto.language,
         tok_ids: lexingData.data // use tok_ids received from lexing function
       }
     );
