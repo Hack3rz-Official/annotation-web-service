@@ -22,7 +22,10 @@ export class HighlightService {
 
     const lexingRequest: Observable<any> = this.httpService.post(
       this.config.get('lex.url'),
-      highlightRequestDto.code,
+      {
+        lang_name: highlightRequestDto.language,
+        code: highlightRequestDto.code,
+      },
     );
     const lexingData = await firstValueFrom(lexingRequest)
     this.logger.log('The lexing function returned', lexingData.data)
