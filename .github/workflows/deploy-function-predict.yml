@@ -20,11 +20,11 @@ jobs:
         
       - name: Create virtual environment and install dependencies
         run: |
-          pip install --upgrade pip
+          python${{ env.PYTHON_VERSION }} -m pip install --upgrade pip
           python${{ env.PYTHON_VERSION }} -m venv env
           source env/bin/activate
           echo "VIRTUAL ENV:" $VIRTUAL_ENV
-          pip install local.requirements.txt
+          pip install -r local.requirements.txt
         working-directory: ${{ env.FUNCTION_NAME }}
 
       - name: Run Tests
