@@ -22,17 +22,18 @@ import static org.mockito.Mockito.*;
  * Unit test for Function class.
  */
 public class FunctionTest {
+
     /**
-     * Unit test for HttpTriggerJava method.
+     * Unit test for Lex method.
      */
     @Test
-    public void testHttpTriggerJava() throws Exception {
+    public void testLexJava() throws Exception {
         // Setup
         @SuppressWarnings("unchecked")
         final HttpRequestMessage<Optional<String>> req = mock(HttpRequestMessage.class);
 
         final Map<String, String> queryParams = new HashMap<>();
-        queryParams.put("name", "Azure");
+        queryParams.put("code", "public void testLexJava() throws Exception {}");
         doReturn(queryParams).when(req).getQueryParameters();
 
         final Optional<String> queryBody = Optional.empty();
@@ -50,9 +51,15 @@ public class FunctionTest {
         doReturn(Logger.getGlobal()).when(context).getLogger();
 
         // Invoke
-        final HttpResponseMessage ret = new Function().run(req, context);
+        final HttpResponseMessage ret = new Function().lex(req, context);
 
         // Verify
+        // TODO: currently we only verify that there are values in the body, not that the values are correct
+
         assertEquals(ret.getStatus(), HttpStatus.OK);
+        assertNotNull(ret.getBody());
+        assertNotEquals("", ret.getBody());
+
     }
+
 }

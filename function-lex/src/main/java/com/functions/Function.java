@@ -37,7 +37,7 @@ public class Function {
      * curl -d "HTTP Body" {your host}/api/lex
      */
     @FunctionName("Lex")
-    public HttpResponseMessage Lex(
+    public HttpResponseMessage lex(
         @HttpTrigger(
             name = "req",
             methods = {HttpMethod.GET, HttpMethod.POST},

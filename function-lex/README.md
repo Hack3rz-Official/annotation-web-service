@@ -31,6 +31,8 @@ Trigger the function from the command line using the following cURL command in a
 curl -w "\n" http://localhost:7071/api/lex --data 'public static void main(String args[]){}'
 ```
 
+## Tests
+You can run the tests by using `./gradlew test`.
 
 ## Deployment
 Make sure that Azure CLI is installed and that you're authenticated (use `az login`)
