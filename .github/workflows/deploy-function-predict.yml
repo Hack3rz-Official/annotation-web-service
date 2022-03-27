@@ -18,7 +18,7 @@ jobs:
         with:
           python-version: ${{ env.PYTHON_VERSION }}
         
-      - name: Create virtual environment and install dependencies
+      - name: Run Tests
         run: |
           python${{ env.PYTHON_VERSION }} -m pip install --upgrade pip
           python${{ env.PYTHON_VERSION }} -m venv env
