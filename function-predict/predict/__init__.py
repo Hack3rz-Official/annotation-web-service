@@ -23,8 +23,8 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
     try:    
         # predict
         model = SHModel(lang_name, "best")
-        model.setup_for_prediction();
-        res = model.predict(tok_ids);
+        model.setup_for_prediction()
+        res = model.predict(tok_ids)
         return func.HttpResponse(json.dumps({'h_code_values': res}))
-    except:
-        return func.HttpResponse("Model error", status_code=500)
+    except Exception as e:
+        return func.HttpResponse("Model error: " + str(e), status_code=500)
