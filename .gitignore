@@ -2,3 +2,6 @@
 .idea
 .gradle
 .vscode
+
+# no predict model files
+*.pt
