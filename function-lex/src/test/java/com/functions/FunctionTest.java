@@ -77,7 +77,7 @@ public class FunctionTest {
     @Test
     public void testLexPython() throws Exception {
         HttpResponseMessage ret = sendLexRequest(
-            "python",
+            "python3",
             "print(\"Hello World\")"
         );
 

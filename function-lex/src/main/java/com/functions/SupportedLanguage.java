@@ -8,5 +8,5 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 public enum SupportedLanguage {
     @JsonProperty("java") JAVA,
     @JsonProperty("kotlin") KOTLIN,
-    @JsonProperty("python") PYTHON;
+    @JsonProperty("python3") PYTHON;
 }

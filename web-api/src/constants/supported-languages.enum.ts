@@ -1,5 +1,5 @@
 export enum SupportedLanguage {
   JAVA = 'java',
   KOTLIN = 'kotlin',
-  PYTHON = 'python'
+  PYTHON = 'python3'
 }
