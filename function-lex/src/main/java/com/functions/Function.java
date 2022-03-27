@@ -8,6 +8,7 @@ package com.functions;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.functions.dtos.LexRequestDTO;
 import com.microsoft.azure.functions.ExecutionContext;
 import com.microsoft.azure.functions.HttpMethod;
 import com.microsoft.azure.functions.HttpRequestMessage;
@@ -26,6 +27,9 @@ import resolver.JavaResolver;
 import java.util.Arrays;
 
 import lexer.LTok;
+import resolver.KotlinResolver;
+import resolver.Python3Resolver;
+import resolver.Resolver;
 
 /**
  * Azure Functions with HTTP Trigger.
@@ -45,19 +49,20 @@ public class Function {
             HttpRequestMessage<Optional<String>> request,
         final ExecutionContext context) {
 
-        context.getLogger().info("Java HTTP trigger processed a request.");
+        context.getLogger().info("Java HTTP trigger for Lex function processed a request.");
 
 
-        // Parse query parameter
         final String query = request.getQueryParameters().get("code");
-        final String code = request.getBody().orElse(query);
+        final String requestBody = request.getBody().orElse(query);
 
-        if (code == null) {
-            return request.createResponseBuilder(HttpStatus.BAD_REQUEST).body("Please pass code on the query string or in the request body").build();
-        } else {
+        ObjectMapper objectMapper = new ObjectMapper();
 
-            JavaResolver resolver = new JavaResolver();
-            LTok[] lToks = resolver.lex(code);
+        try {
+            LexRequestDTO dto = objectMapper.readValue(requestBody, LexRequestDTO.class);
+            context.getLogger().info("Initiating Resolver for language: " + dto.getLanguage());
+            Resolver resolver = getResolverByLanguage(dto.getLanguage());
+
+            LTok[] lToks = resolver.lex(dto.getCode());
 
             if (lToks != null) {
                 Integer[] ids = Arrays.stream(lToks).map(tok -> tok.tokenId).toArray(size -> new Integer[lToks.length]);
@@ -69,11 +74,40 @@ public class Function {
                 }
                 return request.createResponseBuilder(HttpStatus.OK).body(json).build();
             } else {
+                context.getLogger().info("Code could not be lexed.");
                 return request.createResponseBuilder(HttpStatus.BAD_REQUEST).body("Code could not be lexed.").build();
             }
 
-
+        } catch (JsonProcessingException e) {
+            context.getLogger().severe("Error while parsing json " + e.getMessage());
+            return request.createResponseBuilder(HttpStatus.BAD_REQUEST).body("Error while parsing json " + e.getMessage()).build();
         }
+
+    }
+
+    /**
+     * Returns the correct resolver based on the provided language
+     * @param language the language
+     * @return Resolver the resolver
+     */
+    private Resolver getResolverByLanguage(SupportedLanguage language) {
+
+        Resolver resolver;
+
+        switch(language) {
+            case PYTHON:
+                resolver = new Python3Resolver();
+                break;
+            case KOTLIN:
+                resolver = new KotlinResolver();
+                break;
+            case JAVA:
+            default:
+                resolver = new JavaResolver();
+                break;
+        }
+
+        return resolver;
     }
 
 }
