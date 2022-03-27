@@ -18,6 +18,3 @@ $ func start --python
 ```
 
 Finally, the function should be running at ```http://localhost:7071/api/predict```
-
-## Deploying the function
-Before deploying the function make sure to uncomment the deployment dependencies of torch in requirements.txt and comment its local dependencies.

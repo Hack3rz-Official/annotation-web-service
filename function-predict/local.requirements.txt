@@ -6,6 +6,5 @@ azure-functions
 numpy==1.22.3
 typing-extensions==4.1.1
 
-# Torch for deploying the function on Azure
--f https://download.pytorch.org/whl/torch_stable.html
-torch==1.10.0+cpu
+# Torch for running the function locally
+torch==1.10.0
