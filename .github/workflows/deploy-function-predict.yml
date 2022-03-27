@@ -1,0 +1,32 @@
+name: Deploy Predict Function
+on: [push]
+
+env:
+  AZURE_FUNCTIONAPP_NAME: hack3rz-functions-python
+  PYTHON_VERSION: '3.8'
+  FUNCTION_NAME: function-predict
+
+jobs:
+  tests:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 'Checkout GitHub Action'
+        uses: actions/checkout@v2
+
+      - name: Setup Python ${{ env.PYTHON_VERSION }}
+        uses: actions/setup-python@v3.0.0
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+        
+      - name: Create virtual environment and install dependencies
+        run: |
+          pip install --upgrade pip
+          python${{ env.PYTHON_VERSION }} -m venv env
+          source env/bin/activate
+          echo "VIRTUAL ENV:" $VIRTUAL_ENV
+          pip install local.requirements.txt
+        working-directory: ${{ env.FUNCTION_NAME }}
+
+      - name: Run Tests
+        run: python${{ env.PYTHON_VERSION }} -m unittest tests/predict_test.py
+        working-directory: ${{ env.FUNCTION_NAME }}
