@@ -94,6 +94,28 @@ public class FunctionTest {
         assertNotEquals(0, token_ids.size());
     }
 
+    /**
+     * Unit test for Lex method with incomplete Java language.
+     */
+    @Test
+    public void testLexIncompleteJava() throws Exception {
+        HttpResponseMessage ret = sendLexRequest(
+            "java",
+            "public static void mai}"
+        );
+
+        // Verify
+        // TODO: currently we only verify that there are values in the body
+        //  and that they can be deserialized to an integer list, not that the values are correct
+
+        assertEquals(ret.getStatus(), HttpStatus.OK);
+        assertNotNull(ret.getBody());
+        assertNotEquals("", ret.getBody());
+
+        ObjectMapper mapper = new ObjectMapper();
+        List token_ids = mapper.readValue(ret.getBody().toString(), List.class);
+        assertNotEquals(0, token_ids.size());
+    }
 
     /**
      * Sends a request to the lexing function
