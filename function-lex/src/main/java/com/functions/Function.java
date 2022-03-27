@@ -33,11 +33,11 @@ import lexer.LTok;
 public class Function {
 
     /**
-     * This function listens at endpoint "/api/JavaLex". Two ways to invoke it using "curl" command in bash:
-     * curl -d "HTTP Body" {your host}/api/HttpExample
+     * This function listens at endpoint "/api/lex". Two ways to invoke it using "curl" command in bash:
+     * curl -d "HTTP Body" {your host}/api/lex
      */
-    @FunctionName("JavaLex")
-    public HttpResponseMessage JavaLex(
+    @FunctionName("Lex")
+    public HttpResponseMessage Lex(
         @HttpTrigger(
             name = "req",
             methods = {HttpMethod.GET, HttpMethod.POST},
