@@ -11,6 +11,7 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
     try:
         req_body = req.get_json()
     except:
+        logging.error("Model error: " + str(e))
         return func.HttpResponse("Invalid body, please provide json", status_code=400)
     else:
         lang_name = req_body.get('lang_name')
@@ -27,4 +28,5 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
         res = model.predict(tok_ids)
         return func.HttpResponse(json.dumps({'h_code_values': res}))
     except Exception as e:
+        logging.error("Model error: " + str(e))
         return func.HttpResponse("Model error: " + str(e), status_code=500)
