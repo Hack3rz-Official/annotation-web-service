@@ -18,8 +18,8 @@ npm run start:dev
 
 
 
-| Method | Endpoint | Content Type
-|:---------|:-----|:-----|
+| Method | Endpoint   | Content Type
+|:-------|:-----------|:------------------|
 | POST   | /highlight | application/json
 **Sample Body:** 
 ```
@@ -28,3 +28,8 @@ npm run start:dev
 	"language": "java"
 }
 ```
+**Sample Response:**
+```
+// TODO: insert sample response here
+```
+
