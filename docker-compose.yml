@@ -1,0 +1,9 @@
+version: '3.8'
+
+services:
+  annotation:
+    build: annotation-service
+    container_name: "AnnotationService"
+    image: annotation-service:latest
+    ports:
+      - "8080:8080"
