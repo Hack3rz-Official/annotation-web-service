@@ -10,14 +10,22 @@ In order to run and deploy the azure function from localhost, you need to first 
 # activate virtual environment and install dependencies
 $ source venv.sh
 
-# init your local function workers (if not already done)
-$ func init
+# Set PYTHONPATH to pwd
+$ export PYTHONPATH="$PWD"
 
-# run function
-$ func start --python
+# run flask api
+$ python3 predict/__main__.py
+
+# test via postman
+
+{
+    "lang_name":"java",
+    "tok_ids":[34,22,45]
+}
+
 ```
 
-Finally, the function should be running at ```http://localhost:7071/api/predict```
+Finally, the function should be running at ```http://127.0.0.1:5000/```
 
 ## Running the function locally via Docker
 
