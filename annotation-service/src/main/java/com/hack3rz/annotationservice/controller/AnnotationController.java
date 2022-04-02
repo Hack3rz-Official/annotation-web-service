@@ -15,8 +15,6 @@ import org.springframework.web.bind.annotation.RestController;
 import com.hack3rz.annotationservice.dto.AnnotateCodeRequestDTO;
 import com.hack3rz.annotationservice.service.AnnotationService;
 
-import lexer.LTok;
-
 @RestController
 @RequestMapping(value = "/api/annotate", produces = APPLICATION_JSON_VALUE)
 public class AnnotationController {
@@ -26,7 +24,7 @@ public class AnnotationController {
     private AnnotationService annotationService;
 
     @PostMapping()
-    public LTok[] annotateCode(@RequestBody @Valid AnnotateCodeRequestDTO dto) {
+    public String annotateCode(@RequestBody @Valid AnnotateCodeRequestDTO dto) {
         log.info("Received a code annotation request for language: {}", dto.getLanguage());
         return annotationService.annotateCode(dto.getCode(), dto.getLanguage());
     }
