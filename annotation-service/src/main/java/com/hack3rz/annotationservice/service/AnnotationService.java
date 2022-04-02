@@ -40,6 +40,8 @@ public class AnnotationService {
             throw new ApiException(BAD_REQUEST, "Code could not be lexed.", "lexingTokens was null");
         }
 
+        log.info("LexingToken length = {}", lexingTokens.length);
+
         return Arrays.stream(lexingTokens).map(this::mapLTok).collect(Collectors.joining(", "));
     }
 
