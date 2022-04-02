@@ -13,12 +13,11 @@ def predict():
     # deserialize
     try:
         req_body = request.get_json()
-    except:
-        logging.error("Invalid body, not json")
-        return Response("Invalid body, please provide json", status=400)
-    else:
         lang_name = req_body.get('lang_name')
         tok_ids = req_body.get('tok_ids')
+    except Exception as e:
+        logging.error("Invalid body, not json" + str(e))
+        return Response("Invalid body, please provide json", status=400)
 
     # handle unsupported languages
     if lang_name not in supported_languages:
