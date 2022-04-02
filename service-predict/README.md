@@ -1,40 +1,37 @@
-# function-predict
+# Service Predict
 A repository containing all source code for the predict function which is based on the provided [UZH-ASE-AnnotationWS-BaseLearner](https://github.com/MEPalma/UZH-ASE-AnnotationWS-BaseLearner) repository.
 
-## Installation
-In order to run and deploy the azure function from localhost, you need to first install Azure Functions Core Tools on your machine. Instructions can be found [here](https://docs.microsoft.com/en-us/azure/azure-functions/functions-run-local?tabs=v4%2Cmacos%2Ccsharp%2Cportal%2Cbash#install-the-azure-functions-core-tools).
-
-## Running the function locally via Azure Functions Core Tools
+## Running the function locally
+Execute the following code from the `/service-predict` directory:
 
 ```bash
 # activate virtual environment and install dependencies
 $ source venv.sh
 
-# Set PYTHONPATH to pwd
-$ export PYTHONPATH="$PWD"
+# Set PYTHONPATH to current path
+$ export PYTHONPATH="$PWD" # MacOS and Linux, for Windows see here: https://bic-berkeley.github.io/psych-214-fall-2016/using_pythonpath.html
 
 # run flask api
-$ python3 predict/__main__.py
+$ python3 app.py
+```
 
-# test via postman
-
+Finally, the function should be running at ```http://127.0.0.1:5000/predict```. You can test if it works by a POST request with the following body:
+```bash
+# test via postman, send the following body with POST
 {
     "lang_name":"java",
     "tok_ids":[34,22,45]
 }
-
 ```
-
-Finally, the function should be running at ```http://127.0.0.1:5000/```
 
 ## Running the function locally via Docker
 
 ```bash
 # build docker image
-$ docker build --tag <YOUR_DOCKER_HUBB_ID>/hack3rz-function-predict:v1.0.0 .
+$ docker build --tag <YOUR_DOCKER_HUB_ID>/hack3rz-service-predict:v1.0.0 .
 
 # run docker image
-$ docker run -p 7071:80 -it <YOUR_DOCKER_HUBB_ID>/hack3rz-function-predict:v1.0.0
+$ docker run -p 7071:5000 -it <YOUR_DOCKER_HUB_ID>/hack3rz-service-predict:v1.0.0
 ```
 
-Finally, the function should be running at ```http://localhost:7071/api/predict```
+Finally, the function should be running at ```http://127.0.0.1:7071/predict```

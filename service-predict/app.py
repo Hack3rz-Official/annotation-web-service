@@ -3,14 +3,10 @@ from model.SHModelUtils import SHModel
 from flask import Flask, Response, request 
 import json
 
-
-# only for testing purposes
 app = Flask(__name__)
-# only for testing purposes
-@app.route("/", methods=["POST", "GET"])
 
-
-def main():
+@app.route("/predict", methods=["POST"])
+def predict():
     supported_languages = ["java", "python3", "kotlin"]
     logging.info('Python HTTP trigger function processed a request.')
 
@@ -18,7 +14,7 @@ def main():
     try:
         req_body = request.get_json()
     except:
-        logging.error("Model error")
+        logging.error("Invalid body, not json")
         return Response("Invalid body, please provide json", status=400)
     else:
         lang_name = req_body.get('lang_name')
@@ -26,6 +22,7 @@ def main():
 
     # handle unsupported languages
     if lang_name not in supported_languages:
+        logging.error("Unsupported language")
         return Response(f"{lang_name} is an unsupported programming language", status=400)
 
     try:    
@@ -34,8 +31,7 @@ def main():
         model.setup_for_prediction()
         res = model.predict(tok_ids)
         return Response(json.dumps({'h_code_values': res}))
-    
-    except:
+    except Exception as e:
         logging.error("Model error: " + str(e))
         return Response("Model error: " + str(e), status=500)
     
