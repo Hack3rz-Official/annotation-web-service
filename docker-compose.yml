@@ -2,8 +2,15 @@ version: '3.8'
 
 services:
   annotation:
+    build: annotation-service
+    container_name: "AnnotationService"
+    image: annotation-service:latest
+    ports:
+      - "8080:8080"
+      
+  prediction:
     build: service-predict
-    container_name: "ServicePredict"
-    image: service-predict:latest
+    container_name: "PredictionService"
+    image: prediction-service:latest
     ports:
       - "7071:5000"
