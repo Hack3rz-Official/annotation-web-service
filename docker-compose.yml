@@ -7,3 +7,10 @@ services:
     image: annotation-service:latest
     ports:
       - "8080:8080"
+      
+  prediction:
+    build: service-predict
+    container_name: "PredictionService"
+    image: prediction-service:latest
+    ports:
+      - "7071:5000"
