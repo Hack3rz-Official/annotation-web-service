@@ -2,15 +2,29 @@ version: '3.8'
 
 services:
   annotation:
-    build: annotation-service
-    container_name: "AnnotationService"
+    build: ./annotation-service
+    container_name: "annotation-service"
     image: annotation-service:latest
-    ports:
-      - "8080:8080"
-      
+    platform: linux/amd64
+    networks:
+      aws-network:
+
   prediction:
-    build: service-predict
-    container_name: "PredictionService"
+    build: ./service-predict
+    container_name: "prediction-service"
     image: prediction-service:latest
+    platform: linux/amd64
+
+  api-gateway:
+    container_name: "api-gateway"
+    image: api-gateway:latest
+    build: ./web-api
+    command: npm run start:prod
     ports:
-      - "7071:5000"
+      - "3000:3000"
+    networks:
+      - aws-network
+    restart: unless-stopped
+
+networks:
+  aws-network:
