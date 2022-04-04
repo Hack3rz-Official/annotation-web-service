@@ -1,0 +1,9 @@
+version: '3.8'
+
+services:
+  annotation:
+    build: service-predict
+    container_name: "ServicePredict"
+    image: service-predict:latest
+    ports:
+      - "7071:5000"
