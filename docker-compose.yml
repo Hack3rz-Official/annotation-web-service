@@ -2,15 +2,46 @@ version: '3.8'
 
 services:
   annotation:
-    build: annotation-service
-    container_name: "AnnotationService"
+    build: ./annotation-service
+    container_name: "annotation-service"
     image: annotation-service:latest
+    platform: linux/amd64
+    env_file:
+      - .env
     ports:
       - "8080:8080"
-      
+    depends_on:
+      - mongodb
+    networks:
+      - aws-network
+
   prediction:
-    build: service-predict
-    container_name: "PredictionService"
+    build: ./service-predict
+    container_name: "prediction-service"
     image: prediction-service:latest
+    platform: linux/amd64
     ports:
       - "7071:5000"
+    networks:
+      - aws-network
+
+  mongodb:
+    image: mongo:5.0.6
+    container_name: MongoDB
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - MONGO_INITDB_ROOT_USERNAME=admin
+      - MONGO_INITDB_ROOT_PASSWORD=${MONGO_PASSWORD}
+    env_file:
+      - .env
+    restart: unless-stopped
+    volumes:
+      - './data:/data/db'
+      - ./mongo-init.sh:/docker-entrypoint-initdb.d/mongo-init.sh:ro
+    ports:
+      - "27017:${MONGO_PORT}"
+    networks:
+      - aws-network
+networks:
+  aws-network:
