@@ -30,7 +30,7 @@ public class AnnotationController {
     private AnnotationRepository repository;
 
     @PostMapping()
-    public String annotateCode(@RequestBody @Valid AnnotateCodeRequestDTO dto) {
+    public LTok[] annotateCode(@RequestBody @Valid AnnotateCodeRequestDTO dto) {
         log.info("Received a code annotation request for language: {}", dto.getLanguage());
 
         LTok[] lexingTokens = annotationService.annotateCode(dto.getCode(), dto.getLanguage());
@@ -52,6 +52,6 @@ public class AnnotationController {
 
         // TODO: if we run into performance issues we could asynchronously highlight / debug the code and return the lexing straight away
 
-        return annotationService.serializeLexingTokens(lexingTokens);
+        return lexingTokens;
     }
 }
