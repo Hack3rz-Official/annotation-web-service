@@ -10,7 +10,7 @@ FROM adoptopenjdk:11-jre-openj9
 
 RUN mkdir /app
 
-COPY --from=build /home/gradle/src/build/libs/*.jar /app/spring-boot-application.jar
+COPY --from=build /home/gradle/src/build/libs/annotation-service-0.0.1-SNAPSHOT.jar /app/spring-boot-application.jar
 
 ENTRYPOINT ["java", "-XX:+UnlockExperimentalVMOptions", "-XX:+UseCGroupMemoryLimitForHeap", "-jar", "/app/spring-boot-application.jar"]
 
