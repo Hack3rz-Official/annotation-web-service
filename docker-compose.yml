@@ -25,6 +25,17 @@ services:
     networks:
       - aws-network
 
+  api-gateway:
+    container_name: "api-gateway"
+    image: api-gateway:latest
+    build: ./web-api
+    command: npm run start:prod
+    ports:
+      - "3000:3000"
+    networks:
+      - aws-network
+    restart: unless-stopped
+  
   mongodb:
     image: mongo:5.0.6
     container_name: MongoDB
@@ -43,5 +54,7 @@ services:
       - "27017:${MONGO_PORT}"
     networks:
       - aws-network
+
+
 networks:
   aws-network:
