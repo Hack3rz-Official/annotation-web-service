@@ -1,13 +1,12 @@
 package com.hack3rz.annotationservice.model;
 
 import com.hack3rz.annotationservice.enumeration.SupportedLanguage;
-import lexer.HTok;
-import lexer.LTok;
 import lombok.*;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.util.Date;
+import java.util.List;
 
 @Getter
 @Setter
@@ -21,8 +20,8 @@ public class Annotation {
     private String id;
 
     private String sourceCode;
-    private LTok[] lexingTokes;
-    private HTok[] highlightingTokens;
+    private List<Integer> lexingTokes;
+    private List<Integer> highlightingTokens;
 
     private String highlightingCode;
 

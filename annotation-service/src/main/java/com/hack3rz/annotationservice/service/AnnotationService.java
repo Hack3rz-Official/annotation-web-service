@@ -13,6 +13,7 @@ import resolver.Python3Resolver;
 import resolver.Resolver;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.stream.Collectors;
 
 import static com.hack3rz.annotationservice.enumeration.SupportedLanguage.KOTLIN;
@@ -26,7 +27,7 @@ import static org.springframework.http.HttpStatus.BAD_REQUEST;
 public class AnnotationService {
     private static final Logger log = LoggerFactory.getLogger(AnnotationService.class);
 
-    public LTok[] annotateCode(String code, SupportedLanguage language) {
+    public LTok[] lexCode(String code, SupportedLanguage language) {
         log.info("Received code to annotate...");
 
         Resolver resolver = getResolverByLanguage(language);
@@ -78,13 +79,12 @@ public class AnnotationService {
         return htmlCode;
     }
 
-    public String serializeLexingTokens(LTok[] lToks) {
-        return Arrays.stream(lToks).map(this::mapLTok).collect(Collectors.joining(", "));
+    public List<Integer> pluckTokenIds(LTok[] lToks) {
+        return Arrays.stream(lToks).map(lTok -> lTok.tokenId).collect(Collectors.toList());
     }
 
-    public String serializeHighlightTokens(HTok[] hToks) {
-        // TODO: check appropriate format for it
-        return Arrays.stream(hToks).map(this::mapLTok).collect(Collectors.joining(", "));
+    public List<Integer> pluckHCodeValues(HTok[] hToks) {
+        return Arrays.stream(hToks).map(hTok -> hTok.hCodeValue).collect(Collectors.toList());
     }
 
     private Resolver getResolverByLanguage(SupportedLanguage language) {
