@@ -36,6 +36,22 @@ services:
       - aws-network
     restart: unless-stopped
   
+  training:
+    build: ./service-train
+    container_name: "training-service"
+    image: training-service:latest
+    platform: linux/amd64
+    env_file:
+      - .env
+    ports:
+      - "6061:5000"
+    volumes:
+      - './data:/data/db'
+    depends_on:
+      - mongodb
+    networks:
+      - aws-network
+
   mongodb:
     image: mongo:5.0.6
     container_name: MongoDB
@@ -54,7 +70,6 @@ services:
       - "27017:${MONGO_PORT}"
     networks:
       - aws-network
-
 
 networks:
   aws-network:
