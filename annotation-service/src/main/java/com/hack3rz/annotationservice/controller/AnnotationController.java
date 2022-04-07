@@ -16,6 +16,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
 
+import java.util.Date;
+
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
 @RestController
@@ -33,7 +35,9 @@ public class AnnotationController {
     public LTok[] annotateCode(@RequestBody @Valid AnnotateCodeRequestDTO dto) {
         log.info("Received a code annotation request for language: {}", dto.getLanguage());
 
-        LTok[] lexingTokens = annotationService.annotateCode(dto.getCode(), dto.getLanguage());
+        // TODO: refactor logic into service so controller stays slim
+
+        LTok[] lexingTokens = annotationService.lexCode(dto.getCode(), dto.getLanguage());
         HTok[] highlightingTokens = annotationService.highlightCode(dto.getCode(), dto.getLanguage());
 
         // only for debugging purposes and to compare our solution to the java highlighter
@@ -43,9 +47,10 @@ public class AnnotationController {
         Annotation annotation = Annotation.builder()
                 .sourceCode(dto.getCode())
                 .language(dto.getLanguage())
-                .lexingTokes(lexingTokens)
-                .highlightingTokens(highlightingTokens)
+                .lexingTokes(annotationService.pluckTokenIds(lexingTokens))
+                .highlightingTokens(annotationService.pluckHCodeValues(highlightingTokens))
                 .highlightingCode(htmlCode)
+                .timestamp(new Date())
                 .build();
 
         repository.save(annotation);
