@@ -43,6 +43,15 @@ Regularily, the `Service Train` will be triggered to train the underlying predic
 ## Demo
 Here comes the demo page.
 
+## MongoDB
+The MongoDB is launched as a separate container. The credentials are stored within the environment of the other containers, so they can access it.
+A folder `data` in the project root is mounted as a volume for the database. 
+When the container is launched initially a new database and user are created with the credentials from the environment file.
+
+### Testing the connection
+Make sure the mongodb container is running. Connect to the CLI of the container and use the following command to access the DB:
+`mongo --username "$MONGO_USERNAME" --password "$MONGO_PASSWORD"`
+
 ## Organization
 
  
