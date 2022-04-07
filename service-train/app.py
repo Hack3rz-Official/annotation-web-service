@@ -5,6 +5,8 @@ from flask_mongoengine import MongoEngine
 from sklearn.utils import shuffle
 import numpy as np
 import os
+import pickle
+import datetime
 
 app = Flask(__name__)
 app.config['MONGODB_SETTINGS'] = {
@@ -18,6 +20,16 @@ app.config['MONGODB_SETTINGS'] = {
 db = MongoEngine()
 db.init_app(app)
 
+
+class Model(db.Document):
+    file = db.FileField()
+    language = db.StringField()
+    createdTime = db.DateTimeField(default=datetime.datetime.now())
+    meta = {
+        'collection': 'models',
+        'strict': False
+    }
+
 class Annotation(db.Document):
     sourceCode = db.StringField()
     lexingTokes = db.ListField()
@@ -28,6 +40,7 @@ class Annotation(db.Document):
         'collection': 'annotations',
         'strict': False
     }
+
     def to_json(self):
         return {
             "sourceCode": self.sourceCode,
@@ -39,53 +52,76 @@ class Annotation(db.Document):
 
 @app.route('/train', methods=['GET'])
 def train():
-    logging.info('[TRAIN] training started')
+    print("Hello? Anyone there?", flush=True)
+    
+    supported_languages = ["java"]
+    for lang_name in supported_languages:
+        X = np.array([])
+        T = np.array([])
 
-    supported_languages = ["java", "python3", "kotlin"]
-    for language in supported_languages:
-        training_batch = Annotation.objects(language=language)
-        logging.info('[TRAIN] data loaded')
+        """
+        if len(training_batch) < os.environ.get('TRAINING_BATCH_SIZE'):
+            continue
+        """
 
-        # TODO. data preprocessing
-        improve_model(X, T)
+        annotations = Annotation.objects(language=lang_name.upper())
+        for sample in annotations:
+            X = np.append(X, sample.lexingTokes)
+            T = np.append(T, sample.highlightingTokens)
+
+        improve_model(X, T, lang_name)
+
+    return Response(status=200)
 
 
-    # TODO: ?? DEV BRANCH??
-    # TODO: ?? objects(batch==None), fetch only not already trained (db attribute)
-    # TODO: ?? where does the duplication check takes place? (primary key is id, why not lexing? or tokIds probably?)
-    annotation_batch = Annotation.objects()
-    logging.info('[TRAIN] data loaded')
-    # TODO: split data
+def load_cur_model_from_db(lang_name):
+    cur_model = Model.objects(language=lang_name).order_by('createdTime').first()
+    if cur_model:
+        print(cur_model.createdTime, flush=True)
+        model_name = "cur"
+        with open(lang_name + "_" + model_name +".pt", "wb") as file:
+            cur_model_file = cur_model.file.read()
+            file.write(cur_model_file)
 
-    # TODO: ?? train and validate model (extract tokenIds and hValues)
-    # TODO: load existing model and compare accuracy
-    # TODO: store new model on DB if validation is better
-    return jsonify([annotation.to_json() for annotation in annotation_batch])
+    return SHModel(lang_name, model_name)
 
-def improve_model(X, T):
+def save_model_to_db(lang_name):
+    model = Model(language=lang_name)
+    model_name = "cur"
+    with open(lang_name + "_" + model_name + ".pt", "rb") as binary_file:
+        model.file.put(binary_file)
+        
+    model.save()
+
+def improve_model(X, T, lang_name):
     X_train, T_train, X_val, T_val = split_data(X, T)
-    X_train, T_train = shuffle_data(X_train, T_train)
+
+    cur_model = load_cur_model_from_db(lang_name)
+    cur_acc = accuracy(cur_model, X_val, T_val)
     train(X_train, T_train)
-    new_acc = accuracy(X_val, T_val)
-    print(new_acc)
+    new_acc = accuracy(cur_model, X_val, T_val)
 
-    # curr_acc = accuracy(X_val, T_val)
+    if new_acc > cur_acc:
+        cur_model.persist_model()
+        print('stored new model to db', flush=True)
+        save_model_to_db(lang_name)
+        return
+    
+    print('do NOT store new model to db', flush=True)
 
-    if new_acc > curr_acc:
-        return True
-
-def train(X, T, model, epochs=10):
+def train(X_train, T_train, model, epochs=10):
+    X_train, T_train = shuffle_data(X_train, T_train)
     model.setup_for_finetuning()
     losses = np.array([])
     for epoch in range(epochs):
-        print(f'Loading {epoch+1}0%')
+        print(f'Loading {epoch+1}0%', flush=True)
         epoch_losses = np.array([])
-        for idx, x in enumerate(X):
-            epoch_loss = model.finetune_on(x, T[idx])
+        for idx, x in enumerate(X_train):
+            epoch_loss = model.finetune_on(x, T_train[idx])
             epoch_losses = np.append(epoch_losses, epoch_loss)
         avg_epoch_loss = np.mean(epoch_losses)
         losses = np.append(losses, avg_epoch_loss)
-        print(f'Average Loss {avg_epoch_loss} in epoch {epoch+1}')
+        print(f'Average Loss {avg_epoch_loss} in epoch {epoch+1}', flush=True)
     return losses
 
 def shuffle_data(X, T):
@@ -111,82 +147,18 @@ def split_data(X, T, train_percentage=0.8):
     logging.info('[TRAIN] data splitted')
     return X_train, T_train, X_val, T_val
 
+def accuracy(model, X, T):
+    model.setup_for_prediction()
+    correct = 0
+    total = 0
+    for idx, x in enumerate(X):
+        h_codes = model.predict(x)  # [2,3,4,6]
+        for j, h_code in enumerate(h_codes):
+            if h_code == T[idx][j]:
+                correct += 1
+            total += 1
 
-"""
-
-def get_db():
-    client = MongoClient(host=os.environ.get('MONGODB_HOST', 'localhost'),
-                         port=int(os.environ.get('MONGO_PORT')),
-                         username=os.environ.get('MONGO_USERNAME'),
-                         password=os.environ.get('MONGO_PASSWORD'),
-                         authSource=os.environ.get('MONGO_AUTH_DATABASE'))
-    db = client[os.environ.get('MONGO_DATABASE_NAME')]
-    return db
-
-@app.route('/')
-def ping_server():
-    return "Welcome to the world of animals."
-
-@app.route('/animals')
-def get_stored_animals():
-    db = get_db()
-    res = db.palma.find()
-    return Response(json.dumps({'h_code_values': res}))
-
-
-
-app.config['MONGODB_SETTINGS'] = {
-    'db': os.environ.get('MONGO_DATABASE_NAME'),
-    'host': os.environ.get('MONGO_HOST'),
-    'port': int(os.environ.get('MONGO_PORT'))
-}
-db = MongoEngine()
-db.init_app(app)
-
-class Palma(db.Document):
-    sourceCode = db.StringField()
-    lexingTokes = db.StringField()
-    highlightingTokens = db.StringField()
-    highlightingCode = db.StringField()
-
-@app.route("/train", methods=["GET"])
-def train():
-    logging.info("train")
-    print(Palma.objects().first())
-    print(Palma.objects(sourceCode="public static void main(String[] args) {} ").first())
-
-    return Response(status=200)
-
-
-    supported_languages = ["java", "python3", "kotlin"]
-    logging.info('Python HTTP trigger function processed a request.')
-
-    # deserialize
-    try:
-        req_body = request.get_json()
-        lang_name = req_body.get('lang_name')
-        tok_ids = req_body.get('tok_ids')
-    except Exception as e:
-        logging.error("Invalid body, not json" + str(e))
-        return Response("Invalid body, please provide json", status=400)
-
-    # handle unsupported languages
-    if lang_name not in supported_languages:
-        logging.error("Unsupported language")
-        return Response(f"{lang_name} is an unsupported programming language", status=400)
-
-    try:    
-        # predict
-        model = SHModel(lang_name, "curr")
-        model.setup_for_prediction()
-        res = model.predict(tok_ids)
-        return Response(json.dumps({'h_code_values': res}))
-    except Exception as e:
-        logging.error("Model error: " + str(e))
-        return Response("Model error: " + str(e), status=500)
-
-"""
-    
+    return correct/total
 
 if __name__ == "__main__":
     app.run(debug=True)
