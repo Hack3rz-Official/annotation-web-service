@@ -5,7 +5,6 @@ from flask_mongoengine import MongoEngine
 from sklearn.utils import shuffle
 import numpy as np
 import os
-import pickle
 import datetime
 
 app = Flask(__name__)
@@ -20,6 +19,7 @@ app.config['MONGODB_SETTINGS'] = {
 db = MongoEngine()
 db.init_app(app)
 
+MODEL_NAME = "cur"
 
 class Model(db.Document):
     file = db.FileField()
@@ -51,44 +51,51 @@ class Annotation(db.Document):
         }
 
 @app.route('/train', methods=['GET'])
-def train():
-    print("Hello? Anyone there?", flush=True)
-    
+def train():    
+    print("[TRAIN] ### TRAINING STARTED ### ", flush=True)
+
     supported_languages = ["java"]
     for lang_name in supported_languages:
-        X = np.array([])
-        T = np.array([])
+        print("[TRAIN] Starting model training for " + lang_name, flush=True)
 
-        """
-        if len(training_batch) < os.environ.get('TRAINING_BATCH_SIZE'):
+        training_data = Annotation.objects(language=lang_name.upper())
+        print("[TRAIN] Training data loaded from DB: " + str(len(training_data)), flush=True)
+
+        if len(training_data) < int(os.environ.get('TRAINING_BATCH_SIZE')):
+            print("[TRAIN] Not enough data to train model", flush=True)
             continue
-        """
-
-        annotations = Annotation.objects(language=lang_name.upper())
-        for sample in annotations:
-            X = np.append(X, sample.lexingTokes)
-            T = np.append(T, sample.highlightingTokens)
+        
+        # data preprocessing
+        X = []
+        T = []
+        for sample in training_data:
+            X.append(sample.lexingTokes)
+            T.append(sample.highlightingTokens)
+        X = np.array(X, dtype=object)
+        T = np.array(T, dtype=object)
 
         improve_model(X, T, lang_name)
 
+    print("[TRAIN] ### TRAINING DONE ### ", flush=True)
     return Response(status=200)
 
 
 def load_cur_model_from_db(lang_name):
-    cur_model = Model.objects(language=lang_name).order_by('createdTime').first()
+    cur_model = Model.objects(language=lang_name).order_by('-createdTime').first()
     if cur_model:
-        print(cur_model.createdTime, flush=True)
-        model_name = "cur"
-        with open(lang_name + "_" + model_name +".pt", "wb") as file:
+        print(f"[SHModel] Newest Model loaded from DB with createdTime {cur_model.createdTime}", flush=True)
+        with open(lang_name + "_" + MODEL_NAME + ".pt", "wb") as file:
             cur_model_file = cur_model.file.read()
             file.write(cur_model_file)
+    else:
+        print("[SHModel] No model found in DB, creating new model", flush=True)
 
-    return SHModel(lang_name, model_name)
+    return SHModel(lang_name, MODEL_NAME)
 
 def save_model_to_db(lang_name):
+    print("[TRAIN] New Model saved from directory to DB ", flush=True)
     model = Model(language=lang_name)
-    model_name = "cur"
-    with open(lang_name + "_" + model_name + ".pt", "rb") as binary_file:
+    with open(lang_name + "_" + MODEL_NAME + ".pt", "rb") as binary_file:
         model.file.put(binary_file)
         
     model.save()
@@ -98,20 +105,22 @@ def improve_model(X, T, lang_name):
 
     cur_model = load_cur_model_from_db(lang_name)
     cur_acc = accuracy(cur_model, X_val, T_val)
-    train(X_train, T_train)
+    train(cur_model, X_train, T_train)
     new_acc = accuracy(cur_model, X_val, T_val)
 
+    print(f"new_acc = {new_acc} and cur_acc = {cur_acc}, ", flush=True)
     if new_acc > cur_acc:
+        print("[SHModel] Persisting model to directory ", flush=True)
         cur_model.persist_model()
-        print('stored new model to db', flush=True)
         save_model_to_db(lang_name)
         return
     
-    print('do NOT store new model to db', flush=True)
+    print("[TRAIN] No improvement: do nothing", flush=True)
 
-def train(X_train, T_train, model, epochs=10):
-    X_train, T_train = shuffle_data(X_train, T_train)
+
+def train(model, X_train, T_train, epochs=10):
     model.setup_for_finetuning()
+    X_train, T_train = shuffle_data(X_train, T_train)
     losses = np.array([])
     for epoch in range(epochs):
         print(f'Loading {epoch+1}0%', flush=True)
@@ -125,14 +134,13 @@ def train(X_train, T_train, model, epochs=10):
     return losses
 
 def shuffle_data(X, T):
-    logging.info('[TRAIN] shuffling data...')
+    print("[TRAIN] shuffling data...", flush=True)
     assert len(X) == len(T)
     shuffle(X, T, random_state=0)
-    logging.info('[TRAIN] data shhuffled')
     return X, T
 
 def split_data(X, T, train_percentage=0.8):
-    logging.info('[TRAIN] splitting data...')
+    print("[TRAIN] splitting data...", flush=True)
     N = X.shape[0]  
     train_size = int(train_percentage * N) 
     
@@ -144,7 +152,6 @@ def split_data(X, T, train_percentage=0.8):
     assert X_train.shape[0] == T_train.shape[0]
     assert X_val.shape[0] == T_val.shape[0]
 
-    logging.info('[TRAIN] data splitted')
     return X_train, T_train, X_val, T_val
 
 def accuracy(model, X, T):

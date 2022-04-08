@@ -47,7 +47,7 @@ public class AnnotationController {
         Annotation annotation = Annotation.builder()
                 .sourceCode(dto.getCode())
                 .language(dto.getLanguage())
-                .lexingTokes(annotationService.pluckTokenIds(lexingTokens))
+                .lexingTokes(annotationService.pluckTokenIds(highlightingTokens))
                 .highlightingTokens(annotationService.pluckHCodeValues(highlightingTokens))
                 .highlightingCode(htmlCode)
                 .timestamp(new Date())

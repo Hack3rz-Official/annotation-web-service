@@ -137,8 +137,6 @@ class SHModel:
             is_bidirectional=self._is_bidirectional
         )
         if os.path.exists(self._module_path):
-            print("LOADING MODEL ", flush=True)
-            print(os.getcwd(), flush=True)
             self._model.load_state_dict(torch.load(self._module_path, map_location='cpu'))
         else:
             self.persist_model()
@@ -152,8 +150,6 @@ class SHModel:
         loadable from disk during the initialisation of a SHModel object, for the same
         lang_name and model_name values.
         """
-        print("PERSISTING MODEL ", flush=True)
-        print(os.getcwd(), flush=True)
         self._model.zero_grad()
         torch.save(self._model.state_dict(), self._module_path)
 
