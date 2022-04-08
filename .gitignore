@@ -6,3 +6,4 @@
 # no predict model files
 *.pt
 /data
+*.pyc
