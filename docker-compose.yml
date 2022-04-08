@@ -22,9 +22,9 @@ services:
       - aws-network
 
   api-gateway:
+    build: ./web-api
     container_name: "api-gateway"
     image: api-gateway:latest
-    build: ./web-api
     command: npm run start:prod
     ports:
       - "3000:3000"

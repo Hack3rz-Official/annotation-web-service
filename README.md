@@ -22,9 +22,9 @@ Under the hood, the Annotation WebService consists of the following independent 
 
 | Microservice             | Description                                                                | Technology |
 |--------------------|----------------------------------------------------------------------------|------------|
-| [Service Annotation]() | Handles the lexing and highlighting of code. | Java with [Spring Boot](https://github.com/spring-projects/spring-boot)|
-| [Service Predict]()  | Handles the prediction of syntax highlighting.         | Python with [Flask](https://github.com/pallets/flask) |
-| [Service Train]()   | Handles the regularily conducted training and exchange of the underlying prediction models.         | Python with [Flask](https://github.com/pallets/flask) |
+| [Annotation Service]() | Handles the lexing and highlighting of code. | Java with [Spring Boot](https://github.com/spring-projects/spring-boot)|
+| [Prediction Service]()  | Handles the prediction of syntax highlighting.         | Python with [Flask](https://github.com/pallets/flask) |
+| [Training Service]()   | Handles the regularily conducted training and exchange of the underlying prediction models.         | Python with [Flask](https://github.com/pallets/flask) |
 | [Web API]()          | The web API that acts as the primary entry point for the customers.        | JS/TS with [Nest.js](https://github.com/nestjs/nest) |
 
 
@@ -34,11 +34,11 @@ The following illustration depicts the flow of the Annotation WebService.
 ![Architecture](./architecture.png)
 
 After having called the `Web API` with code to be syntax highlighted, the following will be processed:
-1. The code will be lexed and highlighted. This is done by the `Service Annotate` microservice. The lexed code will be returned to the `Web API` whereas the highlighted code will be stored on the Training Database.
-2. The `Web API` will then forward the `tok_ids` extracted from the lexed code to the `Service Predict` microservice where the syntax highlighting is beeing predicted. The predicted syntax highlighting will be returned to the `Web API`.
+1. The code will be lexed and highlighted. This is done by the `Annotation Service` microservice. The lexed code will be returned to the `Web API` whereas the highlighted code will be stored on the Training Database.
+2. The `Web API` will then forward the `tok_ids` extracted from the lexed code to the `Prediction Service` microservice where the syntax highlighting is beeing predicted. The predicted syntax highlighting will be returned to the `Web API`.
 3. Having received the predicted `h_code_values` the `Web API` will create a json file with the highlighted code which will be returned to the caller.
 
-Regularily, the `Service Train` will be triggered to train the underlying prediction models. First, it will load training data from the Training Database. Then, it will train the underlying prediction models with 80% of the data and validate the improved model with the remaining 20% of the data. If the loss is smaller on the new model than the old one, the new model will be saved. Every time the `Service Predict` is invoked, the new best model will be loaded and used for the prediction.
+Regularily, the `Training Service` will be triggered to train the underlying prediction models. First, it will load training data from the Training Database. Then, it will train the underlying prediction models with 80% of the data and validate the improved model with the remaining 20% of the data. If the loss is smaller on the new model than the old one, the new model will be saved. Every time the `Prediction Service` is invoked, the new best model will be loaded and used for the prediction.
 
 ## Demo
 Here comes the demo page.
