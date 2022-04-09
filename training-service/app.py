@@ -1,11 +1,12 @@
 import logging
-from model.SHModelUtils import SHModel
-from flask import Flask, Response, request, jsonify
-from flask_mongoengine import MongoEngine
-from sklearn.utils import shuffle
 import numpy as np
 import os
 import datetime
+from model.SHModelUtils import SHModel
+from flask import Flask, Response, request, jsonify
+from flask_mongoengine import MongoEngine
+from apscheduler.schedulers.background import BackgroundScheduler
+from sklearn.utils import shuffle
 
 app = Flask(__name__)
 app.config['MONGODB_SETTINGS'] = {
@@ -41,17 +42,12 @@ class Annotation(db.Document):
         'strict': False
     }
 
-    def to_json(self):
-        return {
-            "sourceCode": self.sourceCode,
-            "lexingTokes": self.lexingTokes,
-            "highlightingTokens": self.highlightingTokens,
-            "highlightingCode": self.highlightingCode,
-            "language": self.language
-        }
-
 @app.route('/train', methods=['GET'])
 def train():    
+    train_models()
+    return Response(status=200)
+
+def train_models():
     print("[TRAIN] ### TRAINING STARTED ### ", flush=True)
 
     supported_languages = ["java"]
@@ -64,7 +60,7 @@ def train():
         if len(training_data) < int(os.environ.get('TRAINING_BATCH_SIZE')):
             print("[TRAIN] Not enough data to train model", flush=True)
             continue
-        
+
         # data preprocessing
         X = []
         T = []
@@ -77,8 +73,6 @@ def train():
         improve_model(X, T, lang_name)
 
     print("[TRAIN] ### TRAINING DONE ### ", flush=True)
-    return Response(status=200)
-
 
 def load_cur_model_from_db(lang_name):
     cur_model = Model.objects(language=lang_name).order_by('-createdTime').first()
@@ -166,6 +160,15 @@ def accuracy(model, X, T):
             total += 1
 
     return correct/total
+
+
+def training_service():
+    print("Training Service is alive!", flush=True)
+    train_models()
+
+sched = BackgroundScheduler(daemon=True)
+sched.add_job(training_service, 'interval', minutes=5)
+sched.start()
 
 if __name__ == "__main__":
     app.run(debug=True)

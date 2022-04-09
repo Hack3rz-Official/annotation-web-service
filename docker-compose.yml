@@ -14,7 +14,7 @@ services:
       - aws-network
 
   prediction:
-    build: ./service-predict
+    build: ./prediction-service
     container_name: "prediction-service"
     image: prediction-service:latest
     platform: linux/amd64
@@ -22,9 +22,9 @@ services:
       - aws-network
 
   api-gateway:
+    build: ./web-api
     container_name: "api-gateway"
     image: api-gateway:latest
-    build: ./web-api
     command: npm run start:prod
     ports:
       - "3000:3000"
@@ -33,7 +33,7 @@ services:
     restart: unless-stopped
   
   training:
-    build: ./service-train
+    build: ./training-service
     container_name: "training-service"
     image: training-service:latest
     platform: linux/amd64
