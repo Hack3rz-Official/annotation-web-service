@@ -1,7 +1,7 @@
 <script setup>
 import { onMounted, ref, watch } from "vue";
 import axios from "axios";
-import { useRandomCode } from './../composables/useRandomCode'
+import { useRandomCode } from '../composables/useRandomCode'
 
 const inputCode = ref("public static void main(String[] args) {}");
 const languageOptions = ref(["java", "python3", "kotlin"]);
