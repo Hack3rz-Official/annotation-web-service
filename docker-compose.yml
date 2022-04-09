@@ -55,6 +55,14 @@ services:
     networks:
       - aws-network
 
+  demo-frontend:
+    container_name: "demo-frontend"
+    image: demo-frontend:latest
+    build: ./demo-frontend
+    ports:
+      - "8081:8080"
+    networks:
+      - aws-network
 
 networks:
   aws-network:
