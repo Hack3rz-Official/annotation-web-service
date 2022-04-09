@@ -1,7 +1,7 @@
 <script setup>
 import { onMounted, ref, watch } from "vue";
 import axios from "axios";
-import { useRandomCode } from '../composables/useRandomCode'
+import { useRandomCode } from "../composables/useRandomCode";
 
 const inputCode = ref("public static void main(String[] args) {}");
 const languageOptions = ref(["java", "python3", "kotlin"]);
@@ -16,8 +16,10 @@ watch(selectedLanguage, async (newSelectedLanguage, oldSelectedLanguage) => {
 });
 
 watch(inputCode, async (newInputCode, oldInputCode) => {
-  if (isLoading.value) { return }
-  highlight()
+  if (isLoading.value) {
+    return;
+  }
+  highlight();
 });
 
 function highlight() {
@@ -54,15 +56,22 @@ onMounted(() => {
         e.preventDefault();
         var start = this.selectionStart;
         var end = this.selectionEnd;
-
         // set textarea value to: text before caret + tab + text after caret
         this.value =
           this.value.substring(0, start) + "\t" + this.value.substring(end);
-
         // put caret at right position again
         this.selectionStart = this.selectionEnd = start + 1;
       }
     });
+    
+  let codeOutputElement = document.getElementById("code-output");
+  let codeInputElement = document.getElementById("code-input");
+  codeInputElement.addEventListener("scroll", () => {
+    codeOutputElement.scrollLeft = codeInputElement.scrollLeft;
+    codeOutputElement.scrollTop = codeInputElement.scrollTop;
+    // NOTE: the synching of the scroll is not always precise and may lag one letter behind
+    // console.log(codeInputElement.scrollLeft + '<->' + codeOutputElement.scrollLeft);
+  });
 });
 
 function loadRandomCode() {
@@ -74,9 +83,8 @@ function loadRandomCode() {
 
 <template>
   <main class="container mx-auto px-3 gap-y-3">
-    <!-- <h1 class="text-2xl py-4">Syntax Highlighting</h1> -->
     <p class="py-6 text-xl">
-      Frontend Demo for the Annotation Web Service enabling fast code syntax
+      Frontend Demo for the Annotation Web Service enabling realtime syntax
       highlighting. <br />
       Supported languages are Java, Python3 and Kotlin.
     </p>
@@ -97,35 +105,20 @@ function loadRandomCode() {
           {{ language }}
         </option>
       </select>
-      <!-- <div
-        class="
-          border-2
-          p-2
-          border-1
-          bg-cyan-800
-          text-white
-          hover:bg-cyan-600 hover:text-white
-          cursor-pointer
-        "
-        @click="loadRandomCode"
-      >
-        Load random code snippet
-      </div> -->
     </div>
 
-    <div class="flex flex-col gap-4 content-center w-full xl:flex-row">
+    <div class="code-wrapper relative">
       <textarea
         id="code-input"
         name="code-input"
-        rows="10"
+        wrap="off"
         class="
-          bg-white
           border-2 border-cyan-800
           p-2
-          w-full
           resize-none
           font-mono
-          h-96
+          hide-text-show-caret
+          absolute
         "
         v-model="inputCode"
       ></textarea>
@@ -133,8 +126,34 @@ function loadRandomCode() {
       <div
         id="code-output"
         name="code-output"
-        class="bg-slate-50 border-2 border-cyan-800 p-2 w-full h-96 overflow-auto"
+        class="
+          border-2 border-cyan-800
+          p-2
+          absolute
+          pointer-events-none
+          overflow-x-scroll
+        "
       ></div>
     </div>
   </main>
 </template>
+
+<style>
+.hide-text-show-caret {
+  color: black; /* sets the color of both caret and text */
+  -webkit-text-fill-color: transparent; /* sets just the text color */
+}
+
+#code-input,
+#code-output {
+  width: 100%;
+  height: 600px;
+}
+#code-input {
+  z-index: 0;
+}
+#code-output {
+  z-index: 1;
+}
+</style>
+
