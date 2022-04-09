@@ -31,6 +31,20 @@ services:
     networks:
       - aws-network
     restart: unless-stopped
+  
+  training:
+    build: ./service-train
+    container_name: "training-service"
+    image: training-service:latest
+    platform: linux/amd64
+    env_file:
+      - .env
+    ports:
+      - "6061:5000"
+    volumes:
+      - './data:/data/db'
+    networks:
+      - aws-network
     environment:
       - SERVICE_PORT=3000
       - LEX_URL=http://annotation:8080/api/annotate
@@ -38,6 +52,7 @@ services:
     depends_on:
       - annotation
       - prediction
+      - mongodb
 
   mongodb:
     image: mongo:5.0.6
