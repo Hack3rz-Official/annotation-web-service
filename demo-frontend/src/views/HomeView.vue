@@ -1,14 +1,21 @@
 <script setup>
-import { ref } from 'vue'
+import { ref } from "vue";
+import axios from "axios";
 
-const inputCode = ref('public static void main(String[] args) {}')
-const outputCode = ref('')
+const inputCode = ref("public static void main(String[] args) {}");
+const outputCode = ref("");
 
 function highlight() {
-  // TODO: do API call
+  let data = {
+    code: "public static void main(String[] args) {}",
+    language: "java",
+  };
+  axios.post("http://localhost:3000/highlight", data).then((response) => {
+    console.log(response.data);
+  });
 
-  let response = 'this is the response';
-  outputCode.value = response
+  let response = "this is the response";
+  outputCode.value = response;
 }
 </script>
 
@@ -36,9 +43,17 @@ function highlight() {
           <option value="python">Python</option>
           <option value="kotlin">Kotlin</option>
         </select>
-        <p 
-          class="text-center w-min p-2 mx-auto border-2 border-orange-500 cursor-pointer"
-          @click="highlight">
+        <p
+          class="
+            text-center
+            w-min
+            p-2
+            mx-auto
+            border-2 border-orange-500
+            cursor-pointer
+          "
+          @click="highlight"
+        >
           Highlight
         </p>
       </div>
