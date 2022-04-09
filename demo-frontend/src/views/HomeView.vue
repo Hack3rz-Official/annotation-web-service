@@ -4,18 +4,25 @@ import axios from "axios";
 
 const inputCode = ref("public static void main(String[] args) {}");
 const outputCode = ref("");
+const languageOptions = ref(["java", "python3", "kotlin"]);
+const selectedLanguage = ref("java");
 
 function highlight() {
   let data = {
-    code: "public static void main(String[] args) {}",
-    language: "java",
+    code: inputCode.value,
+    language: selectedLanguage.value,
   };
   axios.post("http://localhost:3000/highlight", data).then((response) => {
-    console.log(response.data);
-  });
+    // console.log(response.data);
 
-  let response = "this is the response";
-  outputCode.value = response;
+    let outputElem = document.getElementById("code-output");
+    outputElem.innerHTML = null;
+
+    let newElement = document
+      .createRange()
+      .createContextualFragment(response.data);
+    outputElem.appendChild(newElement);
+  });
 }
 </script>
 
@@ -38,10 +45,10 @@ function highlight() {
       ></textarea>
 
       <div class="flex justify-center gap-2 w-min mx-auto">
-        <select name="language-select" id="language-select">
-          <option value="java">Java</option>
-          <option value="python">Python</option>
-          <option value="kotlin">Kotlin</option>
+        <select name="language-select" id="language-select" v-model="selectedLanguage">
+          <option v-for="language in languageOptions" :key="language" :value="language">
+            {{ language }}
+          </option>
         </select>
         <p
           class="
@@ -58,14 +65,11 @@ function highlight() {
         </p>
       </div>
 
-      <textarea
+      <div
         id="code-output"
         name="code-output"
-        rows="10"
-        disabled
-        class="border-2 border-orange-400 p-2 w-full resize-none"
-        v-model="outputCode"
-      ></textarea>
+        class="border-2 border-orange-400 p-2 w-full"
+      ></div>
     </div>
   </main>
 </template>
