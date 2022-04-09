@@ -23,7 +23,7 @@ function highlight() {
     })
     .catch((error) => {
       console.log(error);
-      outputElem.innerHTML = 'Error in Highlighting Service'
+      outputElem.innerHTML = "Error in Highlighting Service";
     });
 }
 
@@ -81,11 +81,9 @@ onMounted(() => {
 <template>
   <main class="container mx-auto px-3 gap-y-3">
     <!-- <h1 class="text-2xl py-4">Syntax Highlighting</h1> -->
-    <p class="py-4">
-      Highlight your Java, Python and Kotlin code with our Annotation Web
-      Service. Highlight your Java, Python and Kotlin code with our Annotation
-      Web Service. Highlight your Java, Python and Kotlin code with our
-      Annotation Web Service.
+    <p class="py-6 text-lg">
+      Frontend Demo for the Annotation Web Service enabling fast code syntax highlighting. <br>
+      Supported languages are Java, Python3 and Kotlin. 
     </p>
 
     <div class="w-full flex flex-wrap justify-start gap-4 mb-4">
@@ -93,6 +91,12 @@ onMounted(() => {
       <select
         name="language-select"
         id="language-select"
+        class="
+            px-2
+            bg-cyan-800
+            text-white
+            hover:bg-cyan-600
+            hover:text-white"
         v-model="selectedLanguage"
       >
         <option
@@ -103,7 +107,18 @@ onMounted(() => {
           {{ language }}
         </option>
       </select>
-      <div class="border-2 p-2 cursor-pointer" @click="loadRandomCode">
+      <div
+        class="
+          border-2
+          p-2
+          border-1
+          bg-cyan-800
+          text-white
+          hover:bg-cyan-600 hover:text-white
+          cursor-pointer
+        "
+        @click="loadRandomCode"
+      >
         Load random code snippet
       </div>
     </div>
@@ -113,7 +128,7 @@ onMounted(() => {
         id="code-input"
         name="code-input"
         rows="10"
-        class="border-2 border-orange-400 p-2 w-full resize-none"
+        class="bg-white border-2 border-cyan-800 p-2 w-full resize-none"
         v-model="inputCode"
       ></textarea>
 
@@ -124,7 +139,9 @@ onMounted(() => {
             w-min
             p-2
             mx-auto
-            border-2 border-orange-500
+            bg-cyan-800
+            text-white
+            hover:bg-cyan-600 hover:text-white
             cursor-pointer
           "
           @click="highlight"
@@ -136,7 +153,7 @@ onMounted(() => {
       <div
         id="code-output"
         name="code-output"
-        class="border-2 border-orange-400 p-2 w-full"
+        class="bg-slate-50 border-2 border-cyan-800 p-2 w-full"
       ></div>
     </div>
   </main>
