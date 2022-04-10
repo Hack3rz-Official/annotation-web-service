@@ -1,0 +1,39 @@
+name: Deploy Lex Function
+on: [push]
+
+env:
+  AZURE_FUNCTIONAPP_NAME: hack3rz-functions-java
+  JAVA_VERSION: '11'
+  FUNCTION_NAME: function-lex
+
+jobs:
+  build-and-deploy:
+    runs-on: windows-latest
+    steps:
+      - name: 'Checkout GitHub Action'
+        uses: actions/checkout@v2
+
+      - name: Setup Java Sdk ${{ env.JAVA_VERSION }}
+        uses: actions/setup-java@v2
+        with:
+          java-version: ${{ env.JAVA_VERSION }}
+          distribution: 'microsoft'
+          cache: gradle
+
+      - name: Make Gradle executable
+        run: chmod +x ./gradlew
+        working-directory: function-lex
+
+      - name: 'Build function using gradle'
+        shell: bash
+        run: ./gradlew azureFunctionsPackageZip
+        working-directory: function-lex
+
+      - name: Deploy to Azure Function APP ${{ env.AZURE_FUNCTIONAPP_NAME }}
+        uses: Azure/functions-action@v1
+        id: fa
+        with:
+          app-name: ${{ env.AZURE_FUNCTIONAPP_NAME }}
+          package: './function-lex/build/azure-functions/${{ env.AZURE_FUNCTIONAPP_NAME }}'
+          publish-profile: ${{ secrets.AZURE_JAVA_FUNCTIONS_PUBLISH_PROFILE }}
+
