@@ -30,6 +30,10 @@ services:
       - "3000:3000"
     networks:
       - aws-network
+    environment:
+      - SERVICE_PORT=3000
+      - LEX_URL=http://annotation:8080/api/annotate
+      - PREDICT_URL=http://prediction:5000/predict
     restart: unless-stopped
   
   training:
