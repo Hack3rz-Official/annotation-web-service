@@ -1,35 +1,21 @@
-# aws-demo
+# Demo Application
 
-This template should help get you started developing with Vue 3 in Vite.
+This demo was created to show the syntax highlighting in action to demonstrate the progress to our clients.
 
-## Recommended IDE Setup
+## Setup
 
-[VSCode](https://code.visualstudio.com/) + [Volar](https://marketplace.visualstudio.com/items?itemName=johnsoncodehk.volar) (and disable Vetur) + [TypeScript Vue Plugin (Volar)](https://marketplace.visualstudio.com/items?itemName=johnsoncodehk.vscode-typescript-vue-plugin).
+This demo is accessible after launching the project-wide docker-compose file at localhost:8081:
 
-## Customize configuration
-
-See [Vite Configuration Reference](https://vitejs.dev/config/).
-
-## Project Setup
-
-```sh
-npm install
+```bash
+# inside project root /:
+docker-compose up
 ```
-
-### Compile and Hot-Reload for Development
-
-```sh
+You can also launch this app without docker for development:
+```bash
+# inside /demo-frontend:
+npm install
 npm run dev
 ```
+<br>
 
-### Compile and Minify for Production
-
-```sh
-npm run build
-```
-
-### Lint with [ESLint](https://eslint.org/)
-
-```sh
-npm run lint
-```
+![Architecture](./aws_demo_frontend.png)
