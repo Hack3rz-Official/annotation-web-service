@@ -1,0 +1,36 @@
+name: Deploy Predict Function
+on: [push]
+
+env:
+  AZURE_FUNCTIONAPP_NAME: hack3rz-functions-python
+  AZURE_FUNCTIONAPP_PACKAGE_PATH: './function-predict'  
+  PYTHON_VERSION: '3.8'
+  FUNCTION_NAME: function-predict
+  
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+    - name: 'Checkout GitHub Action'
+      uses: actions/checkout@master
+
+    - name: Setup Python ${{ env.PYTHON_VERSION }} Environment
+      uses: actions/setup-python@v3.0.0
+      with:
+        python-version: ${{ env.PYTHON_VERSION }}
+
+    - name: 'Resolve Project Dependencies Using Pip'
+      shell: bash
+      run: |
+        pushd './${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}'
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt --target=".python_packages/lib/site-packages"
+        popd
+        
+    - name: Deploy to Azure Function APP ${{ env.AZURE_FUNCTIONAPP_NAME }}
+      uses: Azure/functions-action@v1
+      id: fa
+      with:
+        app-name: ${{ env.AZURE_FUNCTIONAPP_NAME }}
+        package: ${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}
+        publish-profile: ${{ secrets.AZURE_PYTHON_FUNCTIONS_PUBLISH_PROFILE }}
