@@ -4,4 +4,4 @@ services:
     demo-frontend:
         build: .
         ports: 
-            - 8080:5000
+            - 8081:8080
