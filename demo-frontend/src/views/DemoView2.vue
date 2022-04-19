@@ -1,6 +1,8 @@
 <script setup>
 import { onMounted, ref, watch, computed } from "vue";
 import axios from "axios";
+import File from "../composables/fileClass";
+import { useFileFixtures } from "../composables/useFileFixtures";
 
 const isLoading = ref(false);
 // const githubUser = ref("pallets");
@@ -8,36 +10,61 @@ const isLoading = ref(false);
 // const githubFile = ref("src/flask/views.py");
 const githubUser = ref("elastic");
 const githubRepo = ref("elasticsearch");
-const githubFile = ref("build-tools/src/main/java/org/elasticsearch/gradle/util/Pair.java");
+const githubFile = ref(
+  "server/src/main/java/org/elasticsearch/action/index/IndexAction.java"
+);
 const rawCode = ref("");
 const highlightedCode = ref(``);
 
-const jsdelivrUrl = computed(() => {
-  return `https://cdn.jsdelivr.net/gh/${githubUser.value}/${githubRepo.value}/${githubFile.value}`;
+const files = ref([]);
+
+const showRaw = computed(() => {
+  return highlightedCode.value == "";
 });
 
-function fetchFile() {
-  isLoading.value = true;
+function loadTestFiles() {
+  files.value = useFileFixtures();
+  for (let file of files.value) {
+    fetchRawCode(file);
+  }
+}
+
+function highlightAllFiles() {
+  for (let file of files.value) {
+    if (file.status != "highlighted") {
+      highlight(file);
+    }
+  }
+}
+
+function deleteAllFiles() {
+  files.value = []
+}
+
+function fetchRawCode(file) {
   axios
-    .get(jsdelivrUrl.value)
+    .get(`${File.jsDelivrBaseUrl}${file.identifier}`)
     .then((response) => {
-      console.log(response);
-      rawCode.value = response.data;
-      isLoading.value = false;
+    //   console.log(response);
+      file.rawCode = response.data;
+      file.status = "raw";
     })
     .catch((error) => {
       console.log(error);
-      isLoading.value = false;
+      file.status = "empty";
     });
 }
 
-function highlight() {
-  isLoading.value = true;
+function highlight(file) {
+//   console.log("requested highlighting for file", file);
+  file.status = "loading";
+  file.request.startTimestamp = Date.now()
   let data = {
-    code: rawCode.value,
-    language: "java",
+    code: file.rawCode,
+    language: file.language,
   };
-  let outputElem = document.getElementById("highlighted-code");
+  let outputElem = document.getElementById(file.identifier);
+//   console.log(outputElem);
   axios
     .post("http://localhost:3000/highlight", data)
     .then((response) => {
@@ -46,13 +73,19 @@ function highlight() {
         .createContextualFragment(response.data);
       outputElem.innerHTML = null;
       outputElem.appendChild(newElement);
-      highlightedCode.value = response.data;
-      isLoading.value = false;
+    //   console.log(newElement);
+    //   console.log(outputElem);
+      file.highlightedCode = response.data;
+      file.status = "highlighted";
+      file.request.endTimestamp = Date.now()
+      file.request.duration = file.request.endTimestamp - file.request.startTimestamp
     })
     .catch((error) => {
       console.log(error);
       outputElem.innerHTML = "Error in Highlighting Service";
-      isLoading.value = false;
+      file.status = "failed";
+      file.request.endTimestamp = Date.now()
+      file.request.duration = file.request.endTimestamp - file.request.startTimestamp
     });
 }
 </script>
@@ -90,32 +123,89 @@ function highlight() {
     </div>
 
     <div class="my-4">
-      {{ jsdelivrUrl }}
-
-      <button class="btn mx-2" @click="fetchFile">fetch file</button>
-      <button class="btn" @click="highlight">Highlight</button>
+      <button class="btn btn-primary mx-2" @click="loadTestFiles">load test files</button>
+      <button class="btn btn-primary mx-2" @click="highlightAllFiles">
+        highlight all files
+      </button>
+      <button class="btn btn-outline btn-error mx-2" @click="deleteAllFiles">
+        delete all files
+      </button>
     </div>
 
-    <div class="flex gap-4">
-      <div class="card w-full bg-base-200 shadow-md">
-        <div class="card-body p-5">
+    <div class="flex flex-wrap gap-3 relative">
+      <div
+        v-for="file in files"
+        :key="file.identifier"
+        class="
+          file-wrapper
+          card card-compact
+          w-full
+          bg-base-200
+          shadow-md
+          border-2
+        "
+      >
+        <!-- overlay div for hover and click effect -->
+        <div
+          class="
+            absolute
+            h-full
+            w-full
+            flex
+            justify-center
+            content-center
+            cursor-pointer
+            opacity-0
+            hover:opacity-100 hover:bg-black/20
+          "
+        >
+          <!-- button -->
+          <button class="btn btn-primary m-auto" :class="{ 'btn-disabled': file.status == 'highlighted' }" @click="highlight(file)">
+            Highlight
+          </button>
+        </div>
+        <!-- this card-body is shown when there is only raw code -->
+        <div class="card-body p-5" v-show="!file.highlightedCode">
           <textarea
             id="raw-code"
             wrap="off"
-            class="resize-none font-mono text-sm bg-transparent"
-            v-model="rawCode"
+            class="
+              resize-none
+              font-mono
+              text-sm
+              bg-transparent
+              overflow-hidden
+              text-tiny
+            "
+            v-model="file.rawCode"
             disabled
           ></textarea>
         </div>
-      </div>
-      <div class="card w-full bg-base-200 shadow-md">
-        <div class="card-body p-5">
+        <!-- this card-body is shown when code has been highlighted -->
+        <div class="card-body p-5" v-show="file.highlightedCode">
           <div
-            id="highlighted-code"
+            :id="file.identifier"
             wrap="off"
-            class="resize-none font-mono text-sm bg-transparent overflow-auto"
+            class="
+              resize-none
+              font-mono
+              text-sm
+              bg-transparent
+              overflow-hidden
+              text-tiny
+            "
             disabled
           ></div>
+        </div>
+        <div
+          class="badge absolute m-2 right-0"
+          :class="{
+            'badge-success': file.status == 'highlighted',
+            'badge-warning': file.status == 'loading',
+            'badge-error': file.status == 'failed',
+          }"
+        >
+          {{ file.language }} {{ file.request.duration }}
         </div>
       </div>
     </div>
@@ -138,9 +228,21 @@ function highlight() {
   }
 }
 
-#raw-code,
-#highlighted-code {
-  height: 600px;
+.file-wrapper {
+  height: 400px;
+  width: 290px;
+  .card-body {
+    height: calc(100% - 50px);
+    div,
+    textarea {
+      height: 100%;
+    }
+  }
+}
+
+.text-tiny {
+  font-size: 6px;
+  line-height: 6px;
 }
 </style>
 
