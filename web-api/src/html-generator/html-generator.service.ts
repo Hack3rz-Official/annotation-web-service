@@ -1,34 +1,38 @@
 import { Injectable } from '@nestjs/common';
-import { HighlightRequestDto } from 'src/modules/highlight/dto/highlight-request.dto';
-import { HCodes } from 'src/constants/hcodes.enum'; 
+import { HCodes } from '../constants/hcodes.enum';
+import { HighlightRequestDto } from '../modules/highlight/dto/highlight-request.dto';
 
 @Injectable()
 export class HtmlGeneratorService {
+  buildHtml(
+    highlightRequestDto: HighlightRequestDto,
+    lexingData: Array<any>,
+    hCodeValues: Array<any>,
+  ) {
+    let out = '';
 
-    buildHtml(highlightRequestDto: HighlightRequestDto, lexingData: Array<any>, hCodeValues: Array<any>) {
+    for (const [index, token] of lexingData.entries()) {
+      if (index == 0) {
+        out += highlightRequestDto.code.substring(0, token.startIndex);
+      } else {
+        const prevToken = lexingData[index - 1];
+        out += highlightRequestDto.code.substring(
+          prevToken.endIndex + 1,
+          token.startIndex,
+        );
+      }
+      const substring = highlightRequestDto.code.substring(
+        token.startIndex,
+        token.endIndex + 1,
+      );
+      const className = HCodes[hCodeValues[index]];
 
-        // console.log(highlightRequestDto)
-        // console.log(lexingData)
-        // console.log(hCodeValues)
-
-        let out = ""
-        
-        for (const [index, token] of lexingData.entries()) {
-            if (index == 0) {
-                out += highlightRequestDto.code.substring(0, token.startIndex)
-            } else {
-                let prevToken = lexingData[index - 1]
-                out += highlightRequestDto.code.substring(prevToken.endIndex + 1, token.startIndex)
-            }
-            let substring = highlightRequestDto.code.substring(token.startIndex, token.endIndex + 1)
-            let className = HCodes[hCodeValues[index]]
-
-            out += `<span class='${className}'>${substring}</span>`
-        }
-        return `${HtmlGeneratorService.prefix}${out}${HtmlGeneratorService.postfix}`
+      out += `<span class='${className}'>${substring}</span>`;
     }
+    return `${HtmlGeneratorService.prefix}${out}${HtmlGeneratorService.postfix}`;
+  }
 
-    static prefix = `
+  static prefix = `
     <!DOCTYPE html>
     <html>
     <style>
@@ -93,11 +97,11 @@ export class HtmlGeneratorService {
         font-style: italic;
     }
     </style>
-    <pre><code>`
-    
-    static postfix = `
+    <pre><code>`;
+
+  static postfix = `
     </pre>
     </code>
     </html>
-    `
+    `;
 }
