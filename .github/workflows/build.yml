@@ -20,7 +20,7 @@ jobs:
         run: yarn install
         working-directory: web-api/
       - name: Test and coverage
-        run: npm jest --coverage
+        run: yarn jest --coverage
         working-directory: web-api/
       - name: SonarCloud Scan
         uses: SonarSource/sonarcloud-github-action@master
