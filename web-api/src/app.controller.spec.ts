@@ -16,7 +16,9 @@ describe('AppController', () => {
 
   describe('root', () => {
     it('should return "Hello World!"', () => {
-      expect(appController.getHello()).toBe('Hello World!');
+      expect(appController.defaultRouter()).toBe(
+        'Congrats, you reached the defaultRouter of our API! 🎉',
+      );
     });
   });
 });
