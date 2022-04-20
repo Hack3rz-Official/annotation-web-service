@@ -1,6 +1,6 @@
 import logging
 from model.SHModelUtils import SHModel
-from flask import Flask, Response, request 
+from flask import Flask, Response, request
 import json
 
 app = Flask(__name__)
@@ -24,7 +24,7 @@ def predict():
         logging.error("Unsupported language")
         return Response(f"{lang_name} is an unsupported programming language", status=400)
 
-    try:    
+    try:
         # predict
         model = SHModel(lang_name, "curr")
         model.setup_for_prediction()
@@ -33,7 +33,7 @@ def predict():
     except Exception as e:
         logging.error("Model error: " + str(e))
         return Response("Model error: " + str(e), status=500)
-    
+
 
 if __name__ == "__main__":
     app.run(debug=True)
