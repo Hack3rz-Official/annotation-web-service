@@ -1,4 +1,4 @@
-name: SonarCloud JS Build
+name: Web Api Service
 on:
   push:
     branches:
