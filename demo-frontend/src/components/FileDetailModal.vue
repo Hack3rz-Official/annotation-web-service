@@ -17,11 +17,20 @@ watch(
     } else {
       editMode.value = false;
     }
+    if (newActiveFile) {
+      // match language selection with current file
+      selectedLanguage.value = newActiveFile.languageLong;
+    }
   }
 );
 
 const editMode = ref(true);
+const languages = ref(["java", "python3", "kotlin", "go"]);
+const selectedLanguage = ref(null);
 
+watch(selectedLanguage, (newSelectedLanguage, oldSelectedLanguage) => {
+  props.activeFile.setLanguage(newSelectedLanguage);
+});
 function toggleEditMode() {
   editMode.value = !editMode.value;
 
@@ -47,7 +56,6 @@ function toggleEditMode() {
       class="modal-box relative h-full w-11/12 max-w-7xl"
       @click.stop="() => {}"
     >
-
       <div class="flex flex-row-reverse gap-4 w-full h-full">
         <!-- sidebar -->
         <div class="w-48 flex flex-col gap-4 justify-between">
@@ -68,11 +76,14 @@ function toggleEditMode() {
               Save & Highlight
             </button>
 
-            <select class="select select-primary w-full max-w-xs">
-              <option disabled selected>Select language</option>
-              <option>English</option>
-              <option>Japanese</option>
-              <option>Italian</option>
+            <select
+              class="select select-primary w-full max-w-xs"
+              v-model="selectedLanguage"
+            >
+              <!-- <option disabled selected>Select language</option> -->
+              <option v-for="language in languages" :key="language">
+                {{ language }}
+              </option>
             </select>
           </div>
 
