@@ -6,11 +6,11 @@
   <a href="https://github.com/Hack3rz-Official/annotation-web-service/actions">
     <img src="https://github.com/Hack3rz-Official/annotation-web-service/workflows/Deploy%20Project/badge.svg">
   </a>
-  <a href="https://sonarcloud.io/dashboard?id=<SONAR_CLOUD_ID>">
-      <img src="https://sonarcloud.io/api/project_badges/measure?project=<SONAR_CLOUD_ID>&metric=coverage">
+  <a href="https://sonarcloud.io/dashboard?id=Hack3rz-Official_annotation-web-service">
+      <img src="https://sonarcloud.io/api/project_badges/measure?project=Hack3rz-Official_annotation-web-service&metric=coverage">
   </a>
-  <a href="https://sonarcloud.io/dashboard?id=<SONAR_CLOUD_ID>">
-        <img src="https://sonarcloud.io/api/project_badges/measure?project=<SONAR_CLOUD_ID>&metric=alert_status">
+  <a href="https://sonarcloud.io/dashboard?id=Hack3rz-Official_annotation-web-service">
+        <img src="https://sonarcloud.io/api/project_badges/measure?project=Hack3rz-Official_annotation-web-service&metric=alert_status">
     </a>
 </p>
 
