@@ -39,12 +39,10 @@ function deleteAllFiles() {
 }
 
 function setActiveFile(file) {
-  console.log("setActiveModal", file);
   activeFile.value = file;
 }
 
 function closeFileModal() {
-  console.log("closeFileModal");
   activeFile.value = null;
 }
 

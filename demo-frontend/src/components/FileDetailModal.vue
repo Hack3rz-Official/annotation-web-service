@@ -14,6 +14,8 @@ watch(
     // make sure edit mode is on when file is not highlighted yet
     if (!newActiveFile || newActiveFile.status != "highlighted") {
       editMode.value = true;
+    } else {
+      editMode.value = false;
     }
   }
 );
@@ -45,12 +47,6 @@ function toggleEditMode() {
       class="modal-box relative h-full w-11/12 max-w-7xl"
       @click.stop="() => {}"
     >
-      <!-- <label
-        class="btn btn-sm btn-circle absolute right-2 top-2"
-        @click="$emit('closeFileModal')"
-        >✕</label
-      > -->
-      <!-- modal content start -->
 
       <div class="flex flex-row-reverse gap-4 w-full h-full">
         <!-- sidebar -->
@@ -80,7 +76,9 @@ function toggleEditMode() {
             </select>
           </div>
 
-          <button class="btn w-full" @click="$emit('closeFileModal')">Close</button>
+          <button class="btn w-full" @click="$emit('closeFileModal')">
+            Close
+          </button>
         </div>
         <!-- code area -->
         <div
@@ -139,18 +137,6 @@ function toggleEditMode() {
 </template>
 
 <style scoped lang="scss">
-// .file-wrapper {
-//   height: 400px;
-//   width: 290px;
-//   .card-body {
-//     height: calc(100% - 50px);
-//     div,
-//     textarea {
-//       height: 100%;
-//     }
-//   }
-// }
-
 .text-tiny {
   font-size: 6px;
   line-height: 6px;
