@@ -3,20 +3,17 @@ import { onMounted, ref, watch, computed } from "vue";
 import axios from "axios";
 import File from "../composables/fileClass";
 import { useFileFixtures } from "../composables/useFileFixtures";
+import FileDetailModalVue from "../components/FileDetailModal.vue";
 
-const isLoading = ref(false);
-// const githubUser = ref("pallets");
-// const githubRepo = ref("flask");
-// const githubFile = ref("src/flask/views.py");
 const githubUser = ref("elastic");
 const githubRepo = ref("elasticsearch");
 const githubFile = ref(
   "server/src/main/java/org/elasticsearch/action/index/IndexAction.java"
 );
-const rawCode = ref("");
 const highlightedCode = ref(``);
 
 const files = ref([]);
+const activeFile = ref(null);
 
 const showRaw = computed(() => {
   return highlightedCode.value == "";
@@ -39,6 +36,16 @@ function highlightAllFiles() {
 
 function deleteAllFiles() {
   files.value = [];
+}
+
+function setActiveFile(file) {
+  console.log("setActiveModal", file);
+  activeFile.value = file;
+}
+
+function closeFileModal() {
+  console.log("closeFileModal");
+  activeFile.value = null;
 }
 
 function fetchRawCode(file) {
@@ -95,6 +102,13 @@ function highlight(file) {
 
 <template>
   <main class="container mx-auto px-3 gap-y-3">
+    <!-- FileDetailModal -->
+    <file-detail-modal-vue
+      :activeFile="activeFile"
+      @close-file-modal="closeFileModal"
+      @highlight-file="highlight(activeFile)"
+    ></file-detail-modal-vue>
+
     <div class="github-source-form form-control flex-row gap-2">
       <label class="github-user-input input-group input-group-vertical">
         <span>Github User</span>
@@ -163,12 +177,13 @@ function highlight(file) {
             opacity-0
             hover:opacity-100 hover:bg-black/20
           "
+          @click="setActiveFile(file)"
         >
           <!-- button -->
           <button
             class="btn btn-primary m-auto"
             :class="{ 'btn-disabled': file.status == 'highlighted' }"
-            @click="highlight(file)"
+            @click.stop="highlight(file)"
           >
             Highlight
           </button>
@@ -206,7 +221,7 @@ function highlight(file) {
             disabled
           ></div>
         </div>
-        <!-- language badge -->
+        <!-- file name badge -->
         <div
           class="badge w-full h-6 absolute rounded-none"
           :class="{
