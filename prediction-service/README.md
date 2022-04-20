@@ -16,7 +16,7 @@ The REST API to the service predict is described below.
         -d '{"lang_name": "java","tok_ids":[34,22,45]}'
 
 #### Response
- 
+
     {"h_code_values": [10, 0, 3]}
 
 ## Running the function locally
