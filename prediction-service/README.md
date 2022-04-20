@@ -9,7 +9,7 @@ The REST API to the service predict is described below.
 
 #### Request
 
-`POST /predict/` 
+`POST /predict/`
 
     curl -X POST http://localhost:7071/predict \
         -H "Content-Type: application/json" \
