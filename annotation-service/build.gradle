@@ -2,6 +2,8 @@ plugins {
     id 'org.springframework.boot' version '2.6.6'
     id 'io.spring.dependency-management' version '1.0.11.RELEASE'
     id 'java'
+    id 'jacoco'
+    id "org.sonarqube" version "3.3"
 }
 
 group = 'com.hack3rz'
@@ -32,4 +34,18 @@ dependencies {
 
 tasks.named('test') {
     useJUnitPlatform()
+}
+
+jacocoTestReport {
+    reports {
+        xml.enabled true
+    }
+}
+
+sonarqube {
+    properties {
+        property "sonar.projectKey", "annotation-service"
+        property "sonar.organization", "hack3rz-official"
+        property "sonar.host.url", "https://sonarcloud.io"
+    }
 }

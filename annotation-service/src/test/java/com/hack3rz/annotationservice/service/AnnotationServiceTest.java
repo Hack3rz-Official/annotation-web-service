@@ -1,18 +1,18 @@
 package com.hack3rz.annotationservice.service;
 
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import static com.hack3rz.annotationservice.enumeration.SupportedLanguage.JAVA;
+import static com.hack3rz.annotationservice.enumeration.SupportedLanguage.KOTLIN;
+import static com.hack3rz.annotationservice.enumeration.SupportedLanguage.PYTHON;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.util.Arrays;
 import java.util.List;
 
-import static com.hack3rz.annotationservice.enumeration.SupportedLanguage.*;
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 class AnnotationServiceTest {
-
-    /*
 
     private AnnotationService annotationService;
 
@@ -70,6 +70,4 @@ class AnnotationServiceTest {
 
         Assertions.assertTrue(annotationService.pluckTokenIds(annotationService.lexCode(code, JAVA)).isEmpty());
     }
-
-    */
 }
