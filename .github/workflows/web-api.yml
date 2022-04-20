@@ -12,16 +12,17 @@ jobs:
   sonarcloud:
     name: SonarCloud
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: web-api
     steps:
       - uses: actions/checkout@v2
         with:
           fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of analysis
       - name: Install dependencies
         run: yarn install
-        working-directory: web-api
       - name: Test and coverage
         run: yarn jest --coverage
-        working-directory: web-api
       - name: SonarCloud Scan
         uses: SonarSource/sonarcloud-github-action@master
         with:
