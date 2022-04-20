@@ -1,5 +1,5 @@
 <script setup>
-import { ref } from "vue";
+import { ref, watch } from "vue";
 
 const props = defineProps({
   activeFile: {
@@ -7,6 +7,16 @@ const props = defineProps({
     required: true,
   },
 });
+
+watch(
+  () => props.activeFile,
+  (newActiveFile, oldActiveFile) => {
+    // make sure edit mode is on when file is not highlighted yet
+    if (!newActiveFile || newActiveFile.status != "highlighted") {
+      editMode.value = true;
+    }
+  }
+);
 
 const editMode = ref(true);
 
@@ -35,11 +45,11 @@ function toggleEditMode() {
       class="modal-box relative h-full w-11/12 max-w-7xl"
       @click.stop="() => {}"
     >
-      <label
+      <!-- <label
         class="btn btn-sm btn-circle absolute right-2 top-2"
         @click="$emit('closeFileModal')"
         >✕</label
-      >
+      > -->
       <!-- modal content start -->
 
       <div class="flex flex-row-reverse gap-4 w-full h-full">
@@ -47,14 +57,22 @@ function toggleEditMode() {
         <div class="w-48 flex flex-col gap-4 justify-between">
           <div class="flex flex-col gap-4">
             <!-- editMode toggle -->
-            <button class="btn btn-primary w-full" :class="{ 'btn-outline': !editMode }" @click="toggleEditMode()" :disabled="activeFile.status != 'highlighted'">
+            <button
+              class="btn btn-primary w-full"
+              :class="{ 'btn-outline': !editMode }"
+              @click="toggleEditMode()"
+              :disabled="activeFile.status != 'highlighted'"
+            >
               Toggle Edit Mode
             </button>
-            <button class="btn btn-primary w-full" @click="$emit('highlightFile')">
-              Highlight
+            <button
+              class="btn btn-primary w-full"
+              @click="$emit('highlightFile')"
+            >
+              Save & Highlight
             </button>
 
-            <select class="select select-info w-full max-w-xs">
+            <select class="select select-primary w-full max-w-xs">
               <option disabled selected>Select language</option>
               <option>English</option>
               <option>Japanese</option>
@@ -62,7 +80,7 @@ function toggleEditMode() {
             </select>
           </div>
 
-          <button class="btn w-full" @click="() => {}">Close</button>
+          <button class="btn w-full" @click="$emit('closeFileModal')">Close</button>
         </div>
         <!-- code area -->
         <div
