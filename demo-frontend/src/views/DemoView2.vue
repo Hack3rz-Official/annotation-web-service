@@ -38,15 +38,16 @@ function highlightAllFiles() {
 }
 
 function deleteAllFiles() {
-  files.value = []
+  files.value = [];
 }
 
 function fetchRawCode(file) {
   axios
     .get(`${File.jsDelivrBaseUrl}${file.identifier}`)
     .then((response) => {
-    //   console.log(response);
+      // console.log(response);
       file.rawCode = response.data;
+      file.size = response.data.length;
       file.status = "raw";
     })
     .catch((error) => {
@@ -56,15 +57,15 @@ function fetchRawCode(file) {
 }
 
 function highlight(file) {
-//   console.log("requested highlighting for file", file);
+  //   console.log("requested highlighting for file", file);
   file.status = "loading";
-  file.request.startTimestamp = Date.now()
+  file.request.startTimestamp = Date.now();
   let data = {
     code: file.rawCode,
-    language: file.language,
+    language: file.languageLong,
   };
   let outputElem = document.getElementById(file.identifier);
-//   console.log(outputElem);
+  //   console.log(outputElem);
   axios
     .post("http://localhost:3000/highlight", data)
     .then((response) => {
@@ -73,19 +74,21 @@ function highlight(file) {
         .createContextualFragment(response.data);
       outputElem.innerHTML = null;
       outputElem.appendChild(newElement);
-    //   console.log(newElement);
-    //   console.log(outputElem);
+      //   console.log(newElement);
+      //   console.log(outputElem);
       file.highlightedCode = response.data;
       file.status = "highlighted";
-      file.request.endTimestamp = Date.now()
-      file.request.duration = file.request.endTimestamp - file.request.startTimestamp
+      file.request.endTimestamp = Date.now();
+      file.request.duration =
+        file.request.endTimestamp - file.request.startTimestamp;
     })
     .catch((error) => {
       console.log(error);
       outputElem.innerHTML = "Error in Highlighting Service";
       file.status = "failed";
-      file.request.endTimestamp = Date.now()
-      file.request.duration = file.request.endTimestamp - file.request.startTimestamp
+      file.request.endTimestamp = Date.now();
+      file.request.duration =
+        file.request.endTimestamp - file.request.startTimestamp;
     });
 }
 </script>
@@ -123,7 +126,9 @@ function highlight(file) {
     </div>
 
     <div class="my-4">
-      <button class="btn btn-primary mx-2" @click="loadTestFiles">load test files</button>
+      <button class="btn btn-primary mx-2" @click="loadTestFiles">
+        load test files
+      </button>
       <button class="btn btn-primary mx-2" @click="highlightAllFiles">
         highlight all files
       </button>
@@ -160,12 +165,16 @@ function highlight(file) {
           "
         >
           <!-- button -->
-          <button class="btn btn-primary m-auto" :class="{ 'btn-disabled': file.status == 'highlighted' }" @click="highlight(file)">
+          <button
+            class="btn btn-primary m-auto"
+            :class="{ 'btn-disabled': file.status == 'highlighted' }"
+            @click="highlight(file)"
+          >
             Highlight
           </button>
         </div>
         <!-- this card-body is shown when there is only raw code -->
-        <div class="card-body p-5" v-show="!file.highlightedCode">
+        <div class="card-body mt-3" v-show="!file.highlightedCode">
           <textarea
             id="raw-code"
             wrap="off"
@@ -182,7 +191,7 @@ function highlight(file) {
           ></textarea>
         </div>
         <!-- this card-body is shown when code has been highlighted -->
-        <div class="card-body p-5" v-show="file.highlightedCode">
+        <div class="card-body mt-3" v-show="file.highlightedCode">
           <div
             :id="file.identifier"
             wrap="off"
@@ -197,15 +206,29 @@ function highlight(file) {
             disabled
           ></div>
         </div>
+        <!-- language badge -->
         <div
-          class="badge absolute m-2 right-0"
+          class="badge w-full h-6 absolute rounded-none"
           :class="{
             'badge-success': file.status == 'highlighted',
             'badge-warning': file.status == 'loading',
             'badge-error': file.status == 'failed',
           }"
         >
-          {{ file.language }} {{ file.request.duration }}
+          {{ file.getFilenameShortened() }}.<span class="font-bold">{{
+            file.languageShort
+          }}</span>
+        </div>
+        <!-- file size and request status information -->
+        <div
+          class="absolute w-full h-8 rounded rounded-t-none border-0 bottom-0"
+        >
+          <div class="badge absolute m-2 right-0">
+            {{ file.request.duration }} ms
+          </div>
+          <div class="badge absolute m-2 left-0">
+            {{ file.getSizeFormatted() }}
+          </div>
         </div>
       </div>
     </div>
