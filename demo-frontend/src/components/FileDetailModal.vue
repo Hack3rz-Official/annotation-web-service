@@ -31,6 +31,7 @@ const selectedLanguage = ref(null);
 watch(selectedLanguage, (newSelectedLanguage, oldSelectedLanguage) => {
   props.activeFile.setLanguage(newSelectedLanguage);
 });
+
 function toggleEditMode() {
   editMode.value = !editMode.value;
 

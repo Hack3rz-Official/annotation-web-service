@@ -3,13 +3,23 @@ import { onMounted, ref, watch, computed } from "vue";
 import axios from "axios";
 import File from "../composables/fileClass";
 import { useFileFixtures } from "../composables/useFileFixtures";
+import {
+  getCommitsFromRepo,
+  getFilesFromTree,
+  sortTreeByLanguages
+} from "../composables/githubApiConnector";
 import FileDetailModalVue from "../components/FileDetailModal.vue";
 
-const githubUser = ref("elastic");
+const githubRepoUrl = ref("https://github.com/elastic/elasticsearch");
+const githubOwner = ref("elastic");
 const githubRepo = ref("elasticsearch");
-const githubFile = ref(
-  "server/src/main/java/org/elasticsearch/action/index/IndexAction.java"
-);
+
+watch(githubRepoUrl, (newRepoUrl, oldRepoUrl) => {
+  let splitted = newRepoUrl.split("/");
+  githubOwner.value = splitted[3];
+  githubRepo.value = splitted[4];
+});
+
 const highlightedCode = ref(``);
 
 const files = ref([]);
@@ -96,6 +106,13 @@ function highlight(file) {
         file.request.endTimestamp - file.request.startTimestamp;
     });
 }
+
+async function loadFilesFromRepo() {
+  const tree_sha = await getCommitsFromRepo(githubOwner.value, githubRepo.value)
+  const tree = await getFilesFromTree(githubOwner.value, githubRepo.value, tree_sha)
+  const languageDict = sortTreeByLanguages(tree)
+  console.log(languageDict)
+}
 </script>
 
 <template>
@@ -107,34 +124,36 @@ function highlight(file) {
       @highlight-file="highlight(activeFile)"
     ></file-detail-modal-vue>
 
-    <div class="github-source-form form-control flex-row gap-2">
-      <label class="github-user-input input-group input-group-vertical">
-        <span>Github User</span>
+    <button
+      class="btn btn-primary mx-2"
+      @click="getCommitsFromRepo(githubUser, githubRepo)"
+    >
+      Load Commits
+    </button>
+
+    <button
+      class="btn btn-primary mx-2"
+      @click="
+        getFilesFromRepo(
+          githubUser,
+          githubRepo,
+          '9505e3478d91aa30b999d59d95eb361b14a4afa6'
+        )
+      "
+    >
+      Get Files
+    </button>
+
+    <div class="form-control">
+      <div class="input-group">
         <input
           type="text"
-          placeholder="Hack3rz-Official"
-          v-model="githubUser"
-          class="input input-bordered"
+          placeholder="https://github.com/{owner}/{repo}"
+          v-model="githubRepoUrl"
+          class="input input-bordered w-96"
         />
-      </label>
-      <label class="github-repo-input input-group input-group-vertical">
-        <span>Repository</span>
-        <input
-          type="text"
-          placeholder="annotation-web-service"
-          v-model="githubRepo"
-          class="input input-bordered"
-        />
-      </label>
-      <label class="github-file-input input-group input-group-vertical">
-        <span>File</span>
-        <input
-          type="text"
-          placeholder="src/main/java/com/hack3rz/annotationservice/controller/AnnotationController.java"
-          v-model="githubFile"
-          class="input input-bordered"
-        />
-      </label>
+        <button class="btn" @click="loadFilesFromRepo()">Load Files</button>
+      </div>
     </div>
 
     <div class="my-4">
@@ -249,21 +268,6 @@ function highlight(file) {
 </template>
 
 <style scoped lang="scss">
-.github-source-form {
-  label {
-    width: min-content;
-  }
-  .github-user-input {
-    flex-grow: 1;
-  }
-  .github-repo-input {
-    flex-grow: 1;
-  }
-  .github-file-input {
-    flex-grow: 3;
-  }
-}
-
 .file-wrapper {
   height: 400px;
   width: 290px;
