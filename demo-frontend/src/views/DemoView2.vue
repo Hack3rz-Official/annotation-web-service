@@ -6,13 +6,15 @@ import { useFileFixtures } from "../composables/useFileFixtures";
 import {
   getCommitsFromRepo,
   getFilesFromTree,
-  sortTreeByLanguages
+  sortTreeByLanguages,
 } from "../composables/githubApiConnector";
 import FileDetailModalVue from "../components/FileDetailModal.vue";
 
-const githubRepoUrl = ref("https://github.com/elastic/elasticsearch");
-const githubOwner = ref("elastic");
-const githubRepo = ref("elasticsearch");
+const githubRepoUrl = ref(
+  "https://github.com/Hack3rz-Official/annotation-web-service"
+);
+const githubOwner = ref("Hack3rz-Official");
+const githubRepo = ref("annotation-web-service");
 
 watch(githubRepoUrl, (newRepoUrl, oldRepoUrl) => {
   let splitted = newRepoUrl.split("/");
@@ -24,6 +26,11 @@ const highlightedCode = ref(``);
 
 const files = ref([]);
 const activeFile = ref(null);
+
+const languageFilesDict = ref({});
+const amountJavaFiles = ref(0);
+const amountPythonFiles = ref(0);
+const amountKotlinFiles = ref(0);
 
 const showRaw = computed(() => {
   return highlightedCode.value == "";
@@ -71,6 +78,17 @@ function fetchRawCode(file) {
     });
 }
 
+function fetchFilteredFiles(language, limit = 5) {
+  let filtered = filterFilesByLanguage(language).slice(0, limit);
+  console.log(filtered);
+  for (let path of filtered) {
+    files.value.push(new File(githubOwner.value, githubRepo.value, path));
+  }
+  for (let file of files.value) {
+    fetchRawCode(file);
+  }
+}
+
 function highlight(file) {
   //   console.log("requested highlighting for file", file);
   file.status = "loading";
@@ -108,10 +126,25 @@ function highlight(file) {
 }
 
 async function loadFilesFromRepo() {
-  const tree_sha = await getCommitsFromRepo(githubOwner.value, githubRepo.value)
-  const tree = await getFilesFromTree(githubOwner.value, githubRepo.value, tree_sha)
-  const languageDict = sortTreeByLanguages(tree)
-  console.log(languageDict)
+  const tree_sha = await getCommitsFromRepo(
+    githubOwner.value,
+    githubRepo.value
+  );
+  const tree = await getFilesFromTree(
+    githubOwner.value,
+    githubRepo.value,
+    tree_sha
+  );
+  languageFilesDict.value = sortTreeByLanguages(tree);
+  console.log(languageFilesDict.value);
+}
+
+function filterFilesByLanguage(language) {
+  if (!languageFilesDict.value || !(language in languageFilesDict.value)) {
+    return [];
+  } else {
+    return languageFilesDict.value[language];
+  }
 }
 </script>
 
@@ -124,42 +157,96 @@ async function loadFilesFromRepo() {
       @highlight-file="highlight(activeFile)"
     ></file-detail-modal-vue>
 
-    <button
-      class="btn btn-primary mx-2"
-      @click="getCommitsFromRepo(githubUser, githubRepo)"
-    >
-      Load Commits
-    </button>
+    <div class="card w-full bg-base-200 mt-3 shadow-xl">
+      <div class="card-body">
+        <div class="form-control flex flex-row justify-start items-center gap-4">
+          <div class="input-group w-auto grow">
+            <input
+              type="text"
+              placeholder="https://github.com/{owner}/{repo}"
+              v-model="githubRepoUrl"
+              class="input input-bordered w-full"
+            />
+            <button class="btn" @click="loadFilesFromRepo()">
+              Load Files from Repo
+            </button>
+          </div>
+          or
+          <button class="btn" @click="loadTestFiles">
+            load test files
+          </button>
+        </div>
 
-    <button
-      class="btn btn-primary mx-2"
-      @click="
-        getFilesFromRepo(
-          githubUser,
-          githubRepo,
-          '9505e3478d91aa30b999d59d95eb361b14a4afa6'
-        )
-      "
-    >
-      Get Files
-    </button>
-
-    <div class="form-control">
-      <div class="input-group">
-        <input
-          type="text"
-          placeholder="https://github.com/{owner}/{repo}"
-          v-model="githubRepoUrl"
-          class="input input-bordered w-96"
-        />
-        <button class="btn" @click="loadFilesFromRepo()">Load Files</button>
+        <div v-show="Object.keys(languageFilesDict).length > 0">
+          The
+          <span class="font-bold">{{ githubRepo }}</span> repository contains
+          {{ filterFilesByLanguage("java").length }} Java files,
+          {{ filterFilesByLanguage("py").length }} Python files and
+          {{ filterFilesByLanguage("kt").length }} Kotlin files.
+          <ul class="mt-3 flex flex-col gap-2">
+            <li class="flex flex-row gap-4 items-center">
+              <input
+                type="range"
+                min="0"
+                :max="filterFilesByLanguage('java').length"
+                v-model="amountJavaFiles"
+                class="range range-primary range-s w-64"
+              />
+              <button
+                class="btn btn-primary mx-2"
+                :class="{
+                  'btn-disabled': filterFilesByLanguage('java').length == 0,
+                }"
+                @click="fetchFilteredFiles('java', amountJavaFiles)"
+              >
+                Fetch {{ amountJavaFiles }} of
+                {{ filterFilesByLanguage("java").length }} Java Files
+              </button>
+            </li>
+            <li class="flex flex-row gap-4 items-center">
+              <input
+                type="range"
+                min="0"
+                :max="filterFilesByLanguage('py').length"
+                v-model="amountPythonFiles"
+                class="range range-primary range-s w-64"
+              />
+              <button
+                class="btn btn-primary mx-2"
+                :class="{
+                  'btn-disabled': filterFilesByLanguage('py').length == 0,
+                }"
+                @click="fetchFilteredFiles('py', amountPythonFiles)"
+              >
+                Fetch {{ amountPythonFiles }} of
+                {{ filterFilesByLanguage("py").length }} Python Files
+              </button>
+            </li>
+            <li class="flex flex-row gap-4 items-center">
+              <input
+                type="range"
+                min="0"
+                :max="filterFilesByLanguage('kt').length"
+                v-model="amountKotlinFiles"
+                class="range range-primary range-s w-64"
+              />
+              <button
+                class="btn btn-primary mx-2"
+                :class="{
+                  'btn-disabled': filterFilesByLanguage('kt').length == 0,
+                }"
+                @click="fetchFilteredFiles('kt', amountKotlinFiles)"
+              >
+                Fetch {{ amountKotlinFiles }} of
+                {{ filterFilesByLanguage("kt").length }} Kotlin Files
+              </button>
+            </li>
+          </ul>
+        </div>
       </div>
     </div>
 
     <div class="my-4">
-      <button class="btn btn-primary mx-2" @click="loadTestFiles">
-        load test files
-      </button>
       <button class="btn btn-primary mx-2" @click="highlightAllFiles">
         highlight all files
       </button>
