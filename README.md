@@ -50,7 +50,7 @@ docker-compose up --scale annotation=2
 ```
 To test the load-balancing and scaling make sure to scale some services:
 ```
-docker-compose up --scale prediction=2 annotation=2
+docker-compose up --scale prediction=2 --scale annotation=2
 ```
 
 ## MongoDB
