@@ -57,10 +57,6 @@ services:
       - './data:/data/db'
     networks:
       - aws-network
-    environment:
-      - SERVICE_PORT=3000
-      - LEX_URL=http://nginx:4000/api/annotate
-      - PREDICT_URL=http://nginx:4000/predict
     depends_on:
       - annotation
       - prediction
