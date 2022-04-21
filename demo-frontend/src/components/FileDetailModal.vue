@@ -16,6 +16,10 @@ watch(
       editMode.value = true;
     } else {
       editMode.value = false;
+      // if the modal gets opened in highlighted state, we need to manually trigger the element
+      setTimeout(() => {
+          updateHighlightedCodeDisplay()
+      }, 20)
     }
     if (newActiveFile) {
       // match language selection with current file
@@ -36,13 +40,17 @@ function toggleEditMode() {
   editMode.value = !editMode.value;
 
   if (!editMode.value) {
-    let outputElem = document.getElementById("active-file-highlighted");
-    let newElement = document
-      .createRange()
-      .createContextualFragment(props.activeFile.highlightedCode);
-    outputElem.innerHTML = null;
-    outputElem.appendChild(newElement);
+    updateHighlightedCodeDisplay()
   }
+}
+
+function updateHighlightedCodeDisplay() {
+  let outputElem = document.getElementById("active-file-highlighted");
+  let newElement = document
+    .createRange()
+    .createContextualFragment(props.activeFile.highlightedCode);
+  outputElem.innerHTML = null;
+  outputElem.appendChild(newElement);
 }
 </script>
 
