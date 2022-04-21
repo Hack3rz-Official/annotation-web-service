@@ -80,7 +80,7 @@ function updateHighlightedCodeDisplay() {
             </button>
             <button
               class="btn btn-primary w-full"
-              @click="$emit('highlightFile')"
+              @click="activeFile.highlight()"
             >
               Save & Highlight
             </button>

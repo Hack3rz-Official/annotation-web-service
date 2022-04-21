@@ -32,21 +32,17 @@ const amountJavaFiles = ref(0);
 const amountPythonFiles = ref(0);
 const amountKotlinFiles = ref(0);
 
-const showRaw = computed(() => {
-  return highlightedCode.value == "";
-});
-
 function loadTestFiles() {
   files.value = useFileFixtures();
   for (let file of files.value) {
-    fetchRawCode(file);
+    file.fetchRawCode()
   }
 }
 
 function highlightAllFiles() {
   for (let file of files.value) {
     if (file.status != "highlighted") {
-      highlight(file);
+      file.highlight();
     }
   }
 }
@@ -63,21 +59,6 @@ function closeFileModal() {
   activeFile.value = null;
 }
 
-function fetchRawCode(file) {
-  axios
-    .get(`${File.jsDelivrBaseUrl}${file.identifier}`)
-    .then((response) => {
-      // console.log(response);
-      file.rawCode = response.data;
-      file.size = response.data.length;
-      file.status = "raw";
-    })
-    .catch((error) => {
-      console.log(error);
-      file.status = "empty";
-    });
-}
-
 function fetchFilteredFiles(language, limit = 5) {
   let filtered = filterFilesByLanguage(language).slice(0, limit);
   console.log(filtered);
@@ -85,44 +66,8 @@ function fetchFilteredFiles(language, limit = 5) {
     files.value.push(new File(githubOwner.value, githubRepo.value, path));
   }
   for (let file of files.value) {
-    fetchRawCode(file);
+    file.fetchRawCode()
   }
-}
-
-function highlight(file) {
-  //   console.log("requested highlighting for file", file);
-  file.status = "loading";
-  file.request.startTimestamp = Date.now();
-  let data = {
-    code: file.rawCode,
-    language: file.languageLong,
-  };
-  let outputElem = document.getElementById(file.identifier);
-  //   console.log(outputElem);
-  axios
-    .post("http://localhost:3000/highlight", data)
-    .then((response) => {
-      let newElement = document
-        .createRange()
-        .createContextualFragment(response.data);
-      outputElem.innerHTML = null;
-      outputElem.appendChild(newElement);
-      //   console.log(newElement);
-      //   console.log(outputElem);
-      file.highlightedCode = response.data;
-      file.status = "highlighted";
-      file.request.endTimestamp = Date.now();
-      file.request.duration =
-        file.request.endTimestamp - file.request.startTimestamp;
-    })
-    .catch((error) => {
-      console.log(error);
-      outputElem.innerHTML = "Error in Highlighting Service";
-      file.status = "failed";
-      file.request.endTimestamp = Date.now();
-      file.request.duration =
-        file.request.endTimestamp - file.request.startTimestamp;
-    });
 }
 
 async function loadFilesFromRepo() {
@@ -154,12 +99,13 @@ function filterFilesByLanguage(language) {
     <file-detail-modal-vue
       :activeFile="activeFile"
       @close-file-modal="closeFileModal"
-      @highlight-file="highlight(activeFile)"
     ></file-detail-modal-vue>
 
     <div class="card w-full bg-base-200 mt-3 shadow-xl">
       <div class="card-body">
-        <div class="form-control flex flex-row justify-start items-center gap-4">
+        <div
+          class="form-control flex flex-row justify-start items-center gap-4"
+        >
           <div class="input-group w-auto grow">
             <input
               type="text"
@@ -172,9 +118,7 @@ function filterFilesByLanguage(language) {
             </button>
           </div>
           or
-          <button class="btn" @click="loadTestFiles">
-            load test files
-          </button>
+          <button class="btn" @click="loadTestFiles">load test files</button>
         </div>
 
         <div v-show="Object.keys(languageFilesDict).length > 0">
@@ -287,7 +231,7 @@ function filterFilesByLanguage(language) {
           <button
             class="btn btn-primary m-auto"
             :class="{ 'btn-disabled': file.status == 'highlighted' }"
-            @click.stop="highlight(file)"
+            @click.stop="file.highlight()"
           >
             Highlight
           </button>
