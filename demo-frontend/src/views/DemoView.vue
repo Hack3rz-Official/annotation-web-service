@@ -1,6 +1,5 @@
 <script setup>
 import { onMounted, ref, watch, computed } from "vue";
-import axios from "axios";
 import File from "../composables/fileClass";
 import { useFileFixtures } from "../composables/useFileFixtures";
 import {
@@ -9,6 +8,9 @@ import {
   sortTreeByLanguages,
 } from "../composables/githubApiConnector";
 import FileDetailModalVue from "../components/FileDetailModal.vue";
+import { useFilesStore } from "../stores/filesStore"
+
+const filesStore = useFilesStore()
 
 const githubRepoUrl = ref(
   "https://github.com/Hack3rz-Official/annotation-web-service"
@@ -24,8 +26,8 @@ watch(githubRepoUrl, (newRepoUrl, oldRepoUrl) => {
 
 const highlightedCode = ref(``);
 
-const files = ref([]);
-const activeFile = ref(null);
+// const files = ref([]);
+// const activeFile = ref(null);
 
 const languageFilesDict = ref({});
 const amountJavaFiles = ref(0);
@@ -33,39 +35,39 @@ const amountPythonFiles = ref(0);
 const amountKotlinFiles = ref(0);
 
 function loadTestFiles() {
-  files.value = useFileFixtures();
-  for (let file of files.value) {
+  filesStore.files = useFileFixtures();
+  for (let file of filesStore.files) {
     file.fetchRawCode()
   }
 }
 
 function highlightAllFiles() {
-  for (let file of files.value) {
+  for (let file of filesStore.files) {
     if (file.status != "highlighted") {
       file.highlight();
     }
   }
 }
 
-function deleteAllFiles() {
-  files.value = [];
-}
+// function deleteAllFiles() {
+//   files.value = [];
+// }
 
-function setActiveFile(file) {
-  activeFile.value = file;
-}
+// function setActiveFile(file) {
+//   activeFile.value = file;
+// }
 
-function closeFileModal() {
-  activeFile.value = null;
-}
+// function closeFileModal() {
+//   activeFile.value = null;
+// }
 
 function fetchFilteredFiles(language, limit = 5) {
   let filtered = filterFilesByLanguage(language).slice(0, limit);
   console.log(filtered);
   for (let path of filtered) {
-    files.value.push(new File(githubOwner.value, githubRepo.value, path));
+    filesStore.files.push(new File(githubOwner.value, githubRepo.value, path));
   }
-  for (let file of files.value) {
+  for (let file of filesStore.files) {
     file.fetchRawCode()
   }
 }
@@ -96,10 +98,7 @@ function filterFilesByLanguage(language) {
 <template>
   <main class="container mx-auto px-3 gap-y-3">
     <!-- FileDetailModal -->
-    <file-detail-modal-vue
-      :activeFile="activeFile"
-      @close-file-modal="closeFileModal"
-    ></file-detail-modal-vue>
+    <file-detail-modal-vue></file-detail-modal-vue>
 
     <div class="card w-full bg-base-200 mt-3 shadow-xl">
       <div class="card-body">
@@ -118,7 +117,7 @@ function filterFilesByLanguage(language) {
             </button>
           </div>
           or
-          <button class="btn" @click="loadTestFiles">load test files</button>
+          <button class="btn" @click="loadTestFiles">load demo files</button>
         </div>
 
         <div v-show="Object.keys(languageFilesDict).length > 0">
@@ -194,14 +193,14 @@ function filterFilesByLanguage(language) {
       <button class="btn btn-primary mx-2" @click="highlightAllFiles">
         highlight all files
       </button>
-      <button class="btn btn-outline btn-error mx-2" @click="deleteAllFiles">
+      <button class="btn btn-outline btn-error mx-2" @click="filesStore.deleteAllFiles">
         delete all files
       </button>
     </div>
 
     <div class="flex flex-wrap gap-3 relative">
       <div
-        v-for="file in files"
+        v-for="file in filesStore.files"
         :key="file.identifier"
         class="
           file-wrapper
@@ -225,7 +224,7 @@ function filterFilesByLanguage(language) {
             opacity-0
             hover:opacity-100 hover:bg-black/20
           "
-          @click="setActiveFile(file)"
+          @click="filesStore.setActiveFile(file)"
         >
           <!-- button -->
           <button

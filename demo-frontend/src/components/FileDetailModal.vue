@@ -1,15 +1,11 @@
 <script setup>
 import { ref, watch } from "vue";
+import { useFilesStore } from "../stores/filesStore"
 
-const props = defineProps({
-  activeFile: {
-    type: Object,
-    required: true,
-  },
-});
+const filesStore = useFilesStore()
 
 watch(
-  () => props.activeFile,
+  () => filesStore.activeFile,
   (newActiveFile, oldActiveFile) => {
     // make sure edit mode is on when file is not highlighted yet
     if (!newActiveFile || newActiveFile.status != "highlighted") {
@@ -33,7 +29,7 @@ const languages = ref(["java", "python3", "kotlin", "go"]);
 const selectedLanguage = ref(null);
 
 watch(selectedLanguage, (newSelectedLanguage, oldSelectedLanguage) => {
-  props.activeFile.setLanguage(newSelectedLanguage);
+  filesStore.activeFile.setLanguage(newSelectedLanguage);
 });
 
 function toggleEditMode() {
@@ -48,7 +44,7 @@ function updateHighlightedCodeDisplay() {
   let outputElem = document.getElementById("active-file-highlighted");
   let newElement = document
     .createRange()
-    .createContextualFragment(props.activeFile.highlightedCode);
+    .createContextualFragment(filesStore.activeFile.highlightedCode);
   outputElem.innerHTML = null;
   outputElem.appendChild(newElement);
 }
@@ -57,9 +53,9 @@ function updateHighlightedCodeDisplay() {
 <template>
   <div
     class="modal h-11/12"
-    :class="{ 'modal-open': activeFile }"
-    @click="$emit('closeFileModal')"
-    v-if="activeFile"
+    :class="{ 'modal-open': filesStore.activeFile }"
+    @click="filesStore.setActiveFile(null)"
+    v-if="filesStore.activeFile"
   >
     <div
       class="modal-box relative h-full w-11/12 max-w-7xl"
@@ -74,13 +70,13 @@ function updateHighlightedCodeDisplay() {
               class="btn btn-primary w-full"
               :class="{ 'btn-outline': !editMode }"
               @click="toggleEditMode()"
-              :disabled="activeFile.status != 'highlighted'"
+              :disabled="filesStore.activeFile.status != 'highlighted'"
             >
               Toggle Edit Mode
             </button>
             <button
               class="btn btn-primary w-full"
-              @click="activeFile.highlight()"
+              @click="filesStore.activeFile.highlight()"
             >
               Save & Highlight
             </button>
@@ -96,7 +92,7 @@ function updateHighlightedCodeDisplay() {
             </select>
           </div>
 
-          <button class="btn w-full" @click="$emit('closeFileModal')">
+          <button class="btn w-full" @click="filesStore.setActiveFile(null)">
             Close
           </button>
         </div>
@@ -123,7 +119,7 @@ function updateHighlightedCodeDisplay() {
                 overflow-auto
                 h-full
               "
-              v-model="activeFile.rawCode"
+              v-model="filesStore.activeFile.rawCode"
             ></textarea>
           </div>
 
@@ -139,13 +135,13 @@ function updateHighlightedCodeDisplay() {
           <div
             class="badge w-full h-6 absolute rounded-none"
             :class="{
-              'badge-success': activeFile.status == 'highlighted',
-              'badge-warning': activeFile.status == 'loading',
-              'badge-error': activeFile.status == 'failed',
+              'badge-success': filesStore.activeFile.status == 'highlighted',
+              'badge-warning': filesStore.activeFile.status == 'loading',
+              'badge-error': filesStore.activeFile.status == 'failed',
             }"
           >
-            {{ activeFile.getFilenameShortened() }}.<span class="font-bold">{{
-              activeFile.languageShort
+            {{ filesStore.activeFile.getFilenameShortened() }}.<span class="font-bold">{{
+              filesStore.activeFile.languageShort
             }}</span>
           </div>
         </div>
