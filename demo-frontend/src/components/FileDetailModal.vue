@@ -1,8 +1,10 @@
 <script setup>
 import { ref, watch } from "vue";
 import { useFilesStore } from "../stores/filesStore"
+import { useLanguagesStore } from "../stores/languagesStore"
 
 const filesStore = useFilesStore()
+const languagesStore = useLanguagesStore()
 
 watch(
   () => filesStore.activeFile,
@@ -25,7 +27,6 @@ watch(
 );
 
 const editMode = ref(true);
-const languages = ref(["java", "python3", "kotlin", "go"]);
 const selectedLanguage = ref(null);
 
 watch(selectedLanguage, (newSelectedLanguage, oldSelectedLanguage) => {
@@ -86,8 +87,8 @@ function updateHighlightedCodeDisplay() {
               v-model="selectedLanguage"
             >
               <!-- <option disabled selected>Select language</option> -->
-              <option v-for="language in languages" :key="language">
-                {{ language }}
+              <option v-for="language in languagesStore.languagesExtendedWithGo" :key="language" :value="language.technical">
+                {{ language.humanReadable }}
               </option>
             </select>
           </div>

@@ -1,7 +1,6 @@
 <script setup>
-import { onMounted, ref, watch, computed } from "vue";
+import { ref, watch} from "vue";
 import File from "../composables/fileClass";
-import { useFileFixtures } from "../composables/useFileFixtures";
 import {
   getCommitsFromRepo,
   getFilesFromTree,
@@ -26,25 +25,8 @@ watch(githubRepoUrl, (newRepoUrl, oldRepoUrl) => {
   githubRepo.value = splitted[4];
 });
 
-const languageFilesDict = ref({});
-
-function loadTestFiles() {
-  filesStore.files = useFileFixtures();
-  for (let file of filesStore.files) {
-    file.fetchRawCode();
-  }
-}
-
-function highlightAllFiles() {
-  for (let file of filesStore.files) {
-    if (file.status != "highlighted") {
-      file.highlight();
-    }
-  }
-}
-
 function fetchFilteredFiles(language, limit = 5) {
-  let filtered = filterFilesByLanguage(language).slice(0, limit);
+  let filtered = filesStore.filterFilesByLanguage(language).slice(0, limit);
   console.log(filtered);
   for (let path of filtered) {
     filesStore.files.push(new File(githubOwner.value, githubRepo.value, path));
@@ -64,17 +46,9 @@ async function loadFilesFromRepo() {
     githubRepo.value,
     tree_sha
   );
-  languageFilesDict.value = sortTreeByLanguages(tree);
-  console.log(languageFilesDict.value);
+  filesStore.languageFilesDict = sortTreeByLanguages(tree);
 }
 
-function filterFilesByLanguage(language) {
-  if (!languageFilesDict.value || !(language in languageFilesDict.value)) {
-    return [];
-  } else {
-    return languageFilesDict.value[language];
-  }
-}
 </script>
 
 <template>
@@ -99,33 +73,33 @@ function filterFilesByLanguage(language) {
             </button>
           </div>
           or
-          <button class="btn" @click="loadTestFiles">load demo files</button>
+          <button class="btn" @click="filesStore.loadTestFiles">load demo files</button>
         </div>
 
-        <div v-show="Object.keys(languageFilesDict).length > 0">
+        <div v-show="Object.keys(filesStore.languageFilesDict).length > 0">
           The
           <span class="font-bold">{{ githubRepo }}</span> repository contains
-          {{ filterFilesByLanguage("java").length }} Java files,
-          {{ filterFilesByLanguage("py").length }} Python files and
-          {{ filterFilesByLanguage("kt").length }} Kotlin files.
+          {{ filesStore.filterFilesByLanguage("java").length }} Java files,
+          {{ filesStore.filterFilesByLanguage("py").length }} Python files and
+          {{ filesStore.filterFilesByLanguage("kt").length }} Kotlin files.
           <ul class="mt-3 flex flex-col gap-2">
             <li v-for="language in languagesStore.languages" :key="language" class="flex flex-row gap-4 items-center">
               <input
                 type="range"
                 min="0"
-                :max="filterFilesByLanguage(language.extension).length"
+                :max="filesStore.filterFilesByLanguage(language.extension).length"
                 v-model="language.selectedAmount"
                 class="range range-primary range-s w-64"
               />
               <button
                 class="btn btn-primary mx-2"
                 :class="{
-                  'btn-disabled': filterFilesByLanguage(language.extension).length == 0,
+                  'btn-disabled': filesStore.filterFilesByLanguage(language.extension).length == 0,
                 }"
                 @click="fetchFilteredFiles(language.extension, language.selectedAmount)"
               >
                 Fetch {{ language.selectedAmount }} of
-                {{ filterFilesByLanguage(language.extension).length }} {{ language.humanReadable }} Files
+                {{ filesStore.filterFilesByLanguage(language.extension).length }} {{ language.humanReadable }} Files
               </button>
             </li>
           </ul>
@@ -134,7 +108,7 @@ function filterFilesByLanguage(language) {
     </div>
 
     <div class="my-4">
-      <button class="btn btn-primary mx-2" @click="highlightAllFiles">
+      <button class="btn btn-primary mx-2" @click="filesStore.highlightAllFiles">
         highlight all files
       </button>
       <button
