@@ -8,9 +8,11 @@ import {
   sortTreeByLanguages,
 } from "../composables/githubApiConnector";
 import FileDetailModalVue from "../components/FileDetailModal.vue";
-import { useFilesStore } from "../stores/filesStore"
+import { useFilesStore } from "../stores/filesStore";
+import { useLanguagesStore } from "../stores/languagesStore";
 
-const filesStore = useFilesStore()
+const filesStore = useFilesStore();
+const languagesStore = useLanguagesStore();
 
 const githubRepoUrl = ref(
   "https://github.com/Hack3rz-Official/annotation-web-service"
@@ -24,20 +26,12 @@ watch(githubRepoUrl, (newRepoUrl, oldRepoUrl) => {
   githubRepo.value = splitted[4];
 });
 
-const highlightedCode = ref(``);
-
-// const files = ref([]);
-// const activeFile = ref(null);
-
 const languageFilesDict = ref({});
-const amountJavaFiles = ref(0);
-const amountPythonFiles = ref(0);
-const amountKotlinFiles = ref(0);
 
 function loadTestFiles() {
   filesStore.files = useFileFixtures();
   for (let file of filesStore.files) {
-    file.fetchRawCode()
+    file.fetchRawCode();
   }
 }
 
@@ -49,18 +43,6 @@ function highlightAllFiles() {
   }
 }
 
-// function deleteAllFiles() {
-//   files.value = [];
-// }
-
-// function setActiveFile(file) {
-//   activeFile.value = file;
-// }
-
-// function closeFileModal() {
-//   activeFile.value = null;
-// }
-
 function fetchFilteredFiles(language, limit = 5) {
   let filtered = filterFilesByLanguage(language).slice(0, limit);
   console.log(filtered);
@@ -68,7 +50,7 @@ function fetchFilteredFiles(language, limit = 5) {
     filesStore.files.push(new File(githubOwner.value, githubRepo.value, path));
   }
   for (let file of filesStore.files) {
-    file.fetchRawCode()
+    file.fetchRawCode();
   }
 }
 
@@ -127,61 +109,23 @@ function filterFilesByLanguage(language) {
           {{ filterFilesByLanguage("py").length }} Python files and
           {{ filterFilesByLanguage("kt").length }} Kotlin files.
           <ul class="mt-3 flex flex-col gap-2">
-            <li class="flex flex-row gap-4 items-center">
+            <li v-for="language in languagesStore.languages" :key="language" class="flex flex-row gap-4 items-center">
               <input
                 type="range"
                 min="0"
-                :max="filterFilesByLanguage('java').length"
-                v-model="amountJavaFiles"
+                :max="filterFilesByLanguage(language.extension).length"
+                v-model="language.selectedAmount"
                 class="range range-primary range-s w-64"
               />
               <button
                 class="btn btn-primary mx-2"
                 :class="{
-                  'btn-disabled': filterFilesByLanguage('java').length == 0,
+                  'btn-disabled': filterFilesByLanguage(language.extension).length == 0,
                 }"
-                @click="fetchFilteredFiles('java', amountJavaFiles)"
+                @click="fetchFilteredFiles(language.extension, language.selectedAmount)"
               >
-                Fetch {{ amountJavaFiles }} of
-                {{ filterFilesByLanguage("java").length }} Java Files
-              </button>
-            </li>
-            <li class="flex flex-row gap-4 items-center">
-              <input
-                type="range"
-                min="0"
-                :max="filterFilesByLanguage('py').length"
-                v-model="amountPythonFiles"
-                class="range range-primary range-s w-64"
-              />
-              <button
-                class="btn btn-primary mx-2"
-                :class="{
-                  'btn-disabled': filterFilesByLanguage('py').length == 0,
-                }"
-                @click="fetchFilteredFiles('py', amountPythonFiles)"
-              >
-                Fetch {{ amountPythonFiles }} of
-                {{ filterFilesByLanguage("py").length }} Python Files
-              </button>
-            </li>
-            <li class="flex flex-row gap-4 items-center">
-              <input
-                type="range"
-                min="0"
-                :max="filterFilesByLanguage('kt').length"
-                v-model="amountKotlinFiles"
-                class="range range-primary range-s w-64"
-              />
-              <button
-                class="btn btn-primary mx-2"
-                :class="{
-                  'btn-disabled': filterFilesByLanguage('kt').length == 0,
-                }"
-                @click="fetchFilteredFiles('kt', amountKotlinFiles)"
-              >
-                Fetch {{ amountKotlinFiles }} of
-                {{ filterFilesByLanguage("kt").length }} Kotlin Files
+                Fetch {{ language.selectedAmount }} of
+                {{ filterFilesByLanguage(language.extension).length }} {{ language.humanReadable }} Files
               </button>
             </li>
           </ul>
@@ -193,7 +137,10 @@ function filterFilesByLanguage(language) {
       <button class="btn btn-primary mx-2" @click="highlightAllFiles">
         highlight all files
       </button>
-      <button class="btn btn-outline btn-error mx-2" @click="filesStore.deleteAllFiles">
+      <button
+        class="btn btn-outline btn-error mx-2"
+        @click="filesStore.deleteAllFiles"
+      >
         delete all files
       </button>
     </div>
