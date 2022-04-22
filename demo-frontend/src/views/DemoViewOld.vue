@@ -138,7 +138,7 @@ function loadRandomCode() {
   </main>
 </template>
 
-<style>
+<style lang="scss">
 .hide-text-show-caret {
   color: black; /* sets the color of both caret and text */
   -webkit-text-fill-color: transparent; /* sets just the text color */
