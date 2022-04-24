@@ -99,10 +99,14 @@ def split_data(X, T, train_percentage=0.8):
     X_val = X[train_size:]
     T_val = T[train_size:]
 
+    assert X_train.shape == T_train.shape
+    assert X_val.shape == T_val.shape
+
     return X_train, T_train, X_val, T_val
 
 
 def compute_accuracy(model, X, T):
+    assert X.shape == T.shape
     model.setup_for_prediction()
     correct = 0
     total = 0

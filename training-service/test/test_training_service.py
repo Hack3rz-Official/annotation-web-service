@@ -28,8 +28,22 @@ class TrainingServiceTest(Hack3rzTest):
         self.assertEqual(X_train.shape[0], T_train.shape[0])
         self.assertEqual(X_val.shape[0],T_val.shape[0])
 
-    def test_accuracy(self):
-        pass
+    @patch('src.util.SHModelUtils.SHModel.predict')
+    def test_compute_accuracy_valid(self, predict_mock):
+        X = np.array([[1], [1], [1], [1],[1],[1],[1],[1],[1],[1]])
+        T = np.array([[1], [2], [1], [1],[1],[1],[1],[1],[1],[1]])
+        predict_mock.side_effect = [[1], [1], [1], [1],[1],[1],[1],[1],[1],[1]]
+        best_sh_model = SHModel("java", "test_best")
+        ratio = compute_accuracy(best_sh_model, X, T)
+        self.assertEqual(ratio, 0.9)
+    
+    @patch('src.util.SHModelUtils.SHModel.predict')
+    def test_compute_accuracy_invalid(self, predict_mock):
+        X = np.array([[1], [1], [1], [1],[1],[1],[1],[1],[1],[1]])
+        T = np.array([[1], [2], [1], [1],[1],[1],[1],[1],[1]])
+        best_sh_model = SHModel("java", "test_best")
+        self.assertRaises(AssertionError,compute_accuracy,best_sh_model, X,T)
+        
 
     def test_shuffle_data(self):
         training_data = self.annotation_repository.find_training_data("java")
@@ -84,15 +98,5 @@ class TrainingServiceTest(Hack3rzTest):
         self.assertIsNotNone(best_db_model)
         self.assertEquals(best_db_model.accuracy, 10)
     
-
-    def test_annotation(self):
-        annotation = Annotation()
-        annotation.key = AnnotationKey(language="JAVA", lexingTokens=[1, 2, 3])
-        annotation.sourceCode = "public class HelloWorld { public static void main(String[] args) { System.out.println(\"Hello World\"); } }"
-        annotation.highlightingTokens = [1, 2, 3]
-        annotation.highlightingCode = "public class HelloWorld { public static void main(String[] args) { System.out.println(\"Hello World\"); } }"
-        annotation.trainedTime = datetime.datetime.now()
-        annotation.save()
-
         
         
