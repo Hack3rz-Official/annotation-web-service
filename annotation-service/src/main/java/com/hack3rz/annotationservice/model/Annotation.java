@@ -5,28 +5,25 @@ import lombok.*;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-import java.util.Date;
 import java.util.List;
 
-@Getter
-@Setter
 @Document("annotations")
-@AllArgsConstructor
-@NoArgsConstructor
 @Builder
 public class Annotation {
 
     @Id
-    private String id;
+    private AnnotationKey id;
+
+    @Value
+    @AllArgsConstructor
+    public static class AnnotationKey {
+        private SupportedLanguage language;
+        private List<Integer> lexingTokens;
+    }
 
     private String sourceCode;
-    private List<Integer> lexingTokes;
+
     private List<Integer> highlightingTokens;
 
     private String highlightingCode;
-
-    private Date timestamp;
-
-    private SupportedLanguage language;
-
 }

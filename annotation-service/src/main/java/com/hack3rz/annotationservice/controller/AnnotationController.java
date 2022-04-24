@@ -2,6 +2,7 @@ package com.hack3rz.annotationservice.controller;
 
 import com.hack3rz.annotationservice.dto.AnnotateCodeRequestDTO;
 import com.hack3rz.annotationservice.model.Annotation;
+import com.hack3rz.annotationservice.model.Annotation.AnnotationKey;
 import com.hack3rz.annotationservice.repository.AnnotationRepository;
 import com.hack3rz.annotationservice.service.AnnotationService;
 import lexer.HTok;
@@ -44,13 +45,12 @@ public class AnnotationController {
         String htmlCode = annotationService.debugHighlightCode(dto.getCode(), dto.getLanguage());
 
         // Store in database
+        AnnotationKey annotationKey = new AnnotationKey(dto.getLanguage(), annotationService.pluckTokenIds(highlightingTokens));
         Annotation annotation = Annotation.builder()
+                .id(annotationKey)
                 .sourceCode(dto.getCode())
-                .language(dto.getLanguage())
-                .lexingTokes(annotationService.pluckTokenIds(highlightingTokens))
                 .highlightingTokens(annotationService.pluckHCodeValues(highlightingTokens))
                 .highlightingCode(htmlCode)
-                .timestamp(new Date())
                 .build();
 
         repository.save(annotation);
