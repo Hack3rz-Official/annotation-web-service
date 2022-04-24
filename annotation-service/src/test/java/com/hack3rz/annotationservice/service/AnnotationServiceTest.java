@@ -2,7 +2,7 @@ package com.hack3rz.annotationservice.service;
 
 import static com.hack3rz.annotationservice.enumeration.SupportedLanguage.JAVA;
 import static com.hack3rz.annotationservice.enumeration.SupportedLanguage.KOTLIN;
-import static com.hack3rz.annotationservice.enumeration.SupportedLanguage.PYTHON;
+import static com.hack3rz.annotationservice.enumeration.SupportedLanguage.PYTHON3;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.util.Arrays;

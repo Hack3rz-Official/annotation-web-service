@@ -1,5 +1,5 @@
 import os
-from SHModelUtils import SHModel
+from src.util.SHModelUtils import SHModel
 from src.models.model import Model
 
 def from_db_model_to_sh_model(db_model, lang_name):

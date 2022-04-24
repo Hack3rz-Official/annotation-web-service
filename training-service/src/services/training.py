@@ -38,7 +38,7 @@ def data_preprocessing(training_data):
     X = []
     T = []
     for sample in training_data:
-        X.append(sample.lexingTokens)
+        X.append(sample.key.lexingTokens)
         T.append(sample.highlightingTokens)
     X = np.array(X, dtype=object)
     T = np.array(T, dtype=object)
@@ -85,7 +85,7 @@ def train(model, X_train, T_train, epochs=10):
 def shuffle_data(X, T):
     print("[TRAIN] shuffling data...", flush=True)
     assert len(X) == len(T)
-    shuffle(X, T, random_state=0)
+    X, T = shuffle(X, T, random_state=0)
     return X, T
 
 
@@ -98,9 +98,6 @@ def split_data(X, T, train_percentage=0.8):
     T_train = T[:train_size]
     X_val = X[train_size:]
     T_val = T[train_size:]
-
-    assert X_train.shape[0] == T_train.shape[0]
-    assert X_val.shape[0] == T_val.shape[0]
 
     return X_train, T_train, X_val, T_val
 

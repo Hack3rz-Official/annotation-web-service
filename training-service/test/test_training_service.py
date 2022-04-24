@@ -2,27 +2,46 @@ import json
 from unittest.mock import patch
 from hack3rz_test import Hack3rzTest
 from src.models.annotation import Annotation, AnnotationKey
-from src.services.training import improve_model
+from src.services.training import improve_model, data_preprocessing, split_data, shuffle_data, compute_accuracy
 import datetime
+import numpy as np
 
-# run with: python3 -m unittest tests.py
+# run within the test folder the following commoand to execute file
+# run with: python3 -m unittest test_training_service.py
+
 class TrainingServiceTest(Hack3rzTest):
 
-    def test_data_preprocessing(self):
-        pass
+    def test_data_preprocessing(self):  
+        training_data = self.annotation_repository.find_training_data("java")
+        X, T = data_preprocessing(training_data)
+        self.assertIsInstance(X, np.ndarray)
+        self.assertIsInstance(T, np.ndarray)
+        self.assertNotEqual(X.size, 0)
+        self.assertNotEqual(T.size,0)
+
 
     def test_split_data(self):
-        pass
+        training_data = self.annotation_repository.find_training_data("java")
+        X, T = data_preprocessing(training_data)
+        X_train, T_train, X_val, T_val = split_data(X, T, train_percentage=0.8)
+        self.assertEqual(X_train.shape[0], T_train.shape[0])
+        self.assertEqual(X_val.shape[0],T_val.shape[0])
 
     def test_accuracy(self):
         pass
 
     def test_shuffle_data(self):
-        pass
+        training_data = self.annotation_repository.find_training_data("java")
+        X,T = data_preprocessing(training_data)
+        X_shuff,T_shuff = shuffle_data(X,T)
+        self.assertFalse(np.array_equal(X,X_shuff))
+        self.assertFalse(np.array_equal(T,T_shuff))
+
+
+
 
     def test_train(self):
         pass
-    
     """
     @patch('src.services.training.compute_accuracy')
     @patch('src.services.training.train')

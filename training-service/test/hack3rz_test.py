@@ -5,6 +5,8 @@ import os
 from app import create_app
 from src.models.annotation import Annotation
 from src.models.model import Model
+from src.repositories.annotation import AnnotationRepository
+from src.repositories.model import ModelRepository
 import json
 import warnings
 
@@ -31,6 +33,8 @@ class Hack3rzTest(TestCase):
         self.app  = create_app()
         self.app.testing = True
         self.db = MongoEngine()
+        self.annotation_repository = AnnotationRepository()
+        self.model_repository = ModelRepository()
     
     # called before running every test
     def setUp(self):
@@ -39,6 +43,7 @@ class Hack3rzTest(TestCase):
         # TODO drop all collections at once?
         Annotation.drop_collection()
         Model.drop_collection()
+        self.load_training_test_data()
 
     def load_training_test_data(self):
         with open('annotations.json') as file:
