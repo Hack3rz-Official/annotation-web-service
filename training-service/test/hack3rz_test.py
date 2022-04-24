@@ -7,6 +7,7 @@ from src.models.annotation import Annotation
 from src.models.model import Model
 from src.repositories.annotation import AnnotationRepository
 from src.repositories.model import ModelRepository
+from src.services.training import data_preprocessing
 import json
 import warnings
 
@@ -50,7 +51,11 @@ class Hack3rzTest(TestCase):
             file_data = json.load(file)
             annotation_instances = [Annotation.from_json(json.dumps(annotation), created=True) for annotation in file_data]
             Annotation.objects.insert(annotation_instances, load_bulk=False)
-        
+
+    def load_test_X_T(self, lang_name):
+        X, T = data_preprocessing(self.annotation_repository.find_training_data(lang_name))
+        return X, T
+
     @classmethod
     def tearDownClass(self):
         super().tearDownClass()

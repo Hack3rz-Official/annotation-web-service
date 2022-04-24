@@ -74,8 +74,8 @@ def train(model, X_train, T_train, epochs=10):
         print(f'Loading {epoch+1}0%', flush=True)
         epoch_losses = np.array([])
         for idx, x in enumerate(X_train):
-            epoch_loss = model.finetune_on(x, T_train[idx])
-            epoch_losses = np.append(epoch_losses, epoch_loss)
+            loss_of_sample = model.finetune_on(x, T_train[idx])
+            epoch_losses = np.append(epoch_losses, loss_of_sample)
         avg_epoch_loss = np.mean(epoch_losses)
         losses = np.append(losses, avg_epoch_loss)
         print(f'Average Loss {avg_epoch_loss} in epoch {epoch+1}', flush=True)
