@@ -62,8 +62,7 @@ jobs:
         working-directory: training-service
         run: coverage xml
       - name: SonarCloud Scan
-        working-directory: training-service
-      - uses: SonarSource/sonarcloud-github-action@master
+        uses: SonarSource/sonarcloud-github-action@master
         with:
           projectBaseDir: training-service
         env:
