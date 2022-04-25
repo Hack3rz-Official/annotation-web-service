@@ -17,8 +17,6 @@ jobs:
           fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of analysis
       - name: Build docker
         run: docker-compose up -d mongodb
-      - name: fix code coverage paths
-        run: sed -i 's@'$GITHUB_WORKSPACE'@/github/workspace/@g' lcov.info
       - name: Set up Python
         run: sudo apt-get install python3
         working-directory: training-service
