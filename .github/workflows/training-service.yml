@@ -3,7 +3,6 @@ on:
   push:
     branches:
       - develop
-      - feature/setup-ci-sonarqube
     paths:
       - 'training-service/**'
   pull_request:
