@@ -20,8 +20,9 @@ jobs:
     - name: Import environment variables from a file
       id: import-env
       shell: bash
-      run: echo ${{ env.ENV_FILE }}
-      run: echo $GITHUB_ENV
+      run: |
+        echo ${{ env.ENV_FILE }}
+        echo $GITHUB_ENV
     - name: Print environment variable
       run: echo $ABC
       env: ${{ fromJson(steps.import-env.outputs.result) }} # step-level env
