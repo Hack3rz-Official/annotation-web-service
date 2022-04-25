@@ -33,7 +33,9 @@ jobs:
            coverage run -m unittest discover
         working-directory: training-service
       - name: Generate Coverage Report
-        run: coverage xml
+        run: |
+           cd test
+           coverage xml
         working-directory: training-service
       - name: SonarCloud Scan
         uses: SonarSource/sonarcloud-github-action@master
