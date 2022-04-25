@@ -36,7 +36,7 @@ jobs:
       - name: Generate Coverage Report
         run: |
            cd test
-           coverage xml
+           coverage xml --omit=*_test.py,test_*.py
         working-directory: training-service
       - name: SonarCloud Scan
         uses: SonarSource/sonarcloud-github-action@master
