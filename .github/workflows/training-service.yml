@@ -35,7 +35,8 @@ jobs:
       - name: Generate Coverage Report
         run: |
            cd test
-           coverage xml 
+           coverage xml
+           sed -i 's@'$GITHUB_WORKSPACE'@/github/workspace/@g' coverage.xml
         working-directory: training-service
       - name: SonarCloud Scan
         uses: SonarSource/sonarcloud-github-action@master
