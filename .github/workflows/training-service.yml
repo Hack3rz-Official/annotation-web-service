@@ -12,7 +12,7 @@ jobs:
   sonarcloud:
     name: SonarCloud
     runs-on: ubuntu-latest
-    defualts:
+    defaults:
       run:
         working-directory: training-service
 
