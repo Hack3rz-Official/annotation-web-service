@@ -21,6 +21,7 @@ jobs:
       id: import-env
       shell: bash
       run: |
+        cd ..
         echo ${{ env.ENV_FILE }}
         echo $GITHUB_ENV
     - name: Print environment variable
