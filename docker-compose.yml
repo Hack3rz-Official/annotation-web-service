@@ -76,6 +76,7 @@ services:
       - "27017:${MONGO_PORT}"
     networks:
       - aws-network
+    profiles: ["testing"]
 
   demo-frontend:
     build: ./demo-frontend
