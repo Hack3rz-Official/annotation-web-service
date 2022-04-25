@@ -23,6 +23,7 @@ jobs:
       run: |
         cd ..
         echo $PWD
+        echo ${process.env.GITHUB_WORKSPACE}
         cat .env >> $GITHUB_ENV
     - name: Print environment variable
       run: echo $ABC
