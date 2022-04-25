@@ -16,15 +16,14 @@ jobs:
     services:
       mongodb:
         image: mongo:5.0.6
-        container_name: MongoDB
-        environment:
+        env:
           - PUID=1000
           - PGID=1000
           - MONGO_INITDB_ROOT_USERNAME=admin
           - MONGO_INITDB_ROOT_PASSWORD=${MONGO_PASSWORD}
-        env_file:
-          - .env
-        restart: unless-stopped
+        with:
+          file_name: .env
+        
         volumes:
           - ./data:/data/db
           - ./mongo-init.sh:/docker-entrypoint-initdb.d/mongo-init.sh:ro
