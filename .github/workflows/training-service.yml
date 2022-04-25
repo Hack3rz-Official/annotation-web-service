@@ -12,28 +12,46 @@ jobs:
   sonarcloud:
     name: SonarCloud
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: training-service
+
+    services:
+      mongodb:
+        image: mongo:5.0.6
+        container_name: MongoDB
+        environment:
+          - PUID=1000
+          - PGID=1000
+          - MONGO_INITDB_ROOT_USERNAME=admin
+          - MONGO_INITDB_ROOT_PASSWORD=${MONGO_PASSWORD}
+        env_file:
+          - .env
+        restart: unless-stopped
+        volumes:
+          - ./data:/data/db
+          - ./mongo-init.sh:/docker-entrypoint-initdb.d/mongo-init.sh:ro
+        ports:
+          - "27017:${MONGO_PORT}"
+
     steps:
       - uses: actions/checkout@v2
         with:
           fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of analysis
       - name: Set up Python
+        working-directory: training-service
         run: sudo apt-get install python3
       - name: Install dependencies
+        working-directory: training-service
         run: |
            sudo pip install coverage
            python3 -m pip install --upgrade pip
            pip install -r requirements.txt
       - name: Test with unittest
-        run: |
-            export PYTHONPATH="$PWD"
-            cd test
-            coverage run -m unittest discover
+        working-directory: training-service
+        run: coverage run -m unittest discover
       - name: Generate Coverage Report
+        working-directory: training-service
         run: coverage xml
       - name: SonarCloud Scan
+        working-directory: training-service
         uses: SonarSource/sonarcloud-github-action@master
         with:
           projectBaseDir: training-service
