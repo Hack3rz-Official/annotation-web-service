@@ -1,10 +1,10 @@
-name: Prediction Service
+name: Web Api Service SonarCloud
 on:
   push:
     branches:
       - develop
     paths:
-      - 'prediction-service/**'
+      - 'web-api/**'
   pull_request:
     types: [opened, synchronize, reopened]
 jobs:
@@ -13,26 +13,19 @@ jobs:
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: prediction-service
+        working-directory: web-api
     steps:
       - uses: actions/checkout@v2
         with:
           fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of analysis
-      - name: Set up Python
-        run: sudo apt-get install python3
       - name: Install dependencies
-        run: |
-          sudo pip install coverage
-          python3 -m pip install --upgrade pip
-          pip install -r requirements.txt
-      - name: Test with unittest
-        run: coverage run -m unittest discover
-      - name: Generate Coverage Report
-        run: coverage xml
+        run: yarn install
+      - name: Test and coverage
+        run: yarn jest --coverage
       - name: SonarCloud Scan
         uses: SonarSource/sonarcloud-github-action@master
         with:
-          projectBaseDir: prediction-service
+          projectBaseDir: web-api
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Needed to get PR information, if any
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}

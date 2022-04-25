@@ -1,4 +1,4 @@
-name: Annotation Service
+name: Annotation Service SonarCloud
 on:
   push:
     branches:
