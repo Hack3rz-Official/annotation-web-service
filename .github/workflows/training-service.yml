@@ -9,14 +9,15 @@ on:
   pull_request:
     types: [opened, synchronize, reopened]
 jobs:
-  build:
+  build-and-run-docker-testing:
+    name: Build and Run Docker Profile <testing>
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
       - name: Build docker
         run: docker-compose -p testing up -d
-    
   sonarcloud:
+    needs: build-and-run-docker-testing
     name: SonarCloud
     runs-on: ubuntu-latest
     defaults:
