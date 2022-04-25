@@ -26,12 +26,14 @@ import static org.springframework.http.HttpStatus.BAD_REQUEST;
 @Service
 public class AnnotationService {
     private static final Logger log = LoggerFactory.getLogger(AnnotationService.class);
+    private static final String INSTANTIATED_RESOLVER_OF_TYPE = "Instantiated resolver of type {}";
+    private static final String COULD_NOT_BE_HIGHLIGHTED = "Code could not be highlighted.";
 
     public LTok[] lexCode(String code, SupportedLanguage language) {
         log.info("Received code to annotate...");
 
         Resolver resolver = getResolverByLanguage(language);
-        log.info("Instantiated resolver of type {}", resolver.getClass());
+        log.info(INSTANTIATED_RESOLVER_OF_TYPE, resolver.getClass());
 
         LTok[] lexingTokens = resolver.lex(code);
 
@@ -49,17 +51,17 @@ public class AnnotationService {
         log.info("Received code to highlight...");
 
         Resolver resolver = getResolverByLanguage(language);
-        log.info("Instantiated resolver of type {}", resolver.getClass());
+        log.info(INSTANTIATED_RESOLVER_OF_TYPE, resolver.getClass());
 
         HTok[] highlightTokens = resolver.highlight(code);
 
         if (highlightTokens == null) {
-            log.error("Code could not be highlighted.");
-            throw new ApiException(BAD_REQUEST, "Code could not be highlighted.", "highlightTokens was null");
+            log.error(COULD_NOT_BE_HIGHLIGHTED);
+            throw new ApiException(BAD_REQUEST, COULD_NOT_BE_HIGHLIGHTED, "highlightTokens was null");
         }
 
         log.info("HighlightToken length = {}", highlightTokens.length);
-        
+
         return highlightTokens;
     }
 
@@ -67,13 +69,13 @@ public class AnnotationService {
         log.info("Received code to highlight...");
 
         Resolver resolver = getResolverByLanguage(language);
-        log.info("Instantiated resolver of type {}", resolver.getClass());
+        log.info(INSTANTIATED_RESOLVER_OF_TYPE, resolver.getClass());
 
         String htmlCode = resolver.debug(code);
 
         if (htmlCode == null) {
-            log.error("Code could not be highlighted.");
-            throw new ApiException(BAD_REQUEST, "Code could not be highlighted.", "htmlCode was null");
+            log.error(COULD_NOT_BE_HIGHLIGHTED);
+            throw new ApiException(BAD_REQUEST, COULD_NOT_BE_HIGHLIGHTED, "htmlCode was null");
         }
 
         return htmlCode;
@@ -99,9 +101,5 @@ public class AnnotationService {
         }
 
         return resolver;
-    }
-
-    private String mapLTok(LTok t) {
-        return "{ startIndex=" + t.startIndex + ", endIndex=" + t.endIndex + ", tokenId=" + t.tokenId + " }";
     }
 }
