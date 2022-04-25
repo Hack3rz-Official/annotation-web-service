@@ -7,4 +7,5 @@
 *.pt
 /data
 *.pyc
-/service-predict
+*.coverage
+*coverage.xml
