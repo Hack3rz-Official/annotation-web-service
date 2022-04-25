@@ -32,13 +32,12 @@ jobs:
         run: |
            export PYTHONPATH="$PWD"
            cd test
-           echo $GITHUB_WORKSPACE
-           coverage run --source=$GITHUB_WORKSPACE --omit=*_test.py,test_*.py,*SHModelUtils.py -m unittest discover
+           coverage run --omit=*_test.py,test_*.py,*SHModelUtils.py -m unittest discover
         working-directory: training-service
       - name: Generate Coverage Report
         run: |
            cd test
-           coverage xml
+           coverage xml 
         working-directory: training-service
       - name: SonarCloud Scan
         uses: SonarSource/sonarcloud-github-action@master
