@@ -22,6 +22,7 @@ jobs:
       shell: bash
       run: |
         cd ..
+        echo $PWD
         echo ${{ env.ENV_FILE }}
         echo $GITHUB_ENV
     - name: Print environment variable
