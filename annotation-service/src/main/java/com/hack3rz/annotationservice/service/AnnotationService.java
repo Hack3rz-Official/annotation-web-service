@@ -59,7 +59,7 @@ public class AnnotationService {
         }
 
         log.info("HighlightToken length = {}", highlightTokens.length);
-        
+
         return highlightTokens;
     }
 
@@ -99,9 +99,5 @@ public class AnnotationService {
         }
 
         return resolver;
-    }
-
-    private String mapLTok(LTok t) {
-        return "{ startIndex=" + t.startIndex + ", endIndex=" + t.endIndex + ", tokenId=" + t.tokenId + " }";
     }
 }
