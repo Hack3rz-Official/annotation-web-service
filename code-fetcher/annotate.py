@@ -12,7 +12,7 @@ def do_annotation(language):
                     print("Annotating... ", filename)
                     code = language_file.read()
                     body = {
-                        "lang_name": language.upper(),
+                        "language": language.upper(),
                         "code": code
                     }
                     res = requests.post(url=os.environ.get('ANNOTATE_URL'), json=body)

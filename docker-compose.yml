@@ -8,6 +8,8 @@ services:
     platform: linux/amd64
     env_file:
       - .env
+    ports: 
+      - 8080:8080
     depends_on:
       - mongodb
     networks:
@@ -45,8 +47,6 @@ services:
       - .env
     ports:
       - "6061:5000"
-    volumes:
-      - './data:/data/db'
     networks:
       - aws-network
     environment:

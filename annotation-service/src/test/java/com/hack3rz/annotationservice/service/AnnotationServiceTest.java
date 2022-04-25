@@ -2,7 +2,7 @@ package com.hack3rz.annotationservice.service;
 
 import static com.hack3rz.annotationservice.enumeration.SupportedLanguage.JAVA;
 import static com.hack3rz.annotationservice.enumeration.SupportedLanguage.KOTLIN;
-import static com.hack3rz.annotationservice.enumeration.SupportedLanguage.PYTHON;
+import static com.hack3rz.annotationservice.enumeration.SupportedLanguage.PYTHON3;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.util.Arrays;
@@ -40,7 +40,7 @@ class AnnotationServiceTest {
     void whenValidPython3Code_thenReturnLexedTokens() {
         String code = "print(\"Hello World\")";
         List<Integer> expectedLexingResult = Arrays.asList(42, 54, 3, 55);
-        assertEquals(expectedLexingResult, annotationService.pluckTokenIds(annotationService.lexCode(code, PYTHON)));
+        assertEquals(expectedLexingResult, annotationService.pluckTokenIds(annotationService.lexCode(code, PYTHON3)));
     }
 
     @Test
@@ -61,7 +61,7 @@ class AnnotationServiceTest {
     void whenIncompletePython3Code_thenReturnLexedTokens() {
         String code = "print(";
         List<Integer> expectedLexingResult = Arrays.asList(42, 54);
-        assertEquals(expectedLexingResult, annotationService.pluckTokenIds(annotationService.lexCode(code, PYTHON)));
+        assertEquals(expectedLexingResult, annotationService.pluckTokenIds(annotationService.lexCode(code, PYTHON3)));
     }
 
     @Test

@@ -17,7 +17,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import static com.hack3rz.annotationservice.enumeration.SupportedLanguage.KOTLIN;
-import static com.hack3rz.annotationservice.enumeration.SupportedLanguage.PYTHON;
+import static com.hack3rz.annotationservice.enumeration.SupportedLanguage.PYTHON3;
 import static org.springframework.http.HttpStatus.BAD_REQUEST;
 
 /**
@@ -90,7 +90,7 @@ public class AnnotationService {
     private Resolver getResolverByLanguage(SupportedLanguage language) {
         Resolver resolver;
 
-        if (language == PYTHON) {
+        if (language == PYTHON3) {
             resolver = new Python3Resolver();
         } else if (language == KOTLIN) {
             resolver = new KotlinResolver();
