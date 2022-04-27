@@ -8,6 +8,7 @@ from src.models.model import Model
 from src.repositories.annotation import AnnotationRepository
 from src.repositories.model import ModelRepository
 from src.services.training import data_preprocessing
+from src.util.SHModelHelper import SHModel
 import json
 import warnings
 
@@ -45,6 +46,15 @@ class Hack3rzTest(TestCase):
         Annotation.drop_collection()
         Model.drop_collection()
         self.load_training_test_data()
+
+    def save_sh_model_to_db(self,lang_name, accuracy):
+        model = SHModel(lang_name, os.environ.get('MODEL_NAME'))
+        print("[TRAIN] New Model saved from directory to DB ", flush=True)
+        model = Model(language=lang_name, accuracy=accuracy)
+        with open(lang_name + "_" + os.environ.get('MODEL_NAME') + ".pt", "rb") as binary_file:
+            model.file.put(binary_file)
+        model.save()
+
 
     def load_training_test_data(self):
         with open('annotations.json') as file:

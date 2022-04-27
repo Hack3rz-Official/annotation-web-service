@@ -1,5 +1,6 @@
 from hack3rz_test import Hack3rzTest
 from src.repositories.annotation import AnnotationRepository
+import time
 
 annotation_repository = AnnotationRepository()
 
@@ -18,10 +19,17 @@ class RepositoriesTest(Hack3rzTest):
         training_data = annotation_repository.find_training_data(lang_name)
         self.assertEqual(len(training_data), 0)
 
-        # KOTLIN IS CURRENTLY MISSING
-
     def test_model_find_best_model(self):
-        pass
+        test_acc = 0.1234
+        super().save_sh_model_to_db("python3", test_acc)
+        model = self.model_repository.find_best_model("python3")
+        self.assertEqual(test_acc, model.accuracy)
 
-    def test_model_save(self):
-        pass
+    def test_fetch_newest_model(self):
+        test_acc1 = 0.123
+        test_acc2 = 0.789
+        super().save_sh_model_to_db("python3", test_acc1)
+        time.sleep(3)
+        super().save_sh_model_to_db("python3", test_acc2)
+        model = self.model_repository.find_best_model("python3")
+        self.assertEqual(test_acc2, model.accuracy)
