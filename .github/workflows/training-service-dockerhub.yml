@@ -1,0 +1,37 @@
+name: Training Service DockerHub
+on:
+  push:
+    branches:
+      - main
+    tags:
+      - 'v*'
+    paths:
+      - 'training-service/**'
+  pull_request:
+    types: [opened, synchronize, reopened]
+jobs:
+  build:
+    name: DockerHub Image
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: training-service
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Login to Docker Hub
+        uses: docker/login-action@v1
+        with:
+          username: ${{ secrets.DOCKER_HUB_USERNAME }}
+          password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1
+      - name: Build and push
+        uses: docker/build-push-action@v2
+        with:
+          context: training-service/
+          file: training-service/Dockerfile
+          push: true
+          tags: ${{ secrets.DOCKER_HUB_USERNAME }}/training-service:latest
+          cache-from: type=registry,ref=${{ secrets.DOCKER_HUB_USERNAME }}/training-service:buildcache
+          cache-to: type=registry,ref=${{ secrets.DOCKER_HUB_USERNAME }}/training-service:buildcache,mode=max

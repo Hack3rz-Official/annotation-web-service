@@ -1,4 +1,4 @@
-name: Training Service
+name: Training Service SonarCloud
 on:
   push:
     branches:
