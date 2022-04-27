@@ -1,8 +1,6 @@
-import logging
 import os
-import json
 import config as config
-from flask import Flask, Response, request
+from flask import Flask
 from flask_mongoengine import MongoEngine
 from flasgger import Swagger
 
@@ -49,5 +47,3 @@ def create_app():
 if __name__ == "__main__":
     app = create_app()
     app.run(debug=True)
-    #app.run(host=config.HOST, port=config.PORT)
-

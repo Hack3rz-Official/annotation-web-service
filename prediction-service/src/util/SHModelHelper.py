@@ -11,6 +11,3 @@ def load_db_model_to_current_directory(db_model, lang_name):
         print("[SHModel] No model found in DB, creating new model", flush=True)
 
 
-
-
-

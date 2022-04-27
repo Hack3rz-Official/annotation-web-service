@@ -1,17 +1,14 @@
 from flask import Blueprint, jsonify, request, Response
-
 import logging
 import json
 from src.util.SHModelUtils import SHModel
-
-
+import os
 
 prediction_blueprint = Blueprint(name="prediction", import_name=__name__)
 
 @prediction_blueprint.route('/', methods=['POST'])
 def main():
-
-  # swagger
+    # TODO: swagger onfig
     """Train syntax highlighting models for all supported languages
     ---
     definitions:
@@ -47,8 +44,7 @@ def main():
         return Response(f"{lang_name} is an unsupported programming language", status=400)
 
     try:
-        model = SHModel(lang_name, "curr")
-        #predict 
+        model = SHModel(lang_name, os.environ.get('MODEL_NAME'))
         model.setup_for_prediction()
         res = model.predict(tok_ids)
         return Response(json.dumps({'h_code_values': res}))
