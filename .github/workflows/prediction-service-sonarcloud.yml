@@ -11,24 +11,33 @@ jobs:
   sonarcloud:
     name: SonarCloud
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: prediction-service
     steps:
       - uses: actions/checkout@v2
         with:
           fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of analysis
+      - name: Build docker
+        run: docker-compose up -d mongodb
       - name: Set up Python
         run: sudo apt-get install python3
+        working-directory: prediction-service
       - name: Install dependencies
         run: |
-          sudo pip install coverage
-          python3 -m pip install --upgrade pip
-          pip install -r requirements.txt
+           sudo pip install coverage
+           python3 -m pip install --upgrade pip
+           pip install -r requirements.txt
+        working-directory: prediction-service
       - name: Test with unittest
-        run: coverage run -m unittest discover
+        run: |
+           export PYTHONPATH="$PWD"
+           cd test
+           coverage run --omit=*_test.py,test_*.py,*SHModelUtils.py -m unittest discover
+        working-directory: prediction-service
       - name: Generate Coverage Report
-        run: coverage xml
+        run: |
+           cd test
+           coverage xml
+           sed -i 's@'$GITHUB_WORKSPACE'@/github/workspace/@g' coverage.xml
+        working-directory: prediction-service
       - name: SonarCloud Scan
         uses: SonarSource/sonarcloud-github-action@master
         with:
