@@ -17,12 +17,12 @@ A syntax highlighting web service based on AI. Please read the [project instruct
 ## Wiki
 Under the hood, the Annotation WebService consists of the following independent microservices:
 
-| Microservice             | Description                                                                | Technology |
-|--------------------|----------------------------------------------------------------------------|------------|
-| [Annotation Service]() | Handles the lexing and highlighting of code. | Java with [Spring Boot](https://github.com/spring-projects/spring-boot)|
-| [Prediction Service]()  | Handles the prediction of syntax highlighting.         | Python with [Flask](https://github.com/pallets/flask) |
-| [Training Service]()   | Handles the regularily conducted training and exchange of the underlying prediction models.         | Python with [Flask](https://github.com/pallets/flask) |
-| [Web API]()          | The web API that acts as the primary entry point for the customers.        | JS/TS with [Nest.js](https://github.com/nestjs/nest) |
+| Microservice             | Description                                                                | Technology | Status |
+|--------------------|----------------------------------------------------------------------------|------------|--------|
+| [Annotation Service]() | Handles the lexing and highlighting of code. | Java with [Spring Boot](https://github.com/spring-projects/spring-boot)|[![Coverage](https://sonarcloud.io/api/project_badges/measure?project=annotation-service&metric=coverage)](https://sonarcloud.io/summary/new_code?id=annotation-service)|
+| [Prediction Service]()  | Handles the prediction of syntax highlighting.         | Python with [Flask](https://github.com/pallets/flask) | [![Coverage](https://sonarcloud.io/api/project_badges/measure?project=prediction-service&metric=coverage)](https://sonarcloud.io/summary/new_code?id=prediction-service)|
+| [Training Service]()   | Handles the regularily conducted training and exchange of the underlying prediction models.         | Python with [Flask](https://github.com/pallets/flask) | [![Coverage](https://sonarcloud.io/api/project_badges/measure?project=training-service&metric=coverage)](https://sonarcloud.io/summary/new_code?id=training-service)|
+| [Web API]()          | The web API that acts as the primary entry point for the customers.        | JS/TS with [Nest.js](https://github.com/nestjs/nest) | [![Coverage](https://sonarcloud.io/api/project_badges/measure?project=web-api-service&metric=coverage)](https://sonarcloud.io/summary/new_code?id=web-api-service)|
 
 
 ## How it works
