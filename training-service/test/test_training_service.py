@@ -93,7 +93,7 @@ class TrainingServiceTest(Hack3rzTest):
 
         X, T = super().load_test_X_T("java")
         improve_model(X, T, "java")
-
+        
         best_db_model = self.model_repository.find_best_model("java")
         self.assertIsNotNone(best_db_model)
         self.assertEquals(best_db_model.accuracy, 10)
