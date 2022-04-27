@@ -72,31 +72,47 @@ class TrainingServiceTest(Hack3rzTest):
     @patch('src.services.training.compute_accuracy')
     @patch('src.services.training.train')
     def test_improve_model_do_nothing(self, train_mock, compute_accuracy_mock):
+        # create functions mocks
         # skip train method execution
         train_mock.return_value = []
         # cur_acc is 10, new_acc is 5
         compute_accuracy_mock.side_effect = [10, 5]
-       
+        
+        # prepare and run function
+        training_data = self.annotation_repository.find_training_data("java")
         X, T = super().load_test_X_T("java")
-        improve_model(X, T, "java")
-
+        improve_model(X, T, "java", training_data)
+        
+        # test model
         best_db_model = self.model_repository.find_best_model("java")
         self.assertIsNone(best_db_model)
+        
+        # test annotations
+        training_data = self.annotation_repository.find_training_data("java")
+        # test db has 10 test annotations initially loaded per language
+        self.assertEqual(10, len(training_data))
 
     @patch('src.services.training.compute_accuracy')
     @patch('src.services.training.train')
     def test_improve_model_update_best_model(self, train_mock, compute_accuracy_mock):
+        # create functions mocks
         # skip train method execution
         train_mock.return_value = []
         # cur_acc is 5, new_acc is 10
         compute_accuracy_mock.side_effect = [5, 10]
 
+        # prepare and run functions
+        training_data = self.annotation_repository.find_training_data("java")
         X, T = super().load_test_X_T("java")
-        improve_model(X, T, "java")
-        
+        improve_model(X, T, "java", training_data)
+
         best_db_model = self.model_repository.find_best_model("java")
         self.assertIsNotNone(best_db_model)
+        
+        training_data = self.annotation_repository.find_training_data("java")
         self.assertEquals(best_db_model.accuracy, 10)
+        self.assertEquals(0, len(training_data))
+
     
         
         

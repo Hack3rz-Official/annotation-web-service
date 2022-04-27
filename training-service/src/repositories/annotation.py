@@ -9,4 +9,4 @@ class AnnotationRepository:
 
     @staticmethod
     def update_trained_time(annotations):
-        annotations.update(trainedTime=datetime.datetime.now().astimezone())
+        annotations.update(trainedTime=datetime.datetime.now())
