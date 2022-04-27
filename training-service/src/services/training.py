@@ -24,7 +24,7 @@ def train_models():
             continue
 
         X, T = data_preprocessing(training_data)
-        improve_model(X, T, lang_name)
+        improve_model(X, T, lang_name, training_data)
         trained_languages.append(lang_name)
 
     print("[TRAIN] ### TRAINING DONE ### ", flush=True)
@@ -45,7 +45,7 @@ def data_preprocessing(training_data):
     return X, T
 
 
-def improve_model(X, T, lang_name):
+def improve_model(X, T, lang_name, training_data):
     X_train, T_train, X_val, T_val = split_data(X, T)
 
     best_db_model = model_repository.find_best_model(lang_name)
@@ -61,6 +61,7 @@ def improve_model(X, T, lang_name):
         best_sh_model.persist_model()
         improved_db_model = from_best_sh_model_to_db_model(lang_name, new_acc)
         model_repository.save(improved_db_model)
+        annotation_repository.update_trained_time(training_data)
         return
 
     print("[TRAIN] No improvement: do nothing", flush=True)
