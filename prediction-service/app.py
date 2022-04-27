@@ -1,39 +1,49 @@
-import logging
-from model.SHModelUtils import SHModel
-from flask import Flask, Response, request
-import json
+import os
+import config as config
+from flask import Flask
+from flask_mongoengine import MongoEngine
+from flasgger import Swagger
 
-app = Flask(__name__)
+from src.blueprints.prediction import prediction_blueprint
+from src.repositories.model import ModelRepository
+from src.util.SHModelHelper import load_db_model_to_current_directory
 
-@app.route("/predict", methods=["POST"])
-def predict():
-    supported_languages = ["java", "python3", "kotlin"]
-    logging.info('Python HTTP trigger function processed a request.')
+def create_app():
+    app = Flask(__name__)
+    app.debug = config.DEBUG
+    app.config["MONGODB_SETTINGS"] = {
+        'db': os.environ.get('MONGO_DATABASE_NAME'),
+        'host': os.environ.get('MONGO_HOST'),
+        'port': int(os.environ.get('MONGO_PORT')),
+        'username': os.environ.get('MONGO_USERNAME'),
+        'password': os.environ.get('MONGO_PASSWORD'),
+        'authSource': os.environ.get('MONGO_AUTH_DATABASE')
+    }  
 
-    # deserialize
-    try:
-        req_body = request.get_json()
-        lang_name = req_body.get('lang_name')
-        tok_ids = req_body.get('tok_ids')
-    except Exception as e:
-        logging.error("Invalid body, not json" + str(e))
-        return Response("Invalid body, please provide json", status=400)
+    # Connect to database
+    db = MongoEngine()
+    db.init_app(app)
 
-    # handle unsupported languages
-    if lang_name not in supported_languages:
-        logging.error("Unsupported language")
-        return Response(f"{lang_name} is an unsupported programming language", status=400)
+    # Register Blueprints
+    app.register_blueprint(prediction_blueprint, url_prefix="/api/v1/prediction")
 
-    try:
-        # predict
-        model = SHModel(lang_name, "curr")
-        model.setup_for_prediction()
-        res = model.predict(tok_ids)
-        return Response(json.dumps({'h_code_values': res}))
-    except Exception as e:
-        logging.error("Model error: " + str(e))
-        return Response("Model error: " + str(e), status=500)
+    # Init Swagger  
+    Swagger(app, config=config.SWAGGER_CONFIG, template=config.SWAGGER_TEMPLATE)
+
+    # returns binary file of newest model from db for python3, kotlin, java
+    db_model_python = ModelRepository.find_best_model("PYTHON3")
+    db_model_kotlin = ModelRepository.find_best_model("KOTLIN")
+    db_model_java = ModelRepository.find_best_model("JAVA")
+
+    # safes current model of each language to root directory
+    load_db_model_to_current_directory(db_model_python, "PYTHON3")
+    load_db_model_to_current_directory(db_model_kotlin, "KOTLIN")
+    load_db_model_to_current_directory(db_model_java, "JAVA")
+
+    return app
+
 
 
 if __name__ == "__main__":
+    app = create_app()
     app.run(debug=True)
