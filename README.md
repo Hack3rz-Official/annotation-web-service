@@ -21,7 +21,7 @@ Under the hood, the Annotation WebService consists of the following independent 
 |--------------------|----------------------------------------------------------------------------|------------|--------|
 | [Annotation Service]() | Handles the lexing and highlighting of code. | Java with [Spring Boot](https://github.com/spring-projects/spring-boot)|[![Coverage](https://sonarcloud.io/api/project_badges/measure?project=annotation-service&metric=coverage)](https://sonarcloud.io/summary/new_code?id=annotation-service)|
 | [Prediction Service]()  | Handles the prediction of syntax highlighting.         | Python with [Flask](https://github.com/pallets/flask) | [![Coverage](https://sonarcloud.io/api/project_badges/measure?project=prediction-service&metric=coverage)](https://sonarcloud.io/summary/new_code?id=prediction-service)|
-| [Training Service]()   | Handles the regularily conducted training and exchange of the underlying prediction models.         | Python with [Flask](https://github.com/pallets/flask) | [![Coverage](https://sonarcloud.io/api/project_badges/measure?project=training-service&metric=coverage)](https://sonarcloud.io/summary/new_code?id=training-service)|
+| [Training Service]()   | Handles the regularly conducted training and exchange of the underlying prediction models.         | Python with [Flask](https://github.com/pallets/flask) | [![Coverage](https://sonarcloud.io/api/project_badges/measure?project=training-service&metric=coverage)](https://sonarcloud.io/summary/new_code?id=training-service)|
 | [Web API]()          | The web API that acts as the primary entry point for the customers.        | JS/TS with [Nest.js](https://github.com/nestjs/nest) | [![Coverage](https://sonarcloud.io/api/project_badges/measure?project=web-api-service&metric=coverage)](https://sonarcloud.io/summary/new_code?id=web-api-service)|
 
 
@@ -35,7 +35,7 @@ After having called the `Web API` with code to be syntax highlighted, the follow
 2. The `Web API` will then forward the `tok_ids` extracted from the lexed code to the `Prediction Service` microservice where the syntax highlighting is beeing predicted. The predicted syntax highlighting will be returned to the `Web API`.
 3. Having received the predicted `h_code_values` the `Web API` will create a json file with the highlighted code which will be returned to the caller.
 
-Regularily, the `Training Service` will be triggered to train the underlying prediction models. First, it will load training data from the Training Database. Then, it will train the underlying prediction models with 80% of the data and validate the improved model with the remaining 20% of the data. If the loss is smaller on the new model than the old one, the new model will be saved. Every time the `Prediction Service` is invoked, the new best model will be loaded and used for the prediction.
+Regularly, the `Training Service` will be triggered to train the underlying prediction models. First, it will load training data from the Training Database. Then, it will train the underlying prediction models with 80% of the data and validate the improved model with the remaining 20% of the data. If the loss is smaller on the new model than the old one, the new model will be saved. Every time the `Prediction Service` is invoked, the new best model will be loaded and used for the prediction.
 
 ## Demo
 Here comes the demo page.
