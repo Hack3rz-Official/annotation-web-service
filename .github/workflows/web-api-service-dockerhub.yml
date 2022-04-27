@@ -4,11 +4,9 @@ on:
     branches:
       - main
     tags:
-      - 'v*'
+      - 'v*.*.*'
     paths:
       - 'web-api/**'
-  pull_request:
-    types: [opened, synchronize, reopened]
 jobs:
   build:
     name: DockerHub Image
@@ -19,6 +17,17 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v2
+      - name: Docker meta
+        id: meta
+        uses: docker/metadata-action@v3
+        with:
+          # list of Docker images to use as base name for tags
+          images: |
+            ${{ secrets.DOCKER_HUB_USERNAME }}/web-api
+          # generate Docker tags based on the following events/attributes
+          tags: |
+            type=ref,event=branch
+            type=semver,pattern={{version}}
       - name: Login to Docker Hub
         uses: docker/login-action@v1
         with:
@@ -32,6 +41,6 @@ jobs:
           context: web-api/
           file: web-api/Dockerfile
           push: true
-          tags: ${{ secrets.DOCKER_HUB_USERNAME }}/web-api:latest
+          tags: ${{ secrets.DOCKER_HUB_USERNAME }}/web-api:latest,${{ steps.meta.outputs.tags }}
           cache-from: type=registry,ref=${{ secrets.DOCKER_HUB_USERNAME }}/web-api:buildcache
           cache-to: type=registry,ref=${{ secrets.DOCKER_HUB_USERNAME }}/web-api:buildcache,mode=max
