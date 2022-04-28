@@ -93,10 +93,9 @@ services:
     volumes:
       - ./data:/data/db
       - ./mongo-init.sh:/docker-entrypoint-initdb.d/mongo-init.sh:ro
-    # Expose ports without publishing them to the host machine - they'll only
-    # be accessible to linked services. Only the internal port can be specified.
-    expose:
-      - "${MONGO_PORT}"
+    # since this DB is also used during test runs in GitHub CI, port is exposed on host machine
+    ports:
+      - "27017:${MONGO_PORT}"
     networks:
       - aws-network
     restart: unless-stopped
