@@ -11,7 +11,7 @@ The REST API to the service predict is described below.
 
 `POST /predict/`
 
-    curl -X POST http://localhost:7071/predict \
+    curl -X POST http://localhost:7071/api/v1/prediction \
         -H "Content-Type: application/json" \
         -d '{"lang_name": "java","tok_ids":[34,22,45]}'
 
