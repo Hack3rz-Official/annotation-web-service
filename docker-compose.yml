@@ -9,6 +9,8 @@ services:
 
     env_file:
       - .env
+    ports: 
+      - 8080:8080
     depends_on:
       - mongodb
     expose:
@@ -24,6 +26,10 @@ services:
     platform: linux/amd64
     expose:
       - "5000"
+    env_file:
+      - .env
+    depends_on:
+      - mongodb
     networks:
       - aws-network
     restart: unless-stopped
@@ -53,12 +59,9 @@ services:
     ports:
     # todo: use "expose" instead of ports, so port is not exposed to public via host
       - "6061:5000"
-    volumes:
-      - './data:/data/db'
     networks:
       - aws-network
     depends_on:
-      - annotation
       - prediction
       - mongodb
     restart: unless-stopped

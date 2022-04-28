@@ -3,15 +3,12 @@
   <br>
 </h1>
 <p align="center">
-  <a href="https://github.com/Hack3rz-Official/annotation-web-service/actions">
+  <!--<a href="https://github.com/Hack3rz-Official/annotation-web-service/actions">
     <img src="https://github.com/Hack3rz-Official/annotation-web-service/workflows/Deploy%20Project/badge.svg">
+  </a>-->
+  <a href="https://sonarcloud.io/organizations/hack3rz-official/projects">
+    <img width="150" src="https://sonarcloud.io/images/project_badges/sonarcloud-white.svg">
   </a>
-  <a href="https://sonarcloud.io/dashboard?id=Hack3rz-Official_annotation-web-service">
-      <img src="https://sonarcloud.io/api/project_badges/measure?project=Hack3rz-Official_annotation-web-service&metric=coverage">
-  </a>
-  <a href="https://sonarcloud.io/dashboard?id=Hack3rz-Official_annotation-web-service">
-        <img src="https://sonarcloud.io/api/project_badges/measure?project=Hack3rz-Official_annotation-web-service&metric=alert_status">
-    </a>
 </p>
 
 ## Introduction
@@ -20,12 +17,12 @@ A syntax highlighting web service based on AI. Please read the [project instruct
 ## Wiki
 Under the hood, the Annotation WebService consists of the following independent microservices:
 
-| Microservice             | Description                                                                | Technology |
-|--------------------|----------------------------------------------------------------------------|------------|
-| [Annotation Service]() | Handles the lexing and highlighting of code. | Java with [Spring Boot](https://github.com/spring-projects/spring-boot)|
-| [Prediction Service]()  | Handles the prediction of syntax highlighting.         | Python with [Flask](https://github.com/pallets/flask) |
-| [Training Service]()   | Handles the regularily conducted training and exchange of the underlying prediction models.         | Python with [Flask](https://github.com/pallets/flask) |
-| [Web API]()          | The web API that acts as the primary entry point for the customers.        | JS/TS with [Nest.js](https://github.com/nestjs/nest) |
+| Microservice             | Description                                                                | Technology | Status |
+|--------------------|----------------------------------------------------------------------------|------------|--------|
+| [Annotation Service]() | Handles the lexing and highlighting of code. | Java with [Spring Boot](https://github.com/spring-projects/spring-boot)|[![Quality gate](https://sonarcloud.io/api/project_badges/quality_gate?project=annotation-service)](https://sonarcloud.io/summary/new_code?id=annotation-service)|
+| [Prediction Service]()  | Handles the prediction of syntax highlighting.         | Python with [Flask](https://github.com/pallets/flask) | [![Quality gate](https://sonarcloud.io/api/project_badges/quality_gate?project=prediction-service)](https://sonarcloud.io/summary/new_code?id=prediction-service)|
+| [Training Service]()   | Handles the regularly conducted training and exchange of the underlying prediction models.         | Python with [Flask](https://github.com/pallets/flask) | [![Quality gate](https://sonarcloud.io/api/project_badges/quality_gate?project=training-service)](https://sonarcloud.io/summary/new_code?id=training-service)|
+| [Web API]()          | The web API that acts as the primary entry point for the customers.        | JS/TS with [Nest.js](https://github.com/nestjs/nest) | [![Quality gate](https://sonarcloud.io/api/project_badges/quality_gate?project=web-api-service)](https://sonarcloud.io/summary/new_code?id=web-api-service)|
 
 
 ## How it works
@@ -38,7 +35,7 @@ After having called the `Web API` with code to be syntax highlighted, the follow
 2. The `Web API` will then forward the `tok_ids` extracted from the lexed code to the `Prediction Service` microservice where the syntax highlighting is beeing predicted. The predicted syntax highlighting will be returned to the `Web API`.
 3. Having received the predicted `h_code_values` the `Web API` will create a json file with the highlighted code which will be returned to the caller.
 
-Regularily, the `Training Service` will be triggered to train the underlying prediction models. First, it will load training data from the Training Database. Then, it will train the underlying prediction models with 80% of the data and validate the improved model with the remaining 20% of the data. If the loss is smaller on the new model than the old one, the new model will be saved. Every time the `Prediction Service` is invoked, the new best model will be loaded and used for the prediction.
+Regularly, the `Training Service` will be triggered to train the underlying prediction models. First, it will load training data from the Training Database. Then, it will train the underlying prediction models with 80% of the data and validate the improved model with the remaining 20% of the data. If the loss is smaller on the new model than the old one, the new model will be saved. Every time the `Prediction Service` is invoked, the new best model will be loaded and used for the prediction.
 
 ## Demo
 Here comes the demo page.

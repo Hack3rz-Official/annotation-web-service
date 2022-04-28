@@ -1,26 +1,27 @@
-# Service Predict
-A repository containing all source code for the predict function which is based on the provided [UZH-ASE-AnnotationWS-BaseLearner](https://github.com/MEPalma/UZH-ASE-AnnotationWS-BaseLearner) repository.
+# Training Service
+A repository containing all source code for the training function which is based on the provided [UZH-ASE-AnnotationWS-BaseLearner](https://github.com/MEPalma/UZH-ASE-AnnotationWS-BaseLearner) repository.
 
 ## REST API Documentation
 
-The REST API to the service predict is described below.
+The REST API to the training service is described below.
 
-### Predict
+### Training
+
+The following request will manually trigger the training of the models which available training data on the training database. By construction, the training procedure will be executed every 5 minutes anyways. 
 
 #### Request
 
-`POST /predict/`
+`GET /training/`
 
-    curl -X POST http://localhost:7071/predict \
-        -H "Content-Type: application/json" \
-        -d '{"lang_name": "java","tok_ids":[34,22,45]}'
+    curl -X GET http://localhost:6061/api/v1/training \
+        -H "Content-Type: application/json"
 
 #### Response
 
-    {"h_code_values": [10, 0, 3]}
+    200 OK
 
 ## Running the function locally
-Execute the following code from the `/service-predict` directory:
+Execute the following code from the `/training-service` directory:
 
 ```bash
 # activate virtual environment and install dependencies
@@ -33,16 +34,16 @@ $ export PYTHONPATH="$PWD" # MacOS and Linux, for Windows see here: https://bic-
 $ python3 app.py
 ```
 
-Finally, the function should be running at ```http://127.0.0.1:5000/predict```. 
+Finally, the function should be running at ```http://127.0.0.1:5000/api/v1/training```. 
 
 ## Running the function locally via Docker
 
 ```bash
 # build docker image
-$ docker build --tag <YOUR_DOCKER_HUB_ID>/service-predict:v1.0.0 .
+$ docker build --tag <YOUR_DOCKER_HUB_ID>/training-service:v1.0.0 .
 
 # run docker image
-$ docker run -p 7071:5000 -it <YOUR_DOCKER_HUB_ID>/service-predict:v1.0.0
+$ docker run -p 6061:5000 -it <YOUR_DOCKER_HUB_ID>/training-service:v1.0.0
 ```
 
-Finally, the function should be running at ```http://127.0.0.1:7071/predict```
+Finally, the function should be running at ```http://127.0.0.1:6061/api/v1/training```
