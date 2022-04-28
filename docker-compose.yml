@@ -3,29 +3,36 @@ version: '3.8'
 services:
   annotation:
     build: ./annotation-service
-    container_name: "annotation-service"
+    # container_name: "annotation-service"
     image: annotation-service:latest
     platform: linux/amd64
+
     env_file:
       - .env
     ports: 
       - 8080:8080
     depends_on:
       - mongodb
+    expose:
+      - "8080"
     networks:
       - aws-network
+    restart: unless-stopped
 
   prediction:
     build: ./prediction-service
-    container_name: "prediction-service"
+    # container_name: "prediction-service"
     image: prediction-service:latest
     platform: linux/amd64
+    expose:
+      - "5000"
     env_file:
       - .env
     depends_on:
       - mongodb
     networks:
       - aws-network
+    restart: unless-stopped
 
   api-gateway:
     build: ./web-api
@@ -38,8 +45,8 @@ services:
       - aws-network
     environment:
       - SERVICE_PORT=3000
-      - LEX_URL=http://annotation:8080/api/annotate
-      - PREDICT_URL=http://prediction:5000/api/v1/prediction
+      - LEX_URL=http://nginx:4000/api/annotate
+      - PREDICT_URL=http://nginx:4000/predict
     restart: unless-stopped
   
   training:
@@ -50,15 +57,28 @@ services:
     env_file:
       - .env
     ports:
+    # todo: use "expose" instead of ports, so port is not exposed to public via host
       - "6061:5000"
     networks:
       - aws-network
-    environment:
-      - SERVICE_PORT=3000
-      - PREDICT_URL=http://prediction:5000/api/v1/prediction
     depends_on:
       - prediction
       - mongodb
+    restart: unless-stopped
+
+  nginx:
+    image: nginx:latest
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+    depends_on:
+      - annotation
+      - prediction
+    networks:
+      - aws-network
+    # todo: use "expose" instead of ports, so port is not exposed to public via host
+    ports:
+      - "4000:4000"
+
 
   mongodb:
     image: mongo:5.0.6
@@ -70,21 +90,22 @@ services:
       - MONGO_INITDB_ROOT_PASSWORD=${MONGO_PASSWORD}
     env_file:
       - .env
-    restart: unless-stopped
     volumes:
       - ./data:/data/db
       - ./mongo-init.sh:/docker-entrypoint-initdb.d/mongo-init.sh:ro
+    # since this DB is also used during test runs in GitHub CI, port is exposed on host machine
     ports:
       - "27017:${MONGO_PORT}"
     networks:
       - aws-network
+    restart: unless-stopped
 
   demo-frontend:
     build: ./demo-frontend
     container_name: "demo-frontend"
     image: demo-frontend:latest
     ports: 
-      - 8081:8080
+      - "8081:8080"
     networks:
       - aws-network
 

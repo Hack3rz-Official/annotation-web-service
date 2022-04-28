@@ -40,6 +40,16 @@ Regularly, the `Training Service` will be triggered to train the underlying pred
 ## Demo
 Here comes the demo page.
 
+## Run It
+Use the following command to run all services using docker-compose:
+```
+docker-compose up --scale annotation=2
+```
+To test the load-balancing and scaling make sure to scale some services:
+```
+docker-compose up --scale prediction=2 --scale annotation=2
+```
+
 ## MongoDB
 The MongoDB is launched as a separate container. The credentials are stored within the environment of the other containers, so they can access it.
 A folder `data` in the project root is mounted as a volume for the database. 
