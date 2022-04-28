@@ -11,9 +11,9 @@ The following request will manually trigger the training of the models which ava
 
 #### Request
 
-`PUT /training/`
+`GET /training/`
 
-    curl -X PUT http://localhost:6061/training \
+    curl -X GET http://localhost:6061/api/v1/training \
         -H "Content-Type: application/json"
 
 #### Response
@@ -34,7 +34,7 @@ $ export PYTHONPATH="$PWD" # MacOS and Linux, for Windows see here: https://bic-
 $ python3 app.py
 ```
 
-Finally, the function should be running at ```http://127.0.0.1:5000/training```. 
+Finally, the function should be running at ```http://127.0.0.1:5000/api/v1/training```. 
 
 ## Running the function locally via Docker
 
@@ -46,4 +46,4 @@ $ docker build --tag <YOUR_DOCKER_HUB_ID>/training-service:v1.0.0 .
 $ docker run -p 6061:5000 -it <YOUR_DOCKER_HUB_ID>/training-service:v1.0.0
 ```
 
-Finally, the function should be running at ```http://127.0.0.1:6061/training```
+Finally, the function should be running at ```http://127.0.0.1:6061/api/v1/training```

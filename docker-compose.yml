@@ -20,6 +20,10 @@ services:
     container_name: "prediction-service"
     image: prediction-service:latest
     platform: linux/amd64
+    env_file:
+      - .env
+    depends_on:
+      - mongodb
     networks:
       - aws-network
 
@@ -35,7 +39,7 @@ services:
     environment:
       - SERVICE_PORT=3000
       - LEX_URL=http://annotation:8080/api/annotate
-      - PREDICT_URL=http://prediction:5000/predict
+      - PREDICT_URL=http://prediction:5000/api/v1/prediction
     restart: unless-stopped
   
   training:
@@ -51,10 +55,8 @@ services:
       - aws-network
     environment:
       - SERVICE_PORT=3000
-      - LEX_URL=http://annotation:8080/api/annotate
-      - PREDICT_URL=http://prediction:5000/predict
+      - PREDICT_URL=http://prediction:5000/api/v1/prediction
     depends_on:
-      - annotation
       - prediction
       - mongodb
 
