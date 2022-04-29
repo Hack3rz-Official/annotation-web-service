@@ -6,11 +6,8 @@ services:
     # container_name: "annotation-service"
     image: annotation-service:latest
     platform: linux/amd64
-
     env_file:
       - .env
-    ports: 
-      - 8080:8080
     depends_on:
       - mongodb
     expose:
@@ -46,7 +43,7 @@ services:
     environment:
       - SERVICE_PORT=3000
       - LEX_URL=http://nginx:4000/api/annotate
-      - PREDICT_URL=http://nginx:4000/predict
+      - PREDICT_URL=http://nginx:4000/api/v1/prediction
     restart: unless-stopped
   
   training:
@@ -78,6 +75,7 @@ services:
     # todo: use "expose" instead of ports, so port is not exposed to public via host
     ports:
       - "4000:4000"
+    restart: unless-stopped
 
 
   mongodb:
