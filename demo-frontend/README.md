@@ -2,6 +2,10 @@
 
 This demo was created to show the syntax highlighting in action to demonstrate the progress to our clients.
 
+
+## Architecture
+The demo uses vite to build and serve the application. 
+
 ## Setup
 
 This demo is accessible after launching the project-wide docker-compose file at localhost:8081:

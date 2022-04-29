@@ -104,6 +104,8 @@ services:
     build: ./demo-frontend
     container_name: "demo-frontend"
     image: demo-frontend:latest
+    environment:
+      - VITE_API_URL=http://api-gateway:3000
     ports: 
       - "8081:8080"
     networks:
