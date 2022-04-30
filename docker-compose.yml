@@ -50,7 +50,6 @@ services:
     build: ./training-service
     container_name: "training-service"
     image: training-service:latest
-    platform: linux/amd64
     env_file:
       - .env
     ports:
