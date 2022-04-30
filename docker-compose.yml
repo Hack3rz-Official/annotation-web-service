@@ -5,12 +5,8 @@ services:
     build: ./annotation-service
     # container_name: "annotation-service"
     image: annotation-service:latest
-    platform: linux/amd64
-
     env_file:
       - .env
-    ports: 
-      - 8080:8080
     depends_on:
       - mongodb
     expose:
@@ -23,7 +19,6 @@ services:
     build: ./prediction-service
     # container_name: "prediction-service"
     image: prediction-service:latest
-    platform: linux/amd64
     expose:
       - "5000"
     env_file:
@@ -39,6 +34,8 @@ services:
     container_name: "api-gateway"
     image: api-gateway:latest
     command: npm run start:prod
+    depends_on:
+      - nginx
     ports:
       - "3000:3000"
     networks:
@@ -46,19 +43,18 @@ services:
     environment:
       - SERVICE_PORT=3000
       - LEX_URL=http://nginx:4000/api/annotate
-      - PREDICT_URL=http://nginx:4000/predict
+      - PREDICT_URL=http://nginx:4000/api/v1/prediction
     restart: unless-stopped
   
   training:
     build: ./training-service
     container_name: "training-service"
     image: training-service:latest
-    platform: linux/amd64
     env_file:
       - .env
     ports:
     # todo: use "expose" instead of ports, so port is not exposed to public via host
-      - "6061:5000"
+      - "6061:6061"
     networks:
       - aws-network
     depends_on:
@@ -78,6 +74,7 @@ services:
     # todo: use "expose" instead of ports, so port is not exposed to public via host
     ports:
       - "4000:4000"
+    restart: unless-stopped
 
 
   mongodb:
@@ -104,8 +101,12 @@ services:
     build: ./demo-frontend
     container_name: "demo-frontend"
     image: demo-frontend:latest
+    depends_on:
+      - api-gateway
+    environment:
+      - VITE_API_URL=http://api-gateway:3000
     ports: 
-      - "8081:8080"
+      - "8081:8081"
     networks:
       - aws-network
 

@@ -1,8 +1,10 @@
 # code-fetcher
 
-Note: dot_env only works on INTEL chips. If you are running on a M1 chip, you need to hard code the environment variables.
-
-1. Set languages in `main.py`
-2. Add GITHUB_ACCESS_TOKEN (see here: https://docs.github.com/en/enterprise-cloud@latest/authentication/keeping-your-account-and-data-secure/creating-a-personal-access-token) in `.env` and consider changing MAX_FILES
-3. Make sure docker-compose is up
-4. Execute `python3 main.py` in this directory
+Execute the script in the terminal with the following arguments:
+- `-t` your github access token (to download the files from GitHub)
+- `-f` [optional] amount of files to download per language (defaults to 1000)
+- `-u` [optional] url of annotation service (defaults to public url in docker-compose)
+- `-o` [optional] file where benchmark output is stored (defaults to `benchmark.csv`)
+```
+python3 main.py -t <GITHUB_TOKEN> -f 120
+```

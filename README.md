@@ -50,6 +50,11 @@ To test the load-balancing and scaling make sure to scale some services:
 docker-compose up --scale prediction=2 --scale annotation=2
 ```
 
+Sometimes builds fail on machines with different processor architectures (e.g. on M1 MacBooks). In other cases the build might fail, because there are old versions of the docker containers stored. Use the following command for a clean new build:
+```nashorn
+docker-compose up -d --force-recreate --renew-anon-volumes --build --scale prediction=2 --scale annotation=2
+```
+
 ## MongoDB
 The MongoDB is launched as a separate container. The credentials are stored within the environment of the other containers, so they can access it.
 A folder `data` in the project root is mounted as a volume for the database. 

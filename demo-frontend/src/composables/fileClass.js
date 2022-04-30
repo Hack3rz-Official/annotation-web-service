@@ -62,7 +62,7 @@ export default class File {
     let outputElem = document.getElementById(this.identifier);
     //   console.log(outputElem);
     axios
-      .post("http://localhost:3000/highlight", data)
+      .post(`${import.meta.env.VITE_API_URL}/highlight`, data)
       .then((response) => {
         let newElement = document
           .createRange()

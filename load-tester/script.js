@@ -14,11 +14,13 @@ export const options = {
     ],
 };
 
+const testFile = open("samples/java/FunctionTest.java");
+
 export default function () {
 
     const url = 'http://localhost:3000/highlight';
     const payload = JSON.stringify({
-        "code": "public static void main(String args[]){ System.out.println(\"testing\") }",
+        "code": testFile,
         "language": "java"
     });
 
