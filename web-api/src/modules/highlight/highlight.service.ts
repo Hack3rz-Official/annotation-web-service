@@ -21,6 +21,9 @@ export class HighlightService {
 
     this.logger.debug(`lex.url=${this.config.get('lex.url')}`);
 
+    let start_time = new Date().getTime();
+    const request_time = new Date().getTime();
+
     const lexingRequest: Observable<any> = this.httpService.post(
       this.config.get('lex.url'),
       {
@@ -30,8 +33,11 @@ export class HighlightService {
     );
 
     const lexingResponse = await firstValueFrom(lexingRequest)
+    this.logger.debug(
+      `Lexing request took: ${new Date().getTime() - start_time} ms`,
+    );
     const lexingData = lexingResponse.data
-    this.logger.log('The lexing function returned', lexingData)
+    //this.logger.debug('The lexing function returned', lexingData)
 
     // generate array with tokenIds from lexingResponse
     const tok_ids = lexingData.map(tok => {
@@ -39,6 +45,7 @@ export class HighlightService {
     })
 
     this.logger.debug(`predict.url=${this.config.get('predict.url')}`);
+    start_time = new Date().getTime();
     const predictRequest: Observable<any> = this.httpService.post(
       this.config.get('predict.url'),
       {
@@ -47,8 +54,13 @@ export class HighlightService {
       },
     );
     const predictResponse = await firstValueFrom(predictRequest)
-    this.logger.log('The predict function returned', predictResponse.data)
-
+    this.logger.debug(
+      `Predict request took: ${new Date().getTime() - start_time} ms`,
+    );
+    //this.logger.debug('The predict function returned', predictResponse.data)
+    this.logger.debug(
+      `Total request took: ${new Date().getTime() - request_time} ms`,
+    );
     return this.htmlGeneratorService.buildHtml(highlightRequestDto, lexingData, predictResponse.data.h_code_values)
   }
 }
