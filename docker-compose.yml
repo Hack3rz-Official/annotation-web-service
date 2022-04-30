@@ -5,7 +5,6 @@ services:
     build: ./annotation-service
     # container_name: "annotation-service"
     image: annotation-service:latest
-    platform: linux/amd64
     env_file:
       - .env
     depends_on:
@@ -20,7 +19,6 @@ services:
     build: ./prediction-service
     # container_name: "prediction-service"
     image: prediction-service:latest
-    platform: linux/amd64
     expose:
       - "5000"
     env_file:
@@ -36,6 +34,8 @@ services:
     container_name: "api-gateway"
     image: api-gateway:latest
     command: npm run start:prod
+    depends_on:
+      - nginx
     ports:
       - "3000:3000"
     networks:
@@ -55,7 +55,7 @@ services:
       - .env
     ports:
     # todo: use "expose" instead of ports, so port is not exposed to public via host
-      - "6061:5000"
+      - "6061:6061"
     networks:
       - aws-network
     depends_on:
@@ -102,10 +102,12 @@ services:
     build: ./demo-frontend
     container_name: "demo-frontend"
     image: demo-frontend:latest
+    depends_on:
+      - api-gateway
     environment:
       - VITE_API_URL=http://api-gateway:3000
     ports: 
-      - "8081:8080"
+      - "8081:8081"
     networks:
       - aws-network
 
