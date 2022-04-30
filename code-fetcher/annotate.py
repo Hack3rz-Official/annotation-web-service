@@ -2,6 +2,7 @@ import os
 import requests
 import math
 
+
 def convert_size(size_bytes):
     if size_bytes == 0:
         return "0B"
@@ -12,21 +13,41 @@ def convert_size(size_bytes):
     return "%s %s" % (s, size_name[i])
 
 
-def do_annotation(language, url):
+
+
+
+def do_annotation(language, url, benchmark_filename):
+
+    benchmarks = []
+
     for root, dirs, filenames in os.walk(language):
         for index, filename in enumerate(filenames):
             with open(language + "/" + filename, "r") as language_file:
                 try:
                     print(F"Annotating {language} file {index}/{len(filenames)}: {filename}")
                     code = language_file.read()
-                    locs = len(language_file.readlines())
+                    locs = sum(1 for line in language_file)
                     body = {
                         "language": language.lower(),
                         "code": code
                     }
                     res = requests.post(url, json=body)
-                    print(f"Size: {convert_size(os.path.getsize(language_file.name))} LOCs: {locs} Done in: {res.elapsed.total_seconds()}s")
+                    size = os.path.getsize(language_file.name)
+                    time = res.elapsed.total_seconds()
+                    error = ""
+                    print(f"Size: {convert_size(size)} LOCs: {locs} Done in: {time}s")
                     if res.status_code != 200:
+                        error = res.text
                         print("Error during annotation: ", res.text)
+                    benchmarks.append({
+                        "language": language,
+                        "filename": filename,
+                        "size": size,
+                        "locs": locs,
+                        "duration": time,
+                        "error": error
+                    })
                 except Exception as e:
                     print("Error during annotation: ", e)
+
+    return benchmarks
