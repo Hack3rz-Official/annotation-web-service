@@ -24,7 +24,7 @@ class TrainingServiceTest(Hack3rzTest):
     def test_split_data(self):
         training_data = self.annotation_repository.find_training_data("java")
         X, T = data_preprocessing(training_data)
-        X_train, T_train, X_val, T_val = split_data(X, T, train_percentage=0.8)
+        X_train, X_val, T_train, T_val = split_data(X, T, train_percentage=0.8)
         self.assertEqual(X_train.shape[0], T_train.shape[0])
         self.assertEqual(X_val.shape[0],T_val.shape[0])
 
