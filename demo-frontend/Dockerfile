@@ -18,4 +18,4 @@ COPY . .
 # build app for production with minification
 RUN npm run build
 
-CMD [ "http-server", "dist", "-p 8080" ]
+CMD http-server dist -p ${DEMO_FRONTEND_PORT}

@@ -11,7 +11,7 @@ services:
     environment:
       - VITE_API_URL=http://web-api:${WEB_API_PORT}
     ports: 
-      - "${DEMO_FRONTEND_PORT}:8080"
+      - "${DEMO_FRONTEND_PORT}:${DEMO_FRONTEND_PORT}"
     depends_on:
       - web-api
     networks:
