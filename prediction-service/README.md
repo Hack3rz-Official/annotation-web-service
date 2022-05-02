@@ -33,7 +33,7 @@ $ export PYTHONPATH="$PWD" # MacOS and Linux, for Windows see here: https://bic-
 $ python3 app.py
 ```
 
-Finally, the function should be running at ```http://127.0.0.1:5000/predict```. 
+Finally, the function should be running at ```http://127.0.0.1:8084/predict```. 
 
 ## Running the function locally via Docker
 
@@ -42,7 +42,7 @@ Finally, the function should be running at ```http://127.0.0.1:5000/predict```.
 $ docker build --tag <YOUR_DOCKER_HUB_ID>/service-predict:v1.0.0 .
 
 # run docker image
-$ docker run -p 7071:5000 -it <YOUR_DOCKER_HUB_ID>/service-predict:v1.0.0
+$ docker run -p 7071:8084 -it <YOUR_DOCKER_HUB_ID>/service-predict:v1.0.0
 ```
 
 Finally, the function should be running at ```http://127.0.0.1:7071/predict```

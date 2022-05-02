@@ -3,56 +3,60 @@ version: '3.8'
 services:
 
   demo-frontend:
-      build: ./demo-frontend
-      container_name: "demo-frontend"
-      image: demo-frontend:latest
-      depends_on:
-        - web-api
-      env_file:
-        - .env
-      environment:
-        - VITE_API_URL=http://web-api:${WEB_API_PORT}
-      ports: 
-        - "${DEMO_FRONTEND_PORT}:8080"
-      networks:
-        - aws-network
+    build: ./demo-frontend
+    container_name: "demo-frontend"
+    image: demo-frontend:latest
+    env_file:
+      - .env
+    environment:
+      - VITE_API_URL=http://web-api:${WEB_API_PORT}
+    ports: 
+      - "${DEMO_FRONTEND_PORT}:8080"
+    depends_on:
+      - web-api
+    networks:
+      - aws-network
 
   web-api:
     build: ./web-api
     container_name: "web-api"
     image: web-api:latest
     command: npm run start:prod
-    depends_on:
-      - nginx
-      - annotation
-    ports:
-      - "${WEB_API_PORT}:${WEB_API_PORT}"
-    networks:
-      - aws-network
     env_file:
         - .env
     environment:
       - LEX_URL=http://nginx:4000/api/annotate
       - PREDICT_URL=http://nginx:4000/api/v1/prediction
+    ports:
+      - "${WEB_API_PORT}:${WEB_API_PORT}"
+    depends_on:
+      - nginx
+      - annotation
+    networks:
+      - aws-network
     restart: unless-stopped
 
   swagger-ui:
     container_name: "swagger-ui"
     image: swaggerapi/swagger-ui
-    ports:
-      - 8082:8080
-    restart: always
     volumes:
       - ./training-service/api-doc.yaml:/usr/share/nginx/html/training-service.yaml
       - ./prediction-service/api-doc.yaml:/usr/share/nginx/html/prediction-service.yaml
+    env_file:
+        - .env
     environment:
       URLS: "[
           { url: \"training-service.yaml\", name: \"Training Service\" },
           { url: \"prediction-service.yaml\", name: \"Prediction Service\" },
         ]"
+    ports:
+      - "${SWAGGER_UI_PORT}:8080"
     depends_on:
       - training
       - prediction
+    networks:
+      - aws-network
+    restart: always
 
   annotation:
     build: ./annotation-service
@@ -60,10 +64,10 @@ services:
     image: annotation-service:latest
     env_file:
       - .env
-    depends_on:
-      - mongodb
     expose:
       - "${ANNOTATION_SERVICE_PORT}"
+    depends_on:
+      - mongodb
     networks:
       - aws-network
     restart: unless-stopped
@@ -72,10 +76,10 @@ services:
     build: ./prediction-service
     # container_name: "prediction-service"
     image: prediction-service:latest
-    expose:
-      - "5000"
     env_file:
       - .env
+    expose:
+      - "${PREDICTION_SERVICE_PORT}"
     depends_on:
       - mongodb
     networks:

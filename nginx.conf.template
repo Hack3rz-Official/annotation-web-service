@@ -13,8 +13,8 @@ http {
     upstream prediction-service {
         # URL of the docker instance
         # first part refers to the name of the service in docker-compose
-        server annotation-web-service-prediction-1:5000;
-        server annotation-web-service-prediction-2:5000;
+        server annotation-web-service-prediction-1:${PREDICTION_SERVICE_PORT};
+        server annotation-web-service-prediction-2:${PREDICTION_SERVICE_PORT};
     }
 
     # defines a virtual server running on nginx
