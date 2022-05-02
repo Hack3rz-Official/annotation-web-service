@@ -40,5 +40,3 @@ RUN mkdir /app
 COPY --from=build /home/gradle/src/build/libs/annotation-service-0.0.1-SNAPSHOT.jar /app/spring-boot-application.jar
 
 ENTRYPOINT ["java", "-XX:+UnlockExperimentalVMOptions", "-XX:+UseContainerSupport", "-jar", "/app/spring-boot-application.jar"]
-
-EXPOSE 8083

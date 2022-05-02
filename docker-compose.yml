@@ -60,7 +60,7 @@ services:
     depends_on:
       - mongodb
     expose:
-      - "8083"
+      - "${ANNOTATION_SERVICE_PORT}"
     networks:
       - aws-network
     restart: unless-stopped
@@ -98,17 +98,21 @@ services:
   nginx:
     image: nginx:latest
     volumes:
-      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./nginx.conf.template:/etc/nginx/templates/nginx.conf.template
     depends_on:
       - annotation
       - prediction
+    environment:
+      - NGINX_ENVSUBST_OUTPUT_DIR=/etc/nginx
+    env_file:
+      - .env
     networks:
       - aws-network
     # todo: use "expose" instead of ports, so port is not exposed to public via host
     ports:
       - "4000:4000"
     restart: unless-stopped
-
+    
   mongodb:
     image: mongo:5.0.6
     container_name: MongoDB

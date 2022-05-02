@@ -8,7 +8,7 @@ The demo uses vite to build and serve the application.
 
 ## Setup
 
-This demo is accessible after launching the project-wide docker-compose file at localhost:8081:
+This demo is accessible after launching the project-wide docker-compose file at localhost:8080:
 
 ```bash
 # inside project root /:
