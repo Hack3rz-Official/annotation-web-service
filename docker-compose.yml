@@ -110,6 +110,23 @@ services:
     networks:
       - aws-network
 
+  swagger-ui:
+    container_name: "swagger-ui"
+    image: swaggerapi/swagger-ui
+    ports:
+      - 8082:8080
+    restart: always
+    volumes:
+      - ./training-service/swagger.yaml:/usr/share/nginx/html/training-service.yaml
+      - ./prediction-service/swagger.yaml:/usr/share/nginx/html/prediction-service.yaml
+    environment:
+      URLS: "[
+          { url: \"training-service.yaml\", name: \"Training Service\" },
+          { url: \"prediction-service.yaml\", name: \"Prediction Service\" },
+        ]"
+    depends_on:
+      - training
+      - prediction
 
 networks:
   aws-network:
