@@ -25,8 +25,8 @@ services:
     env_file:
         - .env
     environment:
-      - LEX_URL=http://nginx:4000/api/annotate
-      - PREDICT_URL=http://nginx:4000/api/v1/prediction
+      - LEX_URL=http://nginx:${NGINX_PORT}/api/v1/annotation
+      - PREDICT_URL=http://nginx:${NGINX_PORT}/api/v1/prediction
     ports:
       - "${WEB_API_PORT}:${WEB_API_PORT}"
     depends_on:
@@ -67,6 +67,7 @@ services:
     expose:
       - "${ANNOTATION_SERVICE_PORT}"
     depends_on:
+      - prediction
       - mongodb
     networks:
       - aws-network
@@ -92,47 +93,44 @@ services:
     image: training-service:latest
     env_file:
       - .env
-    ports:
-    # todo: use "expose" instead of ports, so port is not exposed to public via host
-      - "6061:6061"
+    expose:
+      - "${TRAINING_SERVICE_PORT}"
+    depends_on:
+      - mongodb
     networks:
       - aws-network
-    depends_on:
-      - prediction
-      - mongodb
     restart: unless-stopped
 
   nginx:
     image: nginx:latest
     volumes:
       - ./nginx.conf.template:/etc/nginx/templates/nginx.conf.template
+    env_file:
+      - .env
+    environment:
+      - NGINX_ENVSUBST_OUTPUT_DIR=/etc/nginx
+    expose:
+      - "${NGINX_PORT}"
     depends_on:
       - annotation
       - prediction
-    environment:
-      - NGINX_ENVSUBST_OUTPUT_DIR=/etc/nginx
-    env_file:
-      - .env
     networks:
       - aws-network
-    # todo: use "expose" instead of ports, so port is not exposed to public via host
-    ports:
-      - "4000:4000"
     restart: unless-stopped
     
   mongodb:
     image: mongo:5.0.6
     container_name: MongoDB
+    volumes:
+      - ./data:/data/db
+      - ./mongo-init.sh:/docker-entrypoint-initdb.d/mongo-init.sh:ro
+    env_file:
+      - .env
     environment:
       - PUID=1000
       - PGID=1000
       - MONGO_INITDB_ROOT_USERNAME=admin
       - MONGO_INITDB_ROOT_PASSWORD=${MONGO_PASSWORD}
-    env_file:
-      - .env
-    volumes:
-      - ./data:/data/db
-      - ./mongo-init.sh:/docker-entrypoint-initdb.d/mongo-init.sh:ro
     # since this DB is also used during test runs in GitHub CI, port is exposed on host machine
     ports:
       - "27017:${MONGO_PORT}"

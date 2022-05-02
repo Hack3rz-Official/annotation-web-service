@@ -20,8 +20,8 @@ http {
     # defines a virtual server running on nginx
     # /annotation will be forwarded to the annotation service
     server {
-        listen 4000;
-        location /api/annotate {
+        listen ${NGINX_PORT};
+        location /api/v1/annotation {
             # will use the upstream "annotation-service" defined above
             proxy_pass http://annotation-service;
         }

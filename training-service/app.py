@@ -41,4 +41,4 @@ def create_app():
 
 if __name__ == "__main__":
     app = create_app()
-    app.run(host=config.HOST, port=config.PORT)
+    app.run(debug=True, port=os.environ.get('TRAINING_SERVICE_PORT'))

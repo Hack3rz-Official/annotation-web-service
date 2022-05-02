@@ -34,7 +34,7 @@ $ export PYTHONPATH="$PWD" # MacOS and Linux, for Windows see here: https://bic-
 $ python3 app.py
 ```
 
-Finally, the function should be running at ```http://127.0.0.1:5000/api/v1/training```. 
+Finally, the function should be running at ```http://127.0.0.1:8085/api/v1/training```. 
 
 ## Running the function locally via Docker
 
@@ -43,7 +43,7 @@ Finally, the function should be running at ```http://127.0.0.1:5000/api/v1/train
 $ docker build --tag <YOUR_DOCKER_HUB_ID>/training-service:v1.0.0 .
 
 # run docker image
-$ docker run -p 6061:5000 -it <YOUR_DOCKER_HUB_ID>/training-service:v1.0.0
+$ docker run -p 8085:8085 -it <YOUR_DOCKER_HUB_ID>/training-service:v1.0.0
 ```
 
-Finally, the function should be running at ```http://127.0.0.1:6061/api/v1/training```
+Finally, the function should be running at ```http://127.0.0.1:8085/api/v1/training```
