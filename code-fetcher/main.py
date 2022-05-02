@@ -21,7 +21,7 @@ def main():
 
     parser.add_argument('-f', '--files', type=int, help="number of files", default=1000)
 
-    parser.add_argument('-u', '--url', help="api url", default="http://localhost:3000/highlight")
+    parser.add_argument('-u', '--url', help="api url", default="http://localhost:8081/highlight")
 
     parser.add_argument('-o', '--output', help="output file", default="benchmark.csv")
 

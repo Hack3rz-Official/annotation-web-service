@@ -3,7 +3,7 @@ import os
 
 DEBUG = os.getenv("ENVIRONEMENT") == "DEV"
 HOST = "127.0.0.1"
-PORT = 5000
+PORT = 8085
 SWAGGER_TEMPLATE = {
     "swagger": "2.0",
     "info": {

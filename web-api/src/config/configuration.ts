@@ -1,6 +1,6 @@
 export default () => ({
   service: {
-    port: process.env.SERVICE_PORT
+    port: process.env.WEB_API_PORT
   },
   lex: {
     url: process.env.LEX_URL

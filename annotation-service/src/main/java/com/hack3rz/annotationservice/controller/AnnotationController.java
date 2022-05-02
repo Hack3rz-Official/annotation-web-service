@@ -16,7 +16,7 @@ import javax.validation.Valid;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
 @RestController
-@RequestMapping(value = "/api/annotate", produces = APPLICATION_JSON_VALUE)
+@RequestMapping(value = "/api/v1/annotation", produces = APPLICATION_JSON_VALUE)
 public class AnnotationController {
     private static final Logger log = LoggerFactory.getLogger(AnnotationController.class);
 

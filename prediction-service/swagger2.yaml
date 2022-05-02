@@ -1,7 +1,10 @@
----
-swagger: "2.0"
+swagger: '2.0'
 info:
-  description: "This is a sample Petstore server.  You can find \nout more about Swagger at \n[http://swagger.io](http://swagger.io) or on \n[irc.freenode.net, #swagger](http://swagger.io/irc/).\n"
+  description: |
+    This is a sample Petstore server.  You can find 
+    out more about Swagger at 
+    [http://swagger.io](http://swagger.io) or on 
+    [irc.freenode.net, #swagger](http://swagger.io/irc/).
   version: 1.0.0
   title: Swagger Petstore
   termsOfService: http://swagger.io/terms/
@@ -10,8 +13,8 @@ info:
   license:
     name: Apache 2.0
     url: http://www.apache.org/licenses/LICENSE-2.0.html
-host: virtserver.swaggerhub.com
-basePath: /pemmenegger/Hack3rz/1.0.0
+# host: petstore.swagger.io
+# basePath: /v2
 tags:
 - name: pet
   description: Everything about your Pets
@@ -25,9 +28,8 @@ tags:
   externalDocs:
     description: Find out more about our store
     url: http://swagger.io
-schemes:
-- https
-- http
+# schemes:
+# - http
 paths:
   /pet:
     post:
@@ -48,13 +50,13 @@ paths:
         required: true
         schema:
           $ref: '#/definitions/Pet'
+      responses:
+        405:
+          description: Invalid input
       security:
       - petstore_auth:
         - write:pets
         - read:pets
-      responses:
-        "405":
-          description: Invalid input
     put:
       tags:
       - pet
@@ -73,17 +75,17 @@ paths:
         required: true
         schema:
           $ref: '#/definitions/Pet'
+      responses:
+        400:
+          description: Invalid ID supplied
+        404:
+          description: Pet not found
+        405:
+          description: Validation exception
       security:
       - petstore_auth:
         - write:pets
         - read:pets
-      responses:
-        "400":
-          description: Invalid ID supplied
-        "404":
-          description: Pet not found
-        "405":
-          description: Validation exception
   /pet/findByStatus:
     get:
       tags:
@@ -108,25 +110,26 @@ paths:
           - sold
           default: available
         collectionFormat: multi
-      security:
-      - petstore_auth:
-        - write:pets
-        - read:pets
       responses:
-        "200":
+        200:
           description: successful operation
           schema:
             type: array
             items:
               $ref: '#/definitions/Pet'
-        "400":
+        400:
           description: Invalid status value
+      security:
+      - petstore_auth:
+        - write:pets
+        - read:pets
   /pet/findByTags:
     get:
       tags:
       - pet
       summary: Finds Pets by tags
-      description: "Muliple tags can be provided with comma separated strings. Use\\ \\ tag1, tag2, tag3 for testing."
+      description: Muliple tags can be provided with comma separated strings. Use\
+        \ tag1, tag2, tag3 for testing.
       operationId: findPetsByTags
       produces:
       - application/json
@@ -140,20 +143,20 @@ paths:
         items:
           type: string
         collectionFormat: multi
-      security:
-      - petstore_auth:
-        - write:pets
-        - read:pets
-      deprecated: true
       responses:
-        "200":
+        200:
           description: successful operation
           schema:
             type: array
             items:
               $ref: '#/definitions/Pet'
-        "400":
+        400:
           description: Invalid tag value
+      security:
+      - petstore_auth:
+        - write:pets
+        - read:pets
+      deprecated: true
   /pet/{petId}:
     get:
       tags:
@@ -171,17 +174,17 @@ paths:
         required: true
         type: integer
         format: int64
-      security:
-      - api_key: []
       responses:
-        "200":
+        200:
           description: successful operation
           schema:
             $ref: '#/definitions/Pet'
-        "400":
+        400:
           description: Invalid ID supplied
-        "404":
+        404:
           description: Pet not found
+      security:
+      - api_key: []
     post:
       tags:
       - pet
@@ -209,13 +212,13 @@ paths:
         description: Updated status of the pet
         required: false
         type: string
+      responses:
+        405:
+          description: Invalid input
       security:
       - petstore_auth:
         - write:pets
         - read:pets
-      responses:
-        "405":
-          description: Invalid input
     delete:
       tags:
       - pet
@@ -235,15 +238,15 @@ paths:
         required: true
         type: integer
         format: int64
+      responses:
+        400:
+          description: Invalid ID supplied
+        404:
+          description: Pet not found
       security:
       - petstore_auth:
         - write:pets
         - read:pets
-      responses:
-        "400":
-          description: Invalid ID supplied
-        "404":
-          description: Pet not found
   /pet/{petId}/uploadImage:
     post:
       tags:
@@ -271,15 +274,15 @@ paths:
         description: file to upload
         required: false
         type: file
+      responses:
+        200:
+          description: successful operation
+          schema:
+            $ref: '#/definitions/ApiResponse'
       security:
       - petstore_auth:
         - write:pets
         - read:pets
-      responses:
-        "200":
-          description: successful operation
-          schema:
-            $ref: '#/definitions/ApiResponse'
   /store/inventory:
     get:
       tags:
@@ -290,16 +293,16 @@ paths:
       produces:
       - application/json
       parameters: []
-      security:
-      - api_key: []
       responses:
-        "200":
+        200:
           description: successful operation
           schema:
             type: object
             additionalProperties:
               type: integer
               format: int32
+      security:
+      - api_key: []
   /store/order:
     post:
       tags:
@@ -317,18 +320,19 @@ paths:
         schema:
           $ref: '#/definitions/Order'
       responses:
-        "200":
+        200:
           description: successful operation
           schema:
             $ref: '#/definitions/Order'
-        "400":
+        400:
           description: Invalid Order
   /store/order/{orderId}:
     get:
       tags:
       - store
       summary: Find purchase order by ID
-      description: For valid response try integer IDs with value >= 1 and <= 10.\ \ Other values will generated exceptions
+      description: For valid response try integer IDs with value >= 1 and <= 10.\
+        \ Other values will generated exceptions
       operationId: getOrderById
       produces:
       - application/json
@@ -343,19 +347,20 @@ paths:
         minimum: 1.0
         format: int64
       responses:
-        "200":
+        200:
           description: successful operation
           schema:
             $ref: '#/definitions/Order'
-        "400":
+        400:
           description: Invalid ID supplied
-        "404":
+        404:
           description: Order not found
     delete:
       tags:
       - store
       summary: Delete purchase order by ID
-      description: For valid response try integer IDs with positive integer value.\ \ Negative or non-integer values will generate API errors
+      description: For valid response try integer IDs with positive integer value.\
+        \ Negative or non-integer values will generate API errors
       operationId: deleteOrder
       produces:
       - application/json
@@ -369,9 +374,9 @@ paths:
         minimum: 1.0
         format: int64
       responses:
-        "400":
+        400:
           description: Invalid ID supplied
-        "404":
+        404:
           description: Order not found
   /user:
     post:
@@ -456,8 +461,10 @@ paths:
         required: true
         type: string
       responses:
-        "200":
+        200:
           description: successful operation
+          schema:
+            type: string
           headers:
             X-Rate-Limit:
               type: integer
@@ -467,9 +474,7 @@ paths:
               type: string
               format: date-time
               description: date in UTC when token expires
-          schema:
-            type: string
-        "400":
+        400:
           description: Invalid username/password supplied
   /user/logout:
     get:
@@ -496,17 +501,17 @@ paths:
       parameters:
       - name: username
         in: path
-        description: The name that needs to be fetched. Use user1 for testing.
+        description: The name that needs to be fetched. Use user1 for testing. 
         required: true
         type: string
       responses:
-        "200":
+        200:
           description: successful operation
           schema:
             $ref: '#/definitions/User'
-        "400":
+        400:
           description: Invalid username supplied
-        "404":
+        404:
           description: User not found
     put:
       tags:
@@ -530,9 +535,9 @@ paths:
         schema:
           $ref: '#/definitions/User'
       responses:
-        "400":
+        400:
           description: Invalid user supplied
-        "404":
+        404:
           description: User not found
     delete:
       tags:
@@ -550,9 +555,9 @@ paths:
         required: true
         type: string
       responses:
-        "400":
+        400:
           description: Invalid username supplied
-        "404":
+        404:
           description: User not found
 securityDefinitions:
   petstore_auth:
@@ -688,3 +693,9 @@ definitions:
 externalDocs:
   description: Find out more about Swagger
   url: http://swagger.io
+# Added by API Auto Mocking Plugin
+host: virtserver.swaggerhub.com
+basePath: /pemmenegger/Hack3rz/1.0.0
+schemes:
+ - https
+ - http
