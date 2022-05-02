@@ -18,7 +18,7 @@ const testFile = open("samples/java/FunctionTest.java");
 
 export default function () {
 
-    const url = 'http://localhost:3000/highlight';
+    const url = 'http://localhost:8081/highlight';
     const payload = JSON.stringify({
         "code": testFile,
         "language": "java"

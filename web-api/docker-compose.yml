@@ -9,8 +9,10 @@ services:
             target: development
             dockerfile: ./Dockerfile
         command: npm run start:debug
+        env_file:
+            - .env
         ports:
-            - 3000:3000
+            - "${WEB_API_PORT}:${WEB_API_PORT}"
             - 9229:9229
         networks:
             - nestjs-network
@@ -26,8 +28,10 @@ services:
             target: production
             dockerfile: ./Dockerfile
         command: npm run start:prod
+        env_file:
+            - .env
         ports:
-            - 3000:3000
+            - "${WEB_API_PORT}:${WEB_API_PORT}"
             - 9229:9229
         networks:
             - nestjs-network
