@@ -1,6 +1,56 @@
 version: '3.8'
 
 services:
+
+  demo-frontend:
+      build: ./demo-frontend
+      container_name: "demo-frontend"
+      image: demo-frontend:latest
+      depends_on:
+        - web-api
+      environment:
+        - VITE_API_URL=http://web-api:3000
+      ports: 
+        - "8081:8081"
+      networks:
+        - aws-network
+
+  web-api:
+    build: ./web-api
+    container_name: "web-api"
+    image: web-api:latest
+    command: npm run start:prod
+    depends_on:
+      - nginx
+      - annotation
+    ports:
+      - "3000:3000"
+    networks:
+      - aws-network
+    environment:
+      - SERVICE_PORT=3000
+      - LEX_URL=http://nginx:4000/api/annotate
+      - PREDICT_URL=http://nginx:4000/api/v1/prediction
+    restart: unless-stopped
+
+  swagger-ui:
+    container_name: "swagger-ui"
+    image: swaggerapi/swagger-ui
+    ports:
+      - 8082:8080
+    restart: always
+    volumes:
+      - ./training-service/api-doc.yaml:/usr/share/nginx/html/training-service.yaml
+      - ./prediction-service/api-doc.yaml:/usr/share/nginx/html/prediction-service.yaml
+    environment:
+      URLS: "[
+          { url: \"training-service.yaml\", name: \"Training Service\" },
+          { url: \"prediction-service.yaml\", name: \"Prediction Service\" },
+        ]"
+    depends_on:
+      - training
+      - prediction
+
   annotation:
     build: ./annotation-service
     # container_name: "annotation-service"
@@ -10,7 +60,7 @@ services:
     depends_on:
       - mongodb
     expose:
-      - "8080"
+      - "8083"
     networks:
       - aws-network
     restart: unless-stopped
@@ -29,23 +79,6 @@ services:
       - aws-network
     restart: unless-stopped
 
-  api-gateway:
-    build: ./web-api
-    container_name: "api-gateway"
-    image: api-gateway:latest
-    command: npm run start:prod
-    depends_on:
-      - nginx
-    ports:
-      - "3000:3000"
-    networks:
-      - aws-network
-    environment:
-      - SERVICE_PORT=3000
-      - LEX_URL=http://nginx:4000/api/annotate
-      - PREDICT_URL=http://nginx:4000/api/v1/prediction
-    restart: unless-stopped
-  
   training:
     build: ./training-service
     container_name: "training-service"
@@ -76,7 +109,6 @@ services:
       - "4000:4000"
     restart: unless-stopped
 
-
   mongodb:
     image: mongo:5.0.6
     container_name: MongoDB
@@ -96,37 +128,6 @@ services:
     networks:
       - aws-network
     restart: unless-stopped
-
-  demo-frontend:
-    build: ./demo-frontend
-    container_name: "demo-frontend"
-    image: demo-frontend:latest
-    depends_on:
-      - api-gateway
-    environment:
-      - VITE_API_URL=http://api-gateway:3000
-    ports: 
-      - "8081:8081"
-    networks:
-      - aws-network
-
-  swagger-ui:
-    container_name: "swagger-ui"
-    image: swaggerapi/swagger-ui
-    ports:
-      - 8082:8080
-    restart: always
-    volumes:
-      - ./training-service/swagger.yaml:/usr/share/nginx/html/training-service.yaml
-      - ./prediction-service/swagger.yaml:/usr/share/nginx/html/prediction-service.yaml
-    environment:
-      URLS: "[
-          { url: \"training-service.yaml\", name: \"Training Service\" },
-          { url: \"prediction-service.yaml\", name: \"Prediction Service\" },
-        ]"
-    depends_on:
-      - training
-      - prediction
 
 networks:
   aws-network:
