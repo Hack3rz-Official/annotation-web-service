@@ -10,12 +10,12 @@ from src.util.SHModelHelper import from_db_model_to_sh_model, from_best_sh_model
 annotation_repository = AnnotationRepository()
 model_repository = ModelRepository()
 
-"""
-fnc which trains models if there is at least the number of TRAINING_BATCH_SIZE rows on db collection "annotation". 
-if number of rows < TRAININ_BATCH_size the fnc is terminated.
-
-"""
 def train_models():
+    """Trains models if there is at least the number of TRAINING_BATCH_SIZE entries on db collection "annotation".
+    
+    Returns:
+        String, based on which condition is fullfilled.  
+    """
     print("[TRAIN] ### TRAINING STARTED ### ", flush=True)
 
     trained_languages = []
@@ -39,11 +39,16 @@ def train_models():
         return "No languages trained. Not enough training data."
     return "Models trained for: " + str(trained_languages)
 
-"""
-fnc which takes a parameter called training_data and extracts the lexing and highlighting tokens.
-Returns two numpy arrays X, T
-"""
+
 def data_preprocessing(training_data):
+    """Takes an array of certain dimensions and extracts the lexing and highlighting tokens & separates them.
+
+    Args: 
+        Training_data array wich includes lexing and highlighting tokens.
+    
+    Returns: 
+        Two numpy arrays X, T such that the training process can be started with these inputs.
+    """
     X = []
     T = []
     for sample in training_data:
@@ -53,15 +58,21 @@ def data_preprocessing(training_data):
     T = np.array(T, dtype=object)
     return X, T
 
-"""
-fnc with params X, T lang_name, and training_data
-Splits X & T in training, validation and test data
-Fetches best model from db and converts the db file into SH model
-Accuracy is computed before (with validation set) & after (with test set) training the fetched model
-If accuracy of the fetched model is higher after training than the current used model the new model will be saved to 
-the current directory such that the old model will be overwritten
-"""
+
 def improve_model(X, T, lang_name, training_data):
+    """Fetches best model respectively most recent model from db and converts the db file into SHModel. Then it splits X & T in training, 
+    validation and test data. The accuracy is computed before (with validation set) & after (with test set) training the fetched model.
+    If accuracy of the fetched model is higher after training than the current used model the new model will be saved to the current directory 
+    such that the old model will be overwritten.
+    
+    Args: 
+        Array with lexing tokens (training data) X, array with highlighting tokens (targets) T, string with language name lang_name,
+        training_data?
+    
+    Returns: 
+        None, but saves new trained model to db if the new accuracy (after the training process) is higher, than the accuracy of the current model
+        which is used by the prediction service.
+    """
     #RECALL: return value of split_data function: X_train, X_val, T_train, T_val
     
     #split the data in 80:10:10 for train:valid:test dataset
@@ -95,18 +106,22 @@ def improve_model(X, T, lang_name, training_data):
     print("[TRAIN] No improvement: do nothing", flush=True)
 
 
-"""
-fnc which trains the model based on a number on epochs. 
-Before the start of the training process, the model will be set into the finetuning mode.
-Training data will be shuffled before the start of the process.
-Function returns np array with losses
-"""
+
 def train(model, X_train, T_train, epochs=10):
+    """Trains the model based on a number on epochs. Before the start of the training process, the model will be set into the finetuning mode.
+    Training data will be shuffled before the start of the process.
+    
+    Args:
+        An SHModel, two arrays which contain training data and targets, number of epochs (default is 10).
+
+    Returns:
+        Array with losses.
+    """
     model.setup_for_finetuning()
     X_train, T_train = shuffle_data(X_train, T_train)
     losses = np.array([])
     for epoch in range(epochs):
-        print(f'Loading {epoch+1/10}%', flush=True)
+        print(f'Loading {(epoch+1/epochs)*100}%', flush=True)
         epoch_losses = np.array([])
         for idx, x in enumerate(X_train):
             loss_of_sample = model.finetune_on(x, T_train[idx])
@@ -116,21 +131,31 @@ def train(model, X_train, T_train, epochs=10):
         print(f'Average Loss {avg_epoch_loss} in epoch {epoch+1}', flush=True)
     return losses
 
-"""
-fnc which takes two np arrays and shuffles them accordingly
-returns two shuffled np arrays 
-"""
+
 def shuffle_data(X, T):
+    """Shuffles two arrays accordingly. 
+    
+    Args:
+        Two np arrays.
+        
+    Returns:
+        Returns two shuffled np arrays.
+    
+    """
     print("[TRAIN] shuffling data...", flush=True)
     assert len(X) == len(T)
     X, T = shuffle(X, T, random_state=0)
     return X, T
 
-"""
-fnc which takes two np arrays as paramets and splits the two arrays into training and validation data
-Returns 4 np arrays with default split of 0.8 training & 0.2 validation data 
-"""
+
 def split_data(X, T, train_percentage=0.8):
+    """ Splits two arrays into training and validation data.
+    Args:
+        Two arrays with training data and targets. Possibility to define the split of train and test data by the user with parameter train_percentage.
+    
+    Returns:
+       4 arrays with default split of 0.8 training & 0.2 validation data 
+"""
     print("[TRAIN] splitting data...", flush=True)
     X_train, X_val,T_train, T_val = train_test_split(X,
                                                      T, 
@@ -143,15 +168,18 @@ def split_data(X, T, train_percentage=0.8):
 
     return X_train, X_val,T_train, T_val
 
-"""
-fnc which takes a SHModel with two np arrays as input.
-the SHModel predicts based on the lexing tokens in the X arrays a highlighting token
-The output of the predict function will be compared to the highlighting token in the T array.
-If predicted highlighting token equals the highlighting token of the T array the var correct is incremented
-In any case the var total will be incremented. 
-Returns a value between 0 & 1 due to the divison of correct/total
-"""
+
 def compute_accuracy(model, X, T):
+    """Predicts the accuracy of a model based on the lexing tokens (in X) via the predict() function and compares the output with the target resp.
+    the highlighting tokens (in T). If predicted highlighting token equals the highlighting token of the T array the var correct is incremented
+    In any case the var total will be incremented. 
+
+    Args:
+        SHModel and an array with training data & an array with target.
+    
+    Returns:
+        A value between 0 & 1 due to the divison of correct/total.
+"""
     assert X.shape == T.shape
     model.setup_for_prediction()
     correct = 0
