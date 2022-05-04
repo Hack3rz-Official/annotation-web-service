@@ -93,7 +93,7 @@ defineProps({
         {{ file.request.duration }} ms
       </div>
       <div class="badge absolute m-2 left-0">
-        {{ file.loc }} loc
+        {{ file.loc }} lines
       </div>
     </div>
   </div>
