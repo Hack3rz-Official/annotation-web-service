@@ -11,6 +11,7 @@ export default class File {
     this.identifier = this.computeIdentifier();
     this.rawCode = "";
     this.size = 0; // size of code in Bytes
+    this.loc = 0; // lines of code
     this.highlightedCode = "";
     this.status = "empty"; // "empty", "raw", "loading", "highlighted"
     this.request = {
@@ -43,6 +44,7 @@ export default class File {
         // console.log(response);
         this.rawCode = response.data;
         this.size = response.data.length;
+        this.loc = this.computeLoc()
         this.status = "raw";
       })
       .catch((error) => {
@@ -117,5 +119,9 @@ export default class File {
 
   getSizeFormatted() {
     return `${Math.round((this.size / 1000) * 10) / 10} kB`;
+  }
+
+  computeLoc() {
+    return this.rawCode.split('\n').length
   }
 }
