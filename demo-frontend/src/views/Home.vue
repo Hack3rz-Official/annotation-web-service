@@ -35,6 +35,7 @@ const languagesStore = useLanguagesStore();
 
     <!-- File Previews for each loaded file -->
     <div class="flex flex-wrap gap-3 relative">
+      <!-- eslint-disable-next-line vue/no-v-for-template-key -->
       <template v-for="file in filesStore.files" :key="file.identifier">
         <file-preview :file="file"></file-preview>
       </template>

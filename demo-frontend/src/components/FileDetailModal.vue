@@ -9,8 +9,6 @@ const editMode = ref(true);
 const selectedLanguage = ref(null);
 
 filesStore.$subscribe((mutation, state) => {
-  console.log(mutation, state);
-
   // prevent updates when typing in the rawCode field
   if (mutation.events.key == "rawCode") {
     return;
