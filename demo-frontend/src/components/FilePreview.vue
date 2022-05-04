@@ -61,7 +61,7 @@ defineProps({
     <!-- this card-body is shown when code has been highlighted -->
     <div class="card-body mt-3" v-show="file.highlightedCode">
       <div
-        :id="file.identifier"
+        :id="file.uuid"
         wrap="off"
         class="
           resize-none

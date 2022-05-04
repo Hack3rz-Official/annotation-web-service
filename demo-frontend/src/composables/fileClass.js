@@ -1,5 +1,5 @@
 import axios from "axios";
-
+import { v4 as uuidv4 } from 'uuid';
 export default class File {
   static jsDelivrBaseUrl = "https://cdn.jsdelivr.net/gh/";
 
@@ -9,6 +9,7 @@ export default class File {
     this.githubFile = githubFile;
     this.setLanguage(this.githubFile.split(".")[1]);
     this.identifier = this.computeIdentifier();
+    this.uuid = uuidv4()
     this.rawCode = "";
     this.size = 0; // size of code in Bytes
     this.loc = 0; // lines of code
@@ -61,7 +62,7 @@ export default class File {
       code: this.rawCode,
       language: this.languageLong,
     };
-    let outputElem = document.getElementById(this.identifier);
+    let outputElem = document.getElementById(this.uuid);
     //   console.log(outputElem);
     axios
       .post(`${import.meta.env.VITE_API_URL}/highlight`, data)
