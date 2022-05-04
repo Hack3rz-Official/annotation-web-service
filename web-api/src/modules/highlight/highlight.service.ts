@@ -7,12 +7,11 @@ import { HtmlGeneratorService } from 'src/html-generator/html-generator.service'
 
 @Injectable()
 export class HighlightService {
-  private readonly logger = new Logger(HighlightService.name);
-
   constructor(
     private config: ConfigService,
     private httpService: HttpService,
     private htmlGeneratorService: HtmlGeneratorService,
+    private readonly logger: Logger
   ) {
   }
 

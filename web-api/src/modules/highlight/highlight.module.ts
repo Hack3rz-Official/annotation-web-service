@@ -1,5 +1,5 @@
 import { HttpModule } from '@nestjs/axios';
-import { Module } from '@nestjs/common';
+import { Logger, Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { HtmlGeneratorService } from 'src/html-generator/html-generator.service';
 import configuration from '../../config/configuration';
@@ -12,7 +12,7 @@ import { HighlightService } from './highlight.service';
     HttpModule,
   ],
   controllers: [HighlightController],
-  providers: [HighlightService, HtmlGeneratorService],
+  providers: [HighlightService, HtmlGeneratorService, Logger],
 })
 export class HighlightModule {
 
