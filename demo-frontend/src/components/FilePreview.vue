@@ -61,7 +61,7 @@ defineProps({
     <!-- this card-body is shown when code has been highlighted -->
     <div class="card-body mt-3" v-show="file.highlightedCode">
       <div
-        :id="file.identifier"
+        :id="file.uuid"
         wrap="off"
         class="
           resize-none
@@ -89,11 +89,11 @@ defineProps({
     </div>
     <!-- file size and request status information -->
     <div class="absolute w-full h-8 rounded rounded-t-none border-0 bottom-0">
-      <div class="badge absolute m-2 right-0">
+      <div v-if="file.request.duration > 0" class="badge absolute m-2 right-0">
         {{ file.request.duration }} ms
       </div>
       <div class="badge absolute m-2 left-0">
-        {{ file.getSizeFormatted() }}
+        {{ file.loc }} lines
       </div>
     </div>
   </div>
