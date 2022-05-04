@@ -89,7 +89,7 @@ defineProps({
     </div>
     <!-- file size and request status information -->
     <div class="absolute w-full h-8 rounded rounded-t-none border-0 bottom-0">
-      <div class="badge absolute m-2 right-0">
+      <div v-if="file.request.duration > 0" class="badge absolute m-2 right-0">
         {{ file.request.duration }} ms
       </div>
       <div class="badge absolute m-2 left-0">
