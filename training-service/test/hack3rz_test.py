@@ -16,6 +16,10 @@ class Hack3rzTest(TestCase):
 
     @classmethod
     def setUpClass(self):
+        """Sets up a db called aws_test for the test files in the test folder. Annotation and Model objects are instantiated
+        since they will be used to either fetch training data or models from db.
+        
+        """
         super().setUpClass()
 
         warnings.simplefilter('ignore', category=DeprecationWarning)
@@ -40,6 +44,10 @@ class Hack3rzTest(TestCase):
     
     # called before running every test
     def setUp(self):
+        """ Is called before running every test. Ensures that the collections where models and annotations are stored
+        are empty. After this, the function load_training_test_data() is called to populate the collections on the db.       
+        
+        """
         assert self.db.get_db().name == "aws_test"
 
         # TODO drop all collections at once?
@@ -48,6 +56,12 @@ class Hack3rzTest(TestCase):
         self.load_training_test_data()
 
     def save_sh_model_to_db(self,lang_name, accuracy):
+        """Saves an SHModel to the db on the collection "models". 
+
+        Args:
+            Corresponding language name (string) of the model and its accuracy. Both args will be saved in a separate coloumn on the db.
+        
+        """
         model = SHModel(lang_name, os.environ.get('MODEL_NAME'))
         print("[TRAIN] New Model saved from directory to DB ", flush=True)
         model = Model(language=lang_name, accuracy=accuracy)
@@ -57,17 +71,33 @@ class Hack3rzTest(TestCase):
 
 
     def load_training_test_data(self):
+        """Populates db with test data which can be used for testing purposes. The data is fetched from the annotation.json
+        file in the test folder and will be saved on the annotation collection.
+        
+        """
         with open('annotations.json') as file:
             file_data = json.load(file)
             annotation_instances = [Annotation.from_json(json.dumps(annotation), created=True) for annotation in file_data]
             Annotation.objects.insert(annotation_instances, load_bulk=False)
 
     def load_test_X_T(self, lang_name):
+        """Preprocesses data for specific language such that a training and target is ready for testing purposes.
+
+        Args:
+            Language name (string) of the requested data which should be preprocessed.
+
+        Returns:
+            training data array X and target data array T. For more informationn check information in src/services/training.py
+        
+        """
         X, T = data_preprocessing(self.annotation_repository.find_training_data(lang_name))
         return X, T
 
     @classmethod
     def tearDownClass(self):
+        """Tears down whole class when called. Inherited method from TestCase.
+        
+        """
         super().tearDownClass()
 
         self.env_patcher.stop()
