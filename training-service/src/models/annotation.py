@@ -13,6 +13,7 @@ class Annotation(db.Document):
     highlightingTokens = db.ListField()
     highlightingCode = db.StringField()
     trainedTime = db.DateTimeField()
+    validatedTime = db.DateTimeField()
     meta = {
         'collection': 'annotations',
         'strict': False

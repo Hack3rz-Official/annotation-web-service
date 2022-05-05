@@ -22,7 +22,7 @@ def train_models():
     for lang_name in config.SUPPORTED_LANGUAGES:
         print("[TRAIN] Starting model training for " + lang_name, flush=True)
 
-        training_data = annotation_repository.find_training_data(lang_name)
+        training_data = annotation_repository.find_data_to_train_with(lang_name)
         print("[TRAIN] Training data loaded from DB: " + str(len(training_data)), flush=True)
 
         if len(training_data) < int(os.environ.get('TRAINING_BATCH_SIZE')):

@@ -13,7 +13,7 @@ import numpy as np
 class TrainingServiceTest(Hack3rzTest):
 
     def test_data_preprocessing(self):  
-        training_data = self.annotation_repository.find_training_data("java")
+        training_data = self.annotation_repository.find_data_to_train_with("java")
         X, T = data_preprocessing(training_data)
         self.assertIsInstance(X, np.ndarray)
         self.assertIsInstance(T, np.ndarray)
@@ -22,7 +22,7 @@ class TrainingServiceTest(Hack3rzTest):
 
 
     def test_split_data(self):
-        training_data = self.annotation_repository.find_training_data("java")
+        training_data = self.annotation_repository.find_data_to_train_with("java")
         X, T = data_preprocessing(training_data)
         X_train, X_val, T_train, T_val = split_data(X, T, train_percentage=0.8)
         self.assertEqual(X_train.shape[0], T_train.shape[0])
@@ -46,7 +46,7 @@ class TrainingServiceTest(Hack3rzTest):
         
 
     def test_shuffle_data(self):
-        training_data = self.annotation_repository.find_training_data("java")
+        training_data = self.annotation_repository.find_data_to_train_with("java")
         X,T = data_preprocessing(training_data)
         X_shuff,T_shuff = shuffle_data(X,T)
         self.assertFalse(np.array_equal(X,X_shuff))
@@ -79,7 +79,7 @@ class TrainingServiceTest(Hack3rzTest):
         compute_accuracy_mock.side_effect = [10, 5]
         
         # prepare and run function
-        training_data = self.annotation_repository.find_training_data("java")
+        training_data = self.annotation_repository.find_data_to_train_with("java")
         X, T = super().load_test_X_T("java")
         improve_model(X, T, "java", training_data)
         
@@ -88,7 +88,7 @@ class TrainingServiceTest(Hack3rzTest):
         self.assertIsNone(best_db_model)
         
         # test annotations
-        training_data = self.annotation_repository.find_training_data("java")
+        training_data = self.annotation_repository.find_data_to_train_with("java")
         # test db has 10 test annotations initially loaded per language
         self.assertEqual(10, len(training_data))
 
@@ -102,14 +102,14 @@ class TrainingServiceTest(Hack3rzTest):
         compute_accuracy_mock.side_effect = [5, 10]
 
         # prepare and run functions
-        training_data = self.annotation_repository.find_training_data("java")
+        training_data = self.annotation_repository.find_data_to_train_with("java")
         X, T = super().load_test_X_T("java")
         improve_model(X, T, "java", training_data)
 
         best_db_model = self.model_repository.find_best_model("java")
         self.assertIsNotNone(best_db_model)
         
-        training_data = self.annotation_repository.find_training_data("java")
+        training_data = self.annotation_repository.find_data_to_train_with("java")
         self.assertEquals(best_db_model.accuracy, 10)
         self.assertEquals(0, len(training_data))
 
