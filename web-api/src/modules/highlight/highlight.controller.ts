@@ -4,11 +4,7 @@ import { HighlightService } from './highlight.service';
 
 @Controller()
 export class HighlightController {
-  constructor(
-    private highlightService: HighlightService,
-  ) {
-  }
-
+  constructor(private highlightService: HighlightService) {}
 
   @Post('/highlight')
   @HttpCode(200)

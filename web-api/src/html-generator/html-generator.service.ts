@@ -32,8 +32,7 @@ export class HtmlGeneratorService {
     return `${HtmlGeneratorService.prefix}${out}${HtmlGeneratorService.postfix}`;
   }
 
-  static prefix = `
-    <!DOCTYPE html>
+  static prefix = `<!DOCTYPE html>
     <html>
     <style>
     .ANY {
@@ -100,8 +99,7 @@ export class HtmlGeneratorService {
     <pre><code>`;
 
   static postfix = `
-    </pre>
     </code>
-    </html>
-    `;
+    </pre>
+    </html>`;
 }
