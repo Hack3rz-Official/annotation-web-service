@@ -4,6 +4,8 @@ import { ConfigService } from '@nestjs/config';
 import { firstValueFrom, Observable } from 'rxjs';
 import { HighlightRequestDto } from './dto/highlight-request.dto';
 import { HtmlGeneratorService } from 'src/html-generator/html-generator.service';
+import { v4 as uuidv4 } from 'uuid';
+
 
 @Injectable()
 export class HighlightService {
@@ -16,11 +18,15 @@ export class HighlightService {
   }
 
   async highlight(highlightRequestDto: HighlightRequestDto): Promise<any> {
-    // TODO: error handling in case functions return error
 
-    this.logger.debug(`lex.url=${this.config.get('lex.url')}`);
+    const times = {
+      'req_id': uuidv4(),
+      'req_in': new Date().getTime(),
+      'req_lexed': 0,
+      'req_predicted': 0,
+      'req_out': 0,
+    }
 
-    let start_time = new Date().getTime();
     const request_time = new Date().getTime();
 
     const lexingRequest: Observable<any> = this.httpService.post(
@@ -32,9 +38,10 @@ export class HighlightService {
     );
 
     const lexingResponse = await firstValueFrom(lexingRequest)
-    this.logger.debug(
-      `Lexing request took: ${new Date().getTime() - start_time} ms`,
-    );
+    // this.logger.debug(
+    //   `Lexing request took: ${new Date().getTime() - request_time} ms`,
+    // );
+    times['req_lexed'] = new Date().getTime()
     const lexingData = lexingResponse.data
     //this.logger.debug('The lexing function returned', lexingData)
 
@@ -43,8 +50,7 @@ export class HighlightService {
       return tok.tokenId
     })
 
-    this.logger.debug(`predict.url=${this.config.get('predict.url')}`);
-    start_time = new Date().getTime();
+    // start_time = new Date().getTime();
     const predictRequest: Observable<any> = this.httpService.post(
       this.config.get('predict.url'),
       {
@@ -53,13 +59,28 @@ export class HighlightService {
       },
     );
     const predictResponse = await firstValueFrom(predictRequest)
-    this.logger.debug(
-      `Predict request took: ${new Date().getTime() - start_time} ms`,
-    );
-    //this.logger.debug('The predict function returned', predictResponse.data)
-    this.logger.debug(
-      `Total request took: ${new Date().getTime() - request_time} ms`,
-    );
-    return this.htmlGeneratorService.buildHtml(highlightRequestDto, lexingData, predictResponse.data.h_code_values)
+    // this.logger.debug(
+    //   `Predict request took: ${new Date().getTime() - start_time} ms`,
+    // );
+    times['req_predicted'] = new Date().getTime()
+    // this.logger.debug(
+    //   `Total request took: ${new Date().getTime() - request_time} ms`,
+    // );
+    const html = this.htmlGeneratorService.buildHtml(highlightRequestDto, lexingData, predictResponse.data.h_code_values)
+    times['req_out'] = new Date().getTime()
+
+    let lexTime = formatMsAsS(times['req_lexed'] - times['req_in'])
+    let predictTime = formatMsAsS(times['req_predicted'] - times['req_lexed'])
+    let htmlTime = formatMsAsS(times['req_out'] - times['req_predicted'])
+    let totalTime = formatMsAsS(times['req_out'] - times['req_in'])
+    this.logger.debug(`req ${times['req_id']}: start=${times['req_in']} lex=${lexTime} predict=${predictTime} html=${htmlTime} total=${totalTime} end=${times['req_out']}`)
+    return html
   }
 }
+
+function formatMsAsS(ms) {
+  return (ms / 1000).toFixed(3)
+}
+
+// docker exec -it web-api /bin/sh
+// cat log/debug/debug.log
