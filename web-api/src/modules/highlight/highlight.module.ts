@@ -7,13 +7,8 @@ import { HighlightController } from './highlight.controller';
 import { HighlightService } from './highlight.service';
 
 @Module({
-  imports: [
-    ConfigModule.forRoot({load: [configuration]}),
-    HttpModule,
-  ],
+  imports: [ConfigModule.forRoot({ load: [configuration] }), HttpModule],
   controllers: [HighlightController],
   providers: [HighlightService, HtmlGeneratorService],
 })
-export class HighlightModule {
-
-}
+export class HighlightModule {}

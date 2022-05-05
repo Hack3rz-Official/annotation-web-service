@@ -2,8 +2,8 @@ import { HttpService } from '@nestjs/axios';
 import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { firstValueFrom, Observable } from 'rxjs';
+import { HtmlGeneratorService } from '../../html-generator/html-generator.service';
 import { HighlightRequestDto } from './dto/highlight-request.dto';
-import { HtmlGeneratorService } from 'src/html-generator/html-generator.service';
 
 @Injectable()
 export class HighlightService {
@@ -16,8 +16,6 @@ export class HighlightService {
   ) {}
 
   async highlight(highlightRequestDto: HighlightRequestDto): Promise<any> {
-    // TODO: error handling in case functions return error
-
     this.logger.debug(`lex.url=${this.config.get('lex.url')}`);
 
     let start_time = new Date().getTime();
@@ -36,7 +34,6 @@ export class HighlightService {
       `Lexing request took: ${new Date().getTime() - start_time} ms`,
     );
     const lexingData = lexingResponse.data;
-    //this.logger.debug('The lexing function returned', lexingData)
 
     // generate array with tokenIds from lexingResponse
     const tok_ids = lexingData.map((tok) => {
@@ -56,10 +53,10 @@ export class HighlightService {
     this.logger.debug(
       `Predict request took: ${new Date().getTime() - start_time} ms`,
     );
-    //this.logger.debug('The predict function returned', predictResponse.data)
     this.logger.debug(
       `Total request took: ${new Date().getTime() - request_time} ms`,
     );
+
     return this.htmlGeneratorService.buildHtml(
       highlightRequestDto,
       lexingData,

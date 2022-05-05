@@ -9,5 +9,4 @@ import { HtmlGeneratorService } from './html-generator/html-generator.service';
   controllers: [AppController],
   providers: [AppService, HtmlGeneratorService],
 })
-export class AppModule {
-}
+export class AppModule {}
