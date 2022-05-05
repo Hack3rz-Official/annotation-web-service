@@ -2,6 +2,7 @@ import { HttpService } from '@nestjs/axios';
 import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { firstValueFrom, Observable } from 'rxjs';
+import { HtmlGeneratorService } from '../../html-generator/html-generator.service';
 import { HighlightRequestDto } from './dto/highlight-request.dto';
 
 @Injectable()
@@ -11,35 +12,55 @@ export class HighlightService {
   constructor(
     private config: ConfigService,
     private httpService: HttpService,
-  ) {
-  }
+    private htmlGeneratorService: HtmlGeneratorService,
+  ) {}
 
   async highlight(highlightRequestDto: HighlightRequestDto): Promise<any> {
-    // TODO: Add dev/prod URLs in azure (Function > Settings > Configuration > add all necessary env variables)
-    // TODO: error handling in case functions return error
+    this.logger.debug(`lex.url=${this.config.get('lex.url')}`);
 
-    this.logger.log(highlightRequestDto)
+    let start_time = new Date().getTime();
+    const request_time = new Date().getTime();
 
     const lexingRequest: Observable<any> = this.httpService.post(
       this.config.get('lex.url'),
       {
-        lang_name: highlightRequestDto.language,
+        language: highlightRequestDto.language.toUpperCase(),
         code: highlightRequestDto.code,
       },
     );
-    const lexingData = await firstValueFrom(lexingRequest)
-    this.logger.log('The lexing function returned', lexingData.data)
 
+    const lexingResponse = await firstValueFrom(lexingRequest);
+    this.logger.debug(
+      `Lexing request took: ${new Date().getTime() - start_time} ms`,
+    );
+    const lexingData = lexingResponse.data;
+
+    // generate array with tokenIds from lexingResponse
+    const tok_ids = lexingData.map((tok) => {
+      return tok.tokenId;
+    });
+
+    this.logger.debug(`predict.url=${this.config.get('predict.url')}`);
+    start_time = new Date().getTime();
     const predictRequest: Observable<any> = this.httpService.post(
       this.config.get('predict.url'),
       {
         lang_name: highlightRequestDto.language,
-        tok_ids: lexingData.data,
+        tok_ids: tok_ids,
       },
     );
-    const predictData = await firstValueFrom(predictRequest)
-    this.logger.log('The predict function returned', predictData.data)
+    const predictResponse = await firstValueFrom(predictRequest);
+    this.logger.debug(
+      `Predict request took: ${new Date().getTime() - start_time} ms`,
+    );
+    this.logger.debug(
+      `Total request took: ${new Date().getTime() - request_time} ms`,
+    );
 
-    return predictData.data
+    return this.htmlGeneratorService.buildHtml(
+      highlightRequestDto,
+      lexingData,
+      predictResponse.data.h_code_values,
+    );
   }
 }

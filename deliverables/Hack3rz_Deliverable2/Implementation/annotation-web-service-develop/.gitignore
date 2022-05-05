@@ -1,0 +1,10 @@
+.DS_Store
+.idea
+.gradle
+.vscode
+
+# no predict model files
+*.pt
+/data
+*.pyc
+/service-predict

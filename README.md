@@ -1,22 +1,75 @@
-# annotation-web-service
-The repository containing all source code for the annotation web service.
+<h1 align="center">
+  Annotation WebService
+  <br>
+</h1>
+<p align="center">
+  <!--<a href="https://github.com/Hack3rz-Official/annotation-web-service/actions">
+    <img src="https://github.com/Hack3rz-Official/annotation-web-service/workflows/Deploy%20Project/badge.svg">
+  </a>-->
+  <a href="https://sonarcloud.io/organizations/hack3rz-official/projects">
+    <img width="150" src="https://sonarcloud.io/images/project_badges/sonarcloud-white.svg">
+  </a>
+</p>
+
+## Introduction
+A syntax highlighting web service based on AI. Please read the [project instructions](https://seal-uzh.notion.site/Annotation-WebService-b9621a3b1b5943cba21ede82d2fcbfe3) for more details about all functionalities. 
+
+## Wiki
+Under the hood, the Annotation WebService consists of the following independent microservices:
+
+| Microservice             | Description                                                                | Technology | Status |
+|--------------------|----------------------------------------------------------------------------|------------|--------|
+| [Annotation Service]() | Handles the lexing and highlighting of code. | Java with [Spring Boot](https://github.com/spring-projects/spring-boot)|[![Quality gate](https://sonarcloud.io/api/project_badges/quality_gate?project=annotation-service)](https://sonarcloud.io/summary/new_code?id=annotation-service)|
+| [Prediction Service]()  | Handles the prediction of syntax highlighting.         | Python with [Flask](https://github.com/pallets/flask) | [![Quality gate](https://sonarcloud.io/api/project_badges/quality_gate?project=prediction-service)](https://sonarcloud.io/summary/new_code?id=prediction-service)|
+| [Training Service]()   | Handles the regularly conducted training and exchange of the underlying prediction models.         | Python with [Flask](https://github.com/pallets/flask) | [![Quality gate](https://sonarcloud.io/api/project_badges/quality_gate?project=training-service)](https://sonarcloud.io/summary/new_code?id=training-service)|
+| [Web API]()          | The web API that acts as the primary entry point for the customers.        | JS/TS with [Nest.js](https://github.com/nestjs/nest) | [![Quality gate](https://sonarcloud.io/api/project_badges/quality_gate?project=web-api-service)](https://sonarcloud.io/summary/new_code?id=web-api-service)|
 
 
-| File/folder        | Description                                                                |
-|--------------------|----------------------------------------------------------------------------|
-| `deliverables`     | All deliverables for the respective submissions.                           |
-| `function-lex`     | The source code of the cloud function that handles the lexing of the code. |
-| `function-predict` | The source code of the cloud function that handles the prediction.         |
-| `web-api`          | The web API that acts as the primary entry point for the customers.        |
-| `.gitignore`       | Define what to ignore at commit time.                                      |
-| `README.md`        | This README file.                                                          |
+## How it works
+The following illustration depicts the flow of the Annotation WebService.
 
+![Architecture](./architecture.png)
 
+After having called the `Web API` with code to be syntax highlighted, the following will be processed:
+1. The code will be lexed and highlighted. This is done by the `Annotation Service` microservice. The lexed code will be returned to the `Web API` whereas the highlighted code will be stored on the Training Database.
+2. The `Web API` will then forward the `tok_ids` extracted from the lexed code to the `Prediction Service` microservice where the syntax highlighting is beeing predicted. The predicted syntax highlighting will be returned to the `Web API`.
+3. Having received the predicted `h_code_values` the `Web API` will create a json file with the highlighted code which will be returned to the caller.
 
-## Links
-- [Azure Workspace](https://portal.azure.com/#@uzh.onmicrosoft.com/dashboard/arm/subscriptions/48c1a3cf-793a-4ca1-97e3-0e93cc815cb4/resourcegroups/hack3rz/providers/microsoft.portal/dashboards/39f628bf-8b8f-45c7-868e-968f8b24f196)
+Regularly, the `Training Service` will be triggered to train the underlying prediction models. First, it will load training data from the Training Database. Then, it will train the underlying prediction models with 80% of the data and validate the improved model with the remaining 20% of the data. If the loss is smaller on the new model than the old one, the new model will be saved. Every time the `Prediction Service` is invoked, the new best model will be loaded and used for the prediction.
 
+## Demo
+Here comes the demo page.
 
+## Run It
+Use the following command to run all services using docker-compose:
+```
+docker-compose up --scale annotation=2
+```
+To test the load-balancing and scaling make sure to scale some services:
+```
+docker-compose up --scale prediction=2 --scale annotation=2
+```
+
+Sometimes builds fail on machines with different processor architectures (e.g. on M1 MacBooks). In other cases the build might fail, because there are old versions of the docker containers stored. Use the following command for a clean new build:
+```nashorn
+docker-compose up -d --force-recreate --renew-anon-volumes --build --scale prediction=2 --scale annotation=2
+```
+
+## MongoDB
+The MongoDB is launched as a separate container. The credentials are stored within the environment of the other containers, so they can access it.
+A folder `data` in the project root is mounted as a volume for the database. 
+When the container is launched initially a new database and user are created with the credentials from the environment file.
+
+### Testing the connection
+Make sure the mongodb container is running. Connect to the CLI of the container and use the following command to access the DB:
+`mongo --username "$MONGO_USERNAME" --password "$MONGO_PASSWORD"`
+
+## Organization
+
+ 
+
+### Project planning and version control
+We use GitHub for our code repositories, task- and issue-tracking, documentation, automated testing and planning as it offers a wide range of free features that we have access to with the GitHub Student Developer Pack. 
 
 
 ### Branching Policy
@@ -38,7 +91,7 @@ Where possible, we create separate feature branches for each feature. This allow
 
 - Prefix: `feature/`
 - Name: Issue/task identifier and short description
-- e.g.: `feature/BACK-001_MyAwesomeFeature`
+- e.g.: `feature/us1a_MyAwesomeFeature`
 
 #### release
 
@@ -56,3 +109,17 @@ The hotfix branch will be created if we encounter issues after a production rele
 - Name: vX.X.X, the version to be fixed
 - e.g.: `hotfix/v1.2.3`
 
+
+### Authors
+
+This project has been built by team Hack3rz:
+
+- [Michael Ziörjen](https://github.com/miczed)
+- [Sebastian Richner](https://github.com/SRichner)
+- [Michael Blum](https://github.com/admi22)
+- [Nicola Crimi](https://github.com/ncrimi)
+- [Pascal Emmenegger](https://github.com/pemmenegger)
+
+It is based on the following libraries:
+- [UZH-ASE-AnnotationWS-FormalModel](https://github.com/MEPalma/UZH-ASE-AnnotationWS-FormalModel)
+- [UZH-ASE-AnnotationWS-BaseLearner](https://github.com/MEPalma/UZH-ASE-AnnotationWS-BaseLearner)
