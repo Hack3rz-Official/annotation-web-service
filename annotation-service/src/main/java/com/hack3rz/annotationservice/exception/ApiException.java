@@ -9,8 +9,8 @@ import lombok.Getter;
 @Getter
 public class ApiException  extends RuntimeException {
 
-    private HttpStatus status;
-    private String message;
+    private final HttpStatus status;
+    private final String message;
     private List<String> errors;
 
     public ApiException(HttpStatus status, String message) {
