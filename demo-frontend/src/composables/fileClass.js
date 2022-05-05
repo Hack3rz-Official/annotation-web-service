@@ -1,5 +1,5 @@
 import axios from "axios";
-
+import { v4 as uuidv4 } from 'uuid';
 export default class File {
   static jsDelivrBaseUrl = "https://cdn.jsdelivr.net/gh/";
 
@@ -9,8 +9,10 @@ export default class File {
     this.githubFile = githubFile;
     this.setLanguage(this.githubFile.split(".")[1]);
     this.identifier = this.computeIdentifier();
+    this.uuid = uuidv4()
     this.rawCode = "";
     this.size = 0; // size of code in Bytes
+    this.loc = 0; // lines of code
     this.highlightedCode = "";
     this.status = "empty"; // "empty", "raw", "loading", "highlighted"
     this.request = {
@@ -43,6 +45,7 @@ export default class File {
         // console.log(response);
         this.rawCode = response.data;
         this.size = response.data.length;
+        this.loc = this.computeLoc()
         this.status = "raw";
       })
       .catch((error) => {
@@ -59,7 +62,7 @@ export default class File {
       code: this.rawCode,
       language: this.languageLong,
     };
-    let outputElem = document.getElementById(this.identifier);
+    let outputElem = document.getElementById(this.uuid);
     //   console.log(outputElem);
     axios
       .post(`${import.meta.env.VITE_API_URL}/highlight`, data)
@@ -117,5 +120,9 @@ export default class File {
 
   getSizeFormatted() {
     return `${Math.round((this.size / 1000) * 10) / 10} kB`;
+  }
+
+  computeLoc() {
+    return this.rawCode.split('\n').length
   }
 }
