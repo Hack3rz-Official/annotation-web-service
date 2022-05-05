@@ -6,12 +6,12 @@ annotation_repository = AnnotationRepository()
 
 class RepositoriesTest(Hack3rzTest):
 
-    def test_annotation_find_training_data(self): # add function for every function
+    def test_annotation_find_data_to_train_with(self): # add function for every function
         """Tests if find_training_data() returns training data for correct number of entries for the "java" language.
         
         """
         lang_name = "java"
-        training_data = annotation_repository.find_training_data(lang_name)
+        training_data = annotation_repository.find_data_to_train_with(lang_name)
         self.assertEqual(len(training_data), 10)
 
     def test_annotation_update_trained_time(self):
@@ -22,10 +22,10 @@ class RepositoriesTest(Hack3rzTest):
         
         """
         lang_name = "python3"
-        training_data = annotation_repository.find_training_data(lang_name)
+        training_data = annotation_repository.find_data_to_train_with(lang_name)
         self.assertEqual(len(training_data), 10)
         annotation_repository.update_trained_time(training_data)
-        training_data = annotation_repository.find_training_data(lang_name)
+        training_data = annotation_repository.find_data_to_train_with(lang_name)
         self.assertEqual(len(training_data), 0)
 
     def test_model_find_best_model(self):

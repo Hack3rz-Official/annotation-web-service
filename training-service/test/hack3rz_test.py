@@ -90,7 +90,7 @@ class Hack3rzTest(TestCase):
             training data array X and target data array T. For more informationn check information in src/services/training.py
         
         """
-        X, T = data_preprocessing(self.annotation_repository.find_training_data(lang_name))
+        X, T = data_preprocessing(self.annotation_repository.find_data_to_train_with(lang_name))
         return X, T
 
     @classmethod
