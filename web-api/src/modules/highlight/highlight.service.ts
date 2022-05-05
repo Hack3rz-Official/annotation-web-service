@@ -13,8 +13,7 @@ export class HighlightService {
     private config: ConfigService,
     private httpService: HttpService,
     private htmlGeneratorService: HtmlGeneratorService,
-  ) {
-  }
+  ) {}
 
   async highlight(highlightRequestDto: HighlightRequestDto): Promise<any> {
     // TODO: error handling in case functions return error
@@ -32,17 +31,17 @@ export class HighlightService {
       },
     );
 
-    const lexingResponse = await firstValueFrom(lexingRequest)
+    const lexingResponse = await firstValueFrom(lexingRequest);
     this.logger.debug(
       `Lexing request took: ${new Date().getTime() - start_time} ms`,
     );
-    const lexingData = lexingResponse.data
+    const lexingData = lexingResponse.data;
     //this.logger.debug('The lexing function returned', lexingData)
 
     // generate array with tokenIds from lexingResponse
-    const tok_ids = lexingData.map(tok => {
-      return tok.tokenId
-    })
+    const tok_ids = lexingData.map((tok) => {
+      return tok.tokenId;
+    });
 
     this.logger.debug(`predict.url=${this.config.get('predict.url')}`);
     start_time = new Date().getTime();
@@ -53,7 +52,7 @@ export class HighlightService {
         tok_ids: tok_ids,
       },
     );
-    const predictResponse = await firstValueFrom(predictRequest)
+    const predictResponse = await firstValueFrom(predictRequest);
     this.logger.debug(
       `Predict request took: ${new Date().getTime() - start_time} ms`,
     );
@@ -61,6 +60,10 @@ export class HighlightService {
     this.logger.debug(
       `Total request took: ${new Date().getTime() - request_time} ms`,
     );
-    return this.htmlGeneratorService.buildHtml(highlightRequestDto, lexingData, predictResponse.data.h_code_values)
+    return this.htmlGeneratorService.buildHtml(
+      highlightRequestDto,
+      lexingData,
+      predictResponse.data.h_code_values,
+    );
   }
 }
