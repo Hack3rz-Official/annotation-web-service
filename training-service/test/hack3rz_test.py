@@ -80,7 +80,7 @@ class Hack3rzTest(TestCase):
             annotation_instances = [Annotation.from_json(json.dumps(annotation), created=True) for annotation in file_data]
             Annotation.objects.insert(annotation_instances, load_bulk=False)
 
-    def load_test_X_T(self, lang_name):
+    def load_test_training_data(self, lang_name):
         """Preprocesses data for specific language such that a training and target is ready for testing purposes.
 
         Args:
@@ -90,8 +90,9 @@ class Hack3rzTest(TestCase):
             training data array X and target data array T. For more informationn check information in src/services/training.py
         
         """
-        X, T = data_preprocessing(self.annotation_repository.find_data_to_train_with(lang_name))
-        return X, T
+        training_data = self.annotation_repository.find_data_to_train_with(lang_name)
+
+        return training_data
 
     @classmethod
     def tearDownClass(self):

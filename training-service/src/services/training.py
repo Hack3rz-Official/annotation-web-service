@@ -1,3 +1,4 @@
+from calendar import TUESDAY
 import numpy as np
 import os
 from sklearn.utils import shuffle
@@ -9,6 +10,7 @@ from src.util.SHModelHelper import from_db_model_to_sh_model, from_best_sh_model
 
 annotation_repository = AnnotationRepository()
 model_repository = ModelRepository()
+FALLBACK_ACCURACY = 0
 
 def train_models():
     """Trains models if there is at least the number of TRAINING_BATCH_SIZE entries on db collection "annotation".
@@ -23,14 +25,15 @@ def train_models():
         print("[TRAIN] Starting model training for " + lang_name, flush=True)
 
         training_data = annotation_repository.find_data_to_train_with(lang_name)
-        print("[TRAIN] Training data loaded from DB: " + str(len(training_data)), flush=True)
+        print("[TRAIN] training data loaded from DB: " + str(len(training_data)), flush=True)
 
         if len(training_data) < int(os.environ.get('TRAINING_BATCH_SIZE')):
             print("[TRAIN] Not enough data to train model", flush=True)
             continue
 
-        X, T = data_preprocessing(training_data)
-        improve_model(X, T, lang_name, training_data)
+        annotations_train, annotations_val = split_objects(training_data)
+    
+        improve_model(annotations_train, annotations_val, lang_name)
         trained_languages.append(lang_name)
 
     print("[TRAIN] ### TRAINING DONE ### ", flush=True)
@@ -40,7 +43,7 @@ def train_models():
     return "Models trained for: " + str(trained_languages)
 
 
-def data_preprocessing(training_data):
+def data_preprocessing(annotation_data):
     """Takes an array of certain dimensions and extracts the lexing and highlighting tokens & separates them.
 
     Args: 
@@ -51,7 +54,7 @@ def data_preprocessing(training_data):
     """
     X = []
     T = []
-    for sample in training_data:
+    for sample in annotation_data:
         X.append(sample.key.lexingTokens)
         T.append(sample.highlightingTokens)
     X = np.array(X, dtype=object)
@@ -59,7 +62,7 @@ def data_preprocessing(training_data):
     return X, T
 
 
-def improve_model(X, T, lang_name, training_data):
+def improve_model(annotations_train, annotations_val, lang_name):
     """Fetches best model respectively most recent model from db and converts the db file into SHModel. Then it splits X & T in training, 
     validation and test data. The accuracy is computed before (with validation set) & after (with test set) training the fetched model.
     If accuracy of the fetched model is higher after training than the current used model the new model will be saved to the current directory 
@@ -73,26 +76,31 @@ def improve_model(X, T, lang_name, training_data):
         None, but saves new trained model to db if the new accuracy (after the training process) is higher, than the accuracy of the current model
         which is used by the prediction service.
     """
-    #RECALL: return value of split_data function: X_train, X_val, T_train, T_val
+    #RECALL: return value of split_objects function: annotations_train, annotations_val
     
-    #split the data in 80:10:10 for train:valid:test dataset
-    X_train, X_rem,T_train, T_rem = split_data(X, T, train_percentage=0.8)
 
-    # Now since we want the valid and test size to be equal (10% each of overall data). 
-    # we have to define valid_size=0.5 (that is 50% of remaining data)
-    X_val, X_test, T_val, T_test = train_test_split(X_rem,T_rem, test_size=0.5)
+    # prepare training data
+    X_train, T_train = data_preprocessing(annotations_train)
+    # prepare validation data
+    X_val, T_val = data_preprocessing(annotations_val)
     
+    # fetch model from db and convert it from a binary file into an SHModel
     best_db_model = model_repository.find_best_model(lang_name)
     best_sh_model = from_db_model_to_sh_model(best_db_model, lang_name)
     
-    # compute current accuracy of model on validation set
-    cur_acc = compute_accuracy(best_sh_model, X_val, T_val)
-    
+    # used for comparison later, if no model on db, 0 is returned
+    cur_acc = best_db_model.accuracy if best_db_model else FALLBACK_ACCURACY
+ 
     # train model on training set
     train(best_sh_model, X_train, T_train)
     
-    # compute accuracy of model on test set
-    new_acc = compute_accuracy(best_sh_model, X_test, T_test)
+    # compute accuracy of model on GLOBAL validation set
+    validation_data = annotation_repository.find_validation_data(lang_name)
+    print("[TRAIN] validation data loaded from DB: " + str(len(validation_data)), flush=True)
+    X_val_previous, T_val_previous = data_preprocessing(validation_data)
+    X_val_all = np.append(X_val, X_val_previous)
+    T_val_all = np.append(T_val, T_val_previous)
+    new_acc = compute_accuracy(best_sh_model, X_val_all, T_val_all)
 
     print(f"new_acc = {new_acc} and cur_acc = {cur_acc}, ", flush=True)
     if new_acc > cur_acc:
@@ -100,14 +108,15 @@ def improve_model(X, T, lang_name, training_data):
         best_sh_model.persist_model()
         improved_db_model = from_best_sh_model_to_db_model(lang_name, new_acc)
         model_repository.save(improved_db_model)
-        annotation_repository.update_trained_time(training_data)
-        return
+        annotation_repository.update_trained_time(annotations_train)
+        annotation_repository.update_validated_time(annotations_val)
+        return 
 
     print("[TRAIN] No improvement: do nothing", flush=True)
 
 
 
-def train(model, X_train, T_train, epochs=10):
+def train(model, X_train, T_train, epochs=10, error_convergence=0.001):
     """Trains the model based on a number on epochs. Before the start of the training process, the model will be set into the finetuning mode.
     Training data will be shuffled before the start of the process.
     
@@ -120,15 +129,25 @@ def train(model, X_train, T_train, epochs=10):
     model.setup_for_finetuning()
     X_train, T_train = shuffle_data(X_train, T_train)
     losses = np.array([])
+    delta = 100
     for epoch in range(epochs):
-        print(f'Loading {(epoch+1/epochs)*100}%', flush=True)
+        print("Epoch: ", epoch)
         epoch_losses = np.array([])
         for idx, x in enumerate(X_train):
+            if delta < error_convergence:
+                break
             loss_of_sample = model.finetune_on(x, T_train[idx])
+            if idx != 0:
+                delta = epoch_losses[idx-1]-loss_of_sample
+                print("current delta: ", delta, flush=True)
             epoch_losses = np.append(epoch_losses, loss_of_sample)
-        avg_epoch_loss = np.mean(epoch_losses)
+        if len(epoch_losses) !=0:
+            avg_epoch_loss = np.mean(epoch_losses)
+            print(f'Average Loss {avg_epoch_loss} in epoch {epoch+1}', flush=True)  
         losses = np.append(losses, avg_epoch_loss)
-        print(f'Average Loss {avg_epoch_loss} in epoch {epoch+1}', flush=True)
+        if delta < error_convergence:
+            break
+          
     return losses
 
 
@@ -148,25 +167,23 @@ def shuffle_data(X, T):
     return X, T
 
 
-def split_data(X, T, train_percentage=0.8):
-    """ Splits two arrays into training and validation data.
+
+def split_objects(annotations, train_percentage=0.8):
+    """ Splits an array of objects into training and validation data.
     Args:
-        Two arrays with training data and targets. Possibility to define the split of train and test data by the user with parameter train_percentage.
+        Arrays with objects from class Annotation. Possibility to define the split of train and test data by the user with parameter train_percentage.
     
     Returns:
-       4 arrays with default split of 0.8 training & 0.2 validation data 
-"""
-    print("[TRAIN] splitting data...", flush=True)
-    X_train, X_val,T_train, T_val = train_test_split(X,
-                                                     T, 
-                                                     train_size=train_percentage, 
-                                                     random_state=42,
-                                                    shuffle=False)
+       2 arrays with default split of 0.8 training & 0.2 validation data 
+    """
+    # training data = [ann_objs1, ann_objs2....]
     
-    assert X_train.shape == T_train.shape
-    assert X_val.shape == T_val.shape
+    split = int(train_percentage*len(annotations))
+    
+    annotations_train = annotations[:split]
+    annotations_val = annotations[split:]
 
-    return X_train, X_val,T_train, T_val
+    return annotations_train, annotations_val
 
 
 def compute_accuracy(model, X, T):
