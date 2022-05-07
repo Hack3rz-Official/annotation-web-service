@@ -3,10 +3,10 @@ from flask_mongoengine import MongoEngine
 from unittest import TestCase, mock
 import os
 from app import create_app
-from src.models.annotation import Annotation
-from src.models.model import Model
-from src.repositories.annotation import AnnotationRepository
-from src.repositories.model import ModelRepository
+from src.model.annotation import Annotation
+from src.model.model import Model
+from src.repository.annotation import AnnotationRepository
+from src.repository.model import ModelRepository
 from src.util.SHModelHelper import SHModel
 import json
 import warnings

@@ -64,8 +64,9 @@ export default class File {
     };
     let outputElem = document.getElementById(this.uuid);
     //   console.log(outputElem);
+
     axios
-      .post(`${import.meta.env.VITE_API_URL}/highlight`, data)
+      .post(import.meta.env.HIGHLIGHT_URL, data)
       .then((response) => {
         let newElement = document
           .createRange()

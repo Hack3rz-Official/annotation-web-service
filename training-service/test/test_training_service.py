@@ -1,8 +1,8 @@
 import json
 from unittest.mock import patch, MagicMock
 from hack3rz_test import Hack3rzTest
-from src.models.annotation import Annotation, AnnotationKey
-from src.services.training import improve_model, data_preprocessing, split_objects, shuffle_data, compute_accuracy, train
+from src.model.annotation import Annotation, AnnotationKey
+from src.service.training import improve_model, data_preprocessing, split_objects, shuffle_data, compute_accuracy, train
 from src.util.SHModelUtils import SHModel
 import datetime
 import numpy as np
@@ -123,9 +123,9 @@ class TrainingServiceTest(Hack3rzTest):
         self.assertIsNot(number_of_finetune_function_calls, 0)
         self.assertEqual(finetune_on_mock.call_count, number_of_finetune_function_calls)
     
-    @patch('src.services.training.FALLBACK_ACCURACY', 100)
-    @patch('src.services.training.compute_accuracy')
-    @patch('src.services.training.train')
+    @patch('src.service.training.FALLBACK_ACCURACY', 100)
+    @patch('src.service.training.compute_accuracy')
+    @patch('src.service.training.train')
     def test_improve_model_do_nothing(self, train_mock, compute_accuracy_mock):
         """Test for the case where a model (fetched from db) is trained and compared with the one in use (from prediction
         service). In this case the fetched model`s accuary is NOT higher than the one in use and therefore the current model
@@ -160,9 +160,9 @@ class TrainingServiceTest(Hack3rzTest):
         # test db has 10 test annotations initially loaded per language
         self.assertEqual(10, len(training_data))
     
-    @patch('src.services.training.FALLBACK_ACCURACY', 9)
-    @patch('src.services.training.compute_accuracy')
-    @patch('src.services.training.train')
+    @patch('src.service.training.FALLBACK_ACCURACY', 9)
+    @patch('src.service.training.compute_accuracy')
+    @patch('src.service.training.train')
     def test_improve_model_update_best_model(self, train_mock, compute_accuracy_mock):
         """Test for the case where a model (fetched from db) is trained and compared with the one in use (from prediction
         service). In this case the fetched model`s accuary is higher than the one in use and therefore the current model

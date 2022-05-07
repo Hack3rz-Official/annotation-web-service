@@ -20,12 +20,15 @@ http {
     # defines a virtual server running on nginx
     # /annotation will be forwarded to the annotation service
     server {
+        add_header Access-Control-Allow-Origin *;
         listen ${NGINX_PORT};
         location /api/v1/annotation {
+            allow all;
             # will use the upstream "annotation-service" defined above
             proxy_pass http://annotation-service;
         }
         location /api/v1/prediction {
+            allow all;
             proxy_pass http://prediction-service;
         }
     }

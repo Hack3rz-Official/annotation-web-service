@@ -9,7 +9,7 @@ services:
     env_file:
       - .env
     environment:
-      - VITE_API_URL=http://web-api:${WEB_API_PORT}
+      - HIGHLIGHT_URL=http://web-api:${WEB_API_PORT}/api/v1/highlight
     ports: 
       - "${DEMO_FRONTEND_PORT}:${DEMO_FRONTEND_PORT}"
     depends_on:

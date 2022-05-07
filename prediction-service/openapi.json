@@ -53,11 +53,12 @@
         "responses": {
           "200":{
             "description": "Predicted h_code_values",
-            "schema": {
-              "$ref":"#/components/schemas/PredictionResponseDTO"
-            },
-            "example": {
-                "h_code_values": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PredictionResponseDTO"
+                }
+              }
             }
           }
         }

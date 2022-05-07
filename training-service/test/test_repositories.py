@@ -1,5 +1,5 @@
 from hack3rz_test import Hack3rzTest
-from src.repositories.annotation import AnnotationRepository
+from src.repository.annotation import AnnotationRepository
 import time
 
 annotation_repository = AnnotationRepository()

@@ -1,4 +1,4 @@
-from src.models.annotation import Annotation
+from src.model.annotation import Annotation
 import datetime
 
 class AnnotationRepository:

@@ -1,4 +1,4 @@
-from src.models.model import Model
+from src.model.model import Model
 from src.util.SHModelUtils import SHModel
 import os
 

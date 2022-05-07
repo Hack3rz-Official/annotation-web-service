@@ -2,8 +2,8 @@ import numpy as np
 import os
 from sklearn.utils import shuffle
 from sklearn.model_selection import train_test_split
-from src.repositories.annotation import AnnotationRepository
-from src.repositories.model import ModelRepository
+from src.repository.annotation import AnnotationRepository
+from src.repository.model import ModelRepository
 import config as config
 from src.util.SHModelHelper import from_db_model_to_sh_model, from_best_sh_model_to_db_model
 

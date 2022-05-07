@@ -6,7 +6,7 @@ import { HighlightService } from './highlight.service';
 export class HighlightController {
   constructor(private highlightService: HighlightService) {}
 
-  @Post('/highlight')
+  @Post('/api/v1/highlight')
   @HttpCode(200)
   highlight(@Body() highlightRequestDto: HighlightRequestDto): Promise<any> {
     return this.highlightService.highlight(highlightRequestDto);

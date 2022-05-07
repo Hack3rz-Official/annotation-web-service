@@ -7,7 +7,7 @@ class Tests(Hack3rzTest):
 
     def test_predict_java(self):
         with self.app.test_client() as client:
-            response = client.post('/api/v1/prediction/', json={
+            response = client.post('/api/v1/prediction', json={
                 'lang_name': 'java',
                 'tok_ids': [42, 42, 75, 76]
             })
@@ -17,7 +17,7 @@ class Tests(Hack3rzTest):
 
     def test_predict_python3(self):
         with self.app.test_client() as client:
-            response = client.post('/api/v1/prediction/', json={
+            response = client.post('/api/v1/prediction', json={
                 'lang_name': 'python3',
                 'tok_ids': [42, 42, 75, 76]
             })
@@ -27,7 +27,7 @@ class Tests(Hack3rzTest):
 
     def test_predict_kotlin(self):
         with self.app.test_client() as client:
-            response = client.post('/api/v1/prediction/', json={
+            response = client.post('/api/v1/prediction', json={
                 'lang_name': 'kotlin',
                 'tok_ids': [42, 42, 75, 76]
             })
@@ -37,20 +37,25 @@ class Tests(Hack3rzTest):
 
     def test_predict_invalid_body(self):
         with self.app.test_client() as client:
-            response = client.post('/api/v1/prediction/', data='no json')
+            response = client.post('/api/v1/prediction', data='no json')
             self.assertEqual(response.status_code, 400)
-            self.assertTrue(response.get_data().decode() == "Invalid body, please provide json")
 
     def test_predict_unsupported_language(self):
         with self.app.test_client() as client:
             unsupported_lang = "go"
-            response = client.post('/api/v1/prediction/', json={
+            response = client.post('/api/v1/prediction', json={
                 'lang_name': unsupported_lang,
                 'tok_ids': [42, 42, 75, 76]
             })
             self.assertEqual(response.status_code, 400)
-            self.assertTrue(response.get_data().decode() == f"{unsupported_lang} is an unsupported programming language")
 
+    def test_predict_invalid_tok_ids(self):
+        with self.app.test_client() as client:
+            response = client.post('/api/v1/prediction', json={
+                'lang_name': 'kotlin',
+                'tok_ids': ['a', 4, 75, 76]
+            })
+            self.assertEqual(response.status_code, 400)
 
     def test_predict_with_model_from_db_python(self):
         super().save_sh_model_to_db("python3", 0.1234)
@@ -59,7 +64,7 @@ class Tests(Hack3rzTest):
         self.app  = create_app()
         self.app.testing = True
         with self.app.test_client() as client:
-            response = client.post('/api/v1/prediction/', json={
+            response = client.post('/api/v1/prediction', json={
                 'lang_name': 'python3',
                 'tok_ids': [42, 42, 75, 76]
             })
@@ -74,7 +79,7 @@ class Tests(Hack3rzTest):
         self.app  = create_app()
         self.app.testing = True
         with self.app.test_client() as client:
-            response = client.post('/api/v1/prediction/', json={
+            response = client.post('/api/v1/prediction', json={
                 'lang_name': 'kotlin',
                 'tok_ids': [42, 42, 75, 76]
             })
@@ -89,7 +94,7 @@ class Tests(Hack3rzTest):
         self.app  = create_app()
         self.app.testing = True
         with self.app.test_client() as client:
-            response = client.post('/api/v1/prediction/', json={
+            response = client.post('/api/v1/prediction', json={
                 'lang_name': 'java',
                 'tok_ids': [42, 42, 75, 76]
             })
