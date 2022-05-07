@@ -1,8 +1,8 @@
 import json
-from unittest.mock import patch
+from unittest.mock import patch, MagicMock
 from hack3rz_test import Hack3rzTest
 from src.models.annotation import Annotation, AnnotationKey
-from src.services.training import improve_model, data_preprocessing, split_data, shuffle_data, compute_accuracy, train
+from src.services.training import improve_model, data_preprocessing, split_objects, shuffle_data, compute_accuracy, train
 from src.util.SHModelUtils import SHModel
 import datetime
 import numpy as np
@@ -28,22 +28,23 @@ class TrainingServiceTest(Hack3rzTest):
         self.assertNotEqual(T.size,0)
 
 
-    def test_split_data(self):
-        """Tests for a correct data split in training and validation data. After the split it will be asserted that 
-        the shapes are correct and from same size for X_train, T_train, X_val, T_val.
+    def test_split_objects(self):
+        """Tests for a correct data split of an annotations array. After the split it will be asserted that 
+        the shapes are correct, respectively according to the desired train_percentage split.
 
         Args:
-            training_data represents fetched training data from the db.
+            training_data represents fetched training data from the db. train_percentage is a float between 0-1
 
         Returns:
-            4 arrays with default split of 0.8 training & 0.2 validation data
+            2 arrays with default split of 0.8 training & 0.2 validation data
         
         """
-        training_data = self.annotation_repository.find_data_to_train_with("java")
-        X, T = data_preprocessing(training_data)
-        X_train, X_val, T_train, T_val = split_data(X, T, train_percentage=0.8)
-        self.assertEqual(X_train.shape[0], T_train.shape[0])
-        self.assertEqual(X_val.shape[0],T_val.shape[0])
+        annotations = self.annotation_repository.find_data_to_train_with("java")
+        train_percentage = 0.8
+        annotation_train, annotation_val = split_objects(annotations, train_percentage)
+        self.assertTrue(0<= train_percentage <=1)
+        self.assertEqual(len(annotation_train),np.ceil(len(annotations)*train_percentage))
+        self.assertEqual(len(annotation_val),np.ceil(len(annotations)*(1-train_percentage)))
 
     @patch('src.util.SHModelUtils.SHModel.predict')
     def test_compute_accuracy_valid(self, predict_mock):
@@ -96,34 +97,33 @@ class TrainingServiceTest(Hack3rzTest):
 
     @patch('src.util.SHModelUtils.SHModel.finetune_on')
     def test_train(self, finetune_on_mock):
-        """Tests the training process. Mocks a return value of the finetune_on function (1).
+        """Tests the training process. Mocks a return values of the finetune_on() with the array [1,0.9,0.8,0.7,0.6,0.5,0.4,0.3,0.25,0.25]  .
         Since its difficult to test the actual training process, we count the number of finetune_on calls 
-        the model is generating during the process. The seeked number should be batch * number of samples. If the function is called
-        batch * number of samples times then the test was successful. 
+        the model is generating during the process. The seeked number should be 10 since after ten iterations the delta should be 0 and . If the function is called
+        10 times then the test was successful. 
 
         Args:
-            finetune_mock is an integer 1 which is used for the above explained purposes.
-            best_sh_model which is a newly instantiated SHModel, a training set with training points and targets and a fixed number of
+            finetune_mock which is an array of ten floats is used for the above explained purposes.
+            best_sh_model which is a newly instantiated SHModel, a training set with training points and targets and a fixed number of 20
             epochs (default is 10).
 
         Returns:
             Array with losses (if assigned)
 
         """
-        finetune_on_mock.return_value = 1
+        finetune_on_mock.side_effect = [1,0.9,0.8,0.7,0.6,0.5,0.4,0.3,0.25,0.25]
 
         best_sh_model = SHModel("java", "test_best")
-        X, T = super().load_test_X_T("java")
-        epochs = 10
-
-        train(best_sh_model, X, T, epochs)
+        annotations = self.annotation_repository.find_data_to_train_with("java")
+        annotations_train, _ = split_objects(annotations)
+        X_train, T_train = data_preprocessing(annotations_train)   
+        train(best_sh_model,X_train,T_train, epochs=20)
         
-        num_of_samples = X.shape[0]
-        number_of_finetune_function_calls = epochs*num_of_samples
+        number_of_finetune_function_calls = 10
         self.assertIsNot(number_of_finetune_function_calls, 0)
         self.assertEqual(finetune_on_mock.call_count, number_of_finetune_function_calls)
     
-
+    @patch('src.services.training.FALLBACK_ACCURACY', 100)
     @patch('src.services.training.compute_accuracy')
     @patch('src.services.training.train')
     def test_improve_model_do_nothing(self, train_mock, compute_accuracy_mock):
@@ -142,13 +142,13 @@ class TrainingServiceTest(Hack3rzTest):
         # create functions mocks
         # skip train method execution
         train_mock.return_value = []
-        # cur_acc is 10, new_acc is 5
-        compute_accuracy_mock.side_effect = [10, 5]
+        # new_acc is 5
+        compute_accuracy_mock.return_value = 5
         
         # prepare and run function
         training_data = self.annotation_repository.find_data_to_train_with("java")
-        X, T = super().load_test_X_T("java")
-        improve_model(X, T, "java", training_data)
+        annotations_train, annotations_val = split_objects(training_data)
+        improve_model(annotations_train, annotations_val, "java")
         
         # test model
         best_db_model = self.model_repository.find_best_model("java")
@@ -156,19 +156,21 @@ class TrainingServiceTest(Hack3rzTest):
         
         # test annotations
         training_data = self.annotation_repository.find_data_to_train_with("java")
+        
         # test db has 10 test annotations initially loaded per language
         self.assertEqual(10, len(training_data))
-
+    
+    @patch('src.services.training.FALLBACK_ACCURACY', 9)
     @patch('src.services.training.compute_accuracy')
     @patch('src.services.training.train')
     def test_improve_model_update_best_model(self, train_mock, compute_accuracy_mock):
         """Test for the case where a model (fetched from db) is trained and compared with the one in use (from prediction
         service). In this case the fetched model`s accuary is higher than the one in use and therefore the current model
-        is discared and the new one saved to the current repository. The whole test case is built indirectly. We fetch before and after
-        the improve_model() function the same amount of training_data (10, which is the number of entries when aws_test db is 
-        instantiated). Consequently, this means that the new accuray is higher (10) than the current acccuracy (6) and there is a
-        change of models. Evenutally, this implies that the training data is marked as "used for training" and thus does not appear
-        as training_data anymore when fetched from the db via the function find_training_data.
+        is discared and the new one saved to the current repository. The whole test case is built indirectly. We fetch before
+        the improve_model() function training_data (10, which is the number of entries when aws_test db is 
+        instantiated). Afterwards we fetch again training_data but this time the return value is 0 since the training data is marked as 
+        "used for training" . Consequently, this means that the new accuray is higher (10) than the current acccuracy (6) and there is a
+        change of models.
 
         Args:
             train_mock which is an empty array. compute_accuracy_mock which is an array with two values.
@@ -177,13 +179,13 @@ class TrainingServiceTest(Hack3rzTest):
         # create functions mocks
         # skip train method execution
         train_mock.return_value = []
-        # cur_acc is 5, new_acc is 10
-        compute_accuracy_mock.side_effect = [5, 10]
+        # new_acc is 10
+        compute_accuracy_mock.return_value = 10
 
         # prepare and run functions
-        training_data = self.annotation_repository.find_data_to_train_with("java")
-        X, T = super().load_test_X_T("java")
-        improve_model(X, T, "java", training_data)
+        training_data =self.annotation_repository.find_data_to_train_with("java")
+        annotations_train, annotations_val = split_objects(training_data)
+        improve_model(annotations_train, annotations_val, "java")
 
         best_db_model = self.model_repository.find_best_model("java")
         self.assertIsNotNone(best_db_model)

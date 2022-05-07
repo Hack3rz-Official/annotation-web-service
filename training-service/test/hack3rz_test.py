@@ -7,7 +7,6 @@ from src.models.annotation import Annotation
 from src.models.model import Model
 from src.repositories.annotation import AnnotationRepository
 from src.repositories.model import ModelRepository
-from src.services.training import data_preprocessing
 from src.util.SHModelHelper import SHModel
 import json
 import warnings
@@ -48,7 +47,7 @@ class Hack3rzTest(TestCase):
         are empty. After this, the function load_training_test_data() is called to populate the collections on the db.       
         
         """
-        assert self.db.get_db().name == "aws_test"
+        self.assertEqual(self.db.get_db().name,"aws_test")
 
         # TODO drop all collections at once?
         Annotation.drop_collection()
@@ -79,19 +78,6 @@ class Hack3rzTest(TestCase):
             file_data = json.load(file)
             annotation_instances = [Annotation.from_json(json.dumps(annotation), created=True) for annotation in file_data]
             Annotation.objects.insert(annotation_instances, load_bulk=False)
-
-    def load_test_X_T(self, lang_name):
-        """Preprocesses data for specific language such that a training and target is ready for testing purposes.
-
-        Args:
-            Language name (string) of the requested data which should be preprocessed.
-
-        Returns:
-            training data array X and target data array T. For more informationn check information in src/services/training.py
-        
-        """
-        X, T = data_preprocessing(self.annotation_repository.find_data_to_train_with(lang_name))
-        return X, T
 
     @classmethod
     def tearDownClass(self):
