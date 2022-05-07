@@ -1,4 +1,3 @@
-from calendar import TUESDAY
 import numpy as np
 import os
 from sklearn.utils import shuffle
@@ -131,7 +130,7 @@ def train(model, X_train, T_train, epochs=10, error_convergence=0.001):
     losses = np.array([])
     delta = 100
     for epoch in range(epochs):
-        print("Epoch: ", epoch)
+        print("Epoch: ", epoch+1)
         epoch_losses = np.array([])
         for idx, x in enumerate(X_train):
             if delta < error_convergence:
@@ -141,12 +140,12 @@ def train(model, X_train, T_train, epochs=10, error_convergence=0.001):
                 delta = epoch_losses[idx-1]-loss_of_sample
                 print("current delta: ", delta, flush=True)
             epoch_losses = np.append(epoch_losses, loss_of_sample)
-        if len(epoch_losses) !=0:
-            avg_epoch_loss = np.mean(epoch_losses)
-            print(f'Average Loss {avg_epoch_loss} in epoch {epoch+1}', flush=True)  
-        losses = np.append(losses, avg_epoch_loss)
         if delta < error_convergence:
             break
+        avg_epoch_loss = np.mean(epoch_losses)
+        print(f'Average Loss {avg_epoch_loss} in epoch {epoch+1}', flush=True)  
+        losses = np.append(losses, avg_epoch_loss)
+
           
     return losses
 

@@ -1,5 +1,4 @@
 import json
-from tkinter import E
 from unittest.mock import patch, MagicMock
 from hack3rz_test import Hack3rzTest
 from src.models.annotation import Annotation, AnnotationKey
@@ -43,9 +42,9 @@ class TrainingServiceTest(Hack3rzTest):
         annotations = self.annotation_repository.find_data_to_train_with("java")
         train_percentage = 0.8
         annotation_train, annotation_val = split_objects(annotations, train_percentage)
-        assert 0<= train_percentage <=1
-        assert len(annotation_train) == np.ceil(len(annotations)*train_percentage)
-        assert len(annotation_val) == np.ceil(len(annotations)*(1-train_percentage))
+        self.assertTrue(0<= train_percentage <=1)
+        self.assertEqual(len(annotation_train),np.ceil(len(annotations)*train_percentage))
+        self.assertEqual(len(annotation_val),np.ceil(len(annotations)*(1-train_percentage)))
 
     @patch('src.util.SHModelUtils.SHModel.predict')
     def test_compute_accuracy_valid(self, predict_mock):
@@ -115,11 +114,10 @@ class TrainingServiceTest(Hack3rzTest):
         finetune_on_mock.side_effect = [1,0.9,0.8,0.7,0.6,0.5,0.4,0.3,0.25,0.25]
 
         best_sh_model = SHModel("java", "test_best")
-        annotations = super().load_test_training_data("java")
-        annotations_train, annotations_val = split_objects(annotations)
-        X_train, T_train = data_preprocessing(annotations_train)
-    
-        train(best_sh_model, X_train, T_train, epochs=20)
+        annotations = self.annotation_repository.find_data_to_train_with("java")
+        annotations_train, _ = split_objects(annotations)
+        X_train, T_train = data_preprocessing(annotations_train)   
+        train(best_sh_model,X_train,T_train, epochs=20)
         
         number_of_finetune_function_calls = 10
         self.assertIsNot(number_of_finetune_function_calls, 0)
@@ -148,7 +146,7 @@ class TrainingServiceTest(Hack3rzTest):
         compute_accuracy_mock.return_value = 5
         
         # prepare and run function
-        training_data = super().load_test_training_data("java")
+        training_data = self.annotation_repository.find_data_to_train_with("java")
         annotations_train, annotations_val = split_objects(training_data)
         improve_model(annotations_train, annotations_val, "java")
         
@@ -157,7 +155,8 @@ class TrainingServiceTest(Hack3rzTest):
         self.assertIsNone(best_db_model)
         
         # test annotations
-        training_data = super().load_test_training_data("java")
+        training_data = self.annotation_repository.find_data_to_train_with("java")
+        
         # test db has 10 test annotations initially loaded per language
         self.assertEqual(10, len(training_data))
     
@@ -184,14 +183,14 @@ class TrainingServiceTest(Hack3rzTest):
         compute_accuracy_mock.return_value = 10
 
         # prepare and run functions
-        training_data = super().load_test_training_data("java")
+        training_data =self.annotation_repository.find_data_to_train_with("java")
         annotations_train, annotations_val = split_objects(training_data)
         improve_model(annotations_train, annotations_val, "java")
 
         best_db_model = self.model_repository.find_best_model("java")
         self.assertIsNotNone(best_db_model)
         
-        training_data = super().load_test_training_data("java")
+        training_data = self.annotation_repository.find_data_to_train_with("java")
         self.assertEquals(best_db_model.accuracy, 10)
         self.assertEquals(0, len(training_data))
 
