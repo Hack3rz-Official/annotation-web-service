@@ -39,21 +39,27 @@ services:
   swagger-ui:
     container_name: "swagger-ui"
     image: swaggerapi/swagger-ui
-    volumes:
-      - ./training-service/api-doc.yaml:/usr/share/nginx/html/training-service.yaml
-      - ./prediction-service/api-doc.yaml:/usr/share/nginx/html/prediction-service.yaml
+    volumes:      
+      - ./web-api/openapi.json:/usr/share/nginx/html/web-api.json
+      - ./annotation-service/openapi.json:/usr/share/nginx/html/annotation-service.json
+      - ./prediction-service/openapi.json:/usr/share/nginx/html/prediction-service.json
+      - ./training-service/openapi.json:/usr/share/nginx/html/training-service.json
     env_file:
         - .env
     environment:
       URLS: "[
-          { url: \"training-service.yaml\", name: \"Training Service\" },
-          { url: \"prediction-service.yaml\", name: \"Prediction Service\" },
+          { url: \"web-api.json\", name: \"Web API\" },
+          { url: \"annotation-service.json\", name: \"Annotation Service\" },
+          { url: \"prediction-service.json\", name: \"Prediction Service\" },
+          { url: \"training-service.json\", name: \"Training Service\" },
         ]"
     ports:
       - "${SWAGGER_UI_PORT}:8080"
     depends_on:
-      - training
+      - web-api
+      - annotation
       - prediction
+      - training
     networks:
       - aws-network
     restart: always
@@ -93,8 +99,8 @@ services:
     image: training-service:latest
     env_file:
       - .env
-    expose:
-      - "${TRAINING_SERVICE_PORT}"
+    ports:
+      - "${TRAINING_SERVICE_PORT}:${TRAINING_SERVICE_PORT}"
     depends_on:
       - mongodb
     networks:
@@ -109,8 +115,8 @@ services:
       - .env
     environment:
       - NGINX_ENVSUBST_OUTPUT_DIR=/etc/nginx
-    expose:
-      - "${NGINX_PORT}"
+    ports:
+      - "${NGINX_PORT}:${NGINX_PORT}"
     depends_on:
       - annotation
       - prediction

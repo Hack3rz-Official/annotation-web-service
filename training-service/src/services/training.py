@@ -11,7 +11,7 @@ annotation_repository = AnnotationRepository()
 model_repository = ModelRepository()
 FALLBACK_ACCURACY = 0
 
-def train_models():
+def train_models(model="all"):
     """Trains models if there is at least the number of TRAINING_BATCH_SIZE entries on db collection "annotation".
     
     Returns:
@@ -20,7 +20,8 @@ def train_models():
     print("[TRAIN] ### TRAINING STARTED ### ", flush=True)
 
     trained_languages = []
-    for lang_name in config.SUPPORTED_LANGUAGES:
+    languages_to_train = config.SUPPORTED_LANGUAGES if model == "all" else [model]
+    for lang_name in languages_to_train:
         print("[TRAIN] Starting model training for " + lang_name, flush=True)
 
         training_data = annotation_repository.find_data_to_train_with(lang_name)

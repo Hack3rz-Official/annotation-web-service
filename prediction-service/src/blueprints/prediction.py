@@ -8,24 +8,6 @@ prediction_blueprint = Blueprint(name="prediction", import_name=__name__)
 
 @prediction_blueprint.route('/', methods=['POST'])
 def main():
-    # TODO: swagger onfig
-    """Train syntax highlighting models for all supported languages
-    ---
-    definitions:
-      Output:
-        type: object
-        properties:
-          msg:
-            type: string
-    responses:
-      200:
-        description: An output message
-        schema:
-          $ref: '#/definitions/Output'
-    tags:
-        - Training
-    """
-
     supported_languages = ["java", "python3", "kotlin"]
     logging.info('Python HTTP trigger function processed a request.')
 
