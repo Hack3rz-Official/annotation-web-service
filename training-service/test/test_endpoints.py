@@ -1,6 +1,6 @@
 import json
 from hack3rz_test import Hack3rzTest
-from src.models.annotation import Annotation
+from src.model.annotation import Annotation
 
 # run all tests: python3 -m unittest
 # run with: python3 -m unittest test_endpoints.py

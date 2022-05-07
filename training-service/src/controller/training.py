@@ -1,7 +1,7 @@
-from src.services.training import train_models
+from src.service.training import train_models
 from flask_restx import Resource, Namespace, fields, reqparse
 
-api = Namespace("training", description="Item operations")
+api = Namespace("training", description="Training operations")
 
 training_response_dto = api.model("TrainingResponseDTO", {
     "msg": fields.String

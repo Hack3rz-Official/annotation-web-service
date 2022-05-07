@@ -1,10 +1,11 @@
 import os
 from flask import Flask
 from flask_mongoengine import MongoEngine
+from flask_cors import CORS
 from apscheduler.schedulers.background import BackgroundScheduler
 
 import config as config
-from src.services.training import train_models
+from src.service.training import train_models
 from src import blueprint as api_v1
 
 def training_service():
@@ -17,6 +18,9 @@ sched.start()
 
 def create_app():
     app = Flask(__name__)
+
+    # allow swagger-ui
+    CORS(app, resources={r"/api/*": {"origins": "http://localhost:" + os.environ.get('SWAGGER_UI_PORT', "0"), "send_wildcard": "False"}})
 
     # Connect to database
     app.config["MONGODB_SETTINGS"] = {

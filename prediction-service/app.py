@@ -2,11 +2,9 @@ import os
 from flask import Flask
 from flask_mongoengine import MongoEngine
 
-import config as config
-from src.blueprints.prediction import prediction_blueprint
-from src.repositories.model import ModelRepository
+from src.repository.model import ModelRepository
 from src.util.SHModelHelper import load_db_model_to_current_directory    
-
+from src import blueprint as api_v1
 
 def create_app():
     app = Flask(__name__)
@@ -23,8 +21,8 @@ def create_app():
     db = MongoEngine()
     db.init_app(app)
 
-    # Register Blueprints
-    app.register_blueprint(prediction_blueprint, url_prefix="/api/v1/prediction")
+    # Register API
+    app.register_blueprint(api_v1)
 
     # returns binary file of newest model from db for python3, kotlin, java
     db_model_python = ModelRepository.find_best_model("PYTHON3")

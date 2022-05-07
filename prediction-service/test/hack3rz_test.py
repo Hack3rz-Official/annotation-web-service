@@ -3,8 +3,8 @@ from flask_mongoengine import MongoEngine
 from unittest import TestCase, mock
 import os
 from app import create_app
-from src.models.model import Model
-from src.repositories.model import ModelRepository
+from src.model.model import Model
+from src.repository.model import ModelRepository
 from src.util.SHModelUtils import SHModel
 import warnings
 

@@ -1,6 +1,6 @@
 import os
 from src.util.SHModelUtils import SHModel
-from src.models.model import Model
+from src.model.model import Model
 
 
 def get_model_path(lang_name):
