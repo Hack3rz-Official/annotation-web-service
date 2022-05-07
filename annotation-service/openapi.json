@@ -1,0 +1,114 @@
+{
+  "openapi": "3.0.1",
+  "info": {
+    "title": "Annotation Service API Documentation",
+    "version": "v1"
+  },
+  "servers": [
+    {
+      "url": "http://localhost:4000"
+    }
+  ],
+  "paths": {
+    "/api/v1/annotation": {
+      "post": {
+        "tags": [
+          "Annotation"
+        ],
+        "summary": "Annotate code",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AnnotateCodeRequestDTO"
+              },
+              "examples": {
+                "Java":  {
+                    "value": {
+                        "language": "JAVA",
+                        "code": "public class Test { public void test() { System.out.println(\"Hello World\"); } }"
+                    }
+                },
+                "Kotlin": {
+                    "value": {
+                        "language": "KOTLIN",
+                        "code": "class Test { fun test() { println(\"Hello World\") } }"
+                    }
+                },
+                "Python3": {
+                    "value": {
+                        "language": "PYTHON3",
+                        "code": "print(\"Hello World\")"
+                    }
+                },
+                "Unsupported Language": {
+                    "value": {
+                        "language": "GO",
+                        "code": "func main() { fmt.Println(\"hello world\") }"
+                    }
+                }
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/LTok"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "AnnotateCodeRequestDTO": {
+        "required": [
+          "code",
+          "language"
+        ],
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string"
+          },
+          "language": {
+            "type": "string",
+            "enum": [
+              "JAVA",
+              "KOTLIN",
+              "PYTHON3"
+            ]
+          }
+        }
+      },
+      "LTok": {
+        "type": "object",
+        "properties": {
+          "startIndex": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "endIndex": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "tokenId": {
+            "type": "integer",
+            "format": "int32"
+          }
+        }
+      }
+    }
+  }
+}

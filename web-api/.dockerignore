@@ -11,3 +11,5 @@ node_modules
 .editorconfig
 Dockerfile
 README.md
+
+*openapi.json

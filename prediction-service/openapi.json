@@ -1,0 +1,105 @@
+{
+  "openapi": "3.0.1",
+  "info": {
+    "title": "Prediction Service API Documentation",
+    "version": "v1"
+  },
+  "servers": [
+    {
+      "url": "http://localhost:4000"
+    }
+  ],
+  "paths": {
+    "/api/v1/prediction": {
+      "post": {
+        "tags": ["Prediction"],
+        "summary": "Predict syntax highlighting for code",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PredictionRequestDTO"
+              },
+              "examples": {
+                "Java":  {
+                    "value": {
+                        "lang_name": "java",
+                        "tok_ids": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+                    }
+                },
+                "Kotlin":  {
+                    "value": {
+                        "lang_name": "kotlin",
+                        "tok_ids": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+                    }
+                },
+                "Python3":  {
+                    "value": {
+                        "lang_name": "python3",
+                        "tok_ids": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+                    }
+                },
+                "Unsupported Language":  {
+                    "value": {
+                        "lang_name": "go",
+                        "tok_ids": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+                    }
+                }
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200":{
+            "description": "Predicted h_code_values",
+            "schema": {
+              "$ref":"#/components/schemas/PredictionResponseDTO"
+            },
+            "example": {
+                "h_code_values": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+            }
+          }
+        }
+      }
+    }
+  },
+   "components": {
+        "schemas": {
+            "PredictionRequestDTO": {
+                "required": [
+                    "lang_name",
+                    "tok_ids"
+                ],
+                "type": "object",
+                "properties": {
+                    "lang_name": {
+                        "type": "string",
+                        "enum": [
+                            "java",
+                            "kotlin",
+                            "python3"
+                        ]
+                    },
+                    "tok_ids": {
+                        "type": "array",
+                        "items": {
+                            "type": "integer"
+                        }
+                    }
+                }
+            },
+            "PredictionResponseDTO": {
+                "type": "object",
+                "properties": {
+                    "h_code_values": {
+                        "type": "array",
+                        "items": {
+                            "type": "integer"
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

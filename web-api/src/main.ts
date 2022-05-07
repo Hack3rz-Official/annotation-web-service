@@ -12,7 +12,6 @@ async function bootstrap() {
   });
   app.use(compression());
   const config: ConfigService = app.get(ConfigService);
-
   await app.listen(config.get('service.port'));
 }
 bootstrap();
