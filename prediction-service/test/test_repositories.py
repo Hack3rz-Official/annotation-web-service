@@ -1,7 +1,6 @@
 from hack3rz_test import Hack3rzTest
 import time
 
-# run with: python3 -m unittest test_prediction.py
 class RepositoriesTest(Hack3rzTest):
 
     def test_model_find_best_model(self):

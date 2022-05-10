@@ -35,6 +35,12 @@ $ python3 app.py
 
 Finally, the function should be running at ```http://127.0.0.1:8084/predict```. 
 
+## Running Tests
+Run the following command to execute all tests within the `/test` folder.
+```
+python3 -m unittest discover test
+```
+
 ## Running the function locally via Docker
 
 ```bash

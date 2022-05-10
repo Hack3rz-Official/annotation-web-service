@@ -2,7 +2,7 @@ import json
 from hack3rz_test import Hack3rzTest
 from app import create_app
 
-# run with: python3 -m unittest test_prediction.py
+
 class Tests(Hack3rzTest):
 
     def test_predict_java(self):
