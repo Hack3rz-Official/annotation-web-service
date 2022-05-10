@@ -5,6 +5,8 @@ FROM python:3.8.3-slim-buster
 COPY requirements.txt requirements.txt
 RUN pip3 install -r requirements.txt
 
+# install production server
+RUN pip install waitress
 COPY . .
 
-CMD python3 -m flask run --host=0.0.0.0 --port=${PREDICTION_SERVICE_PORT}
+CMD waitress-serve --port=${PREDICTION_SERVICE_PORT} --call app:create_app
