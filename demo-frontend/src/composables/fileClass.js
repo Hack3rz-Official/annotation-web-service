@@ -1,19 +1,20 @@
 import { v4 as uuidv4 } from 'uuid';
 import axios from 'axios';
 
-const MAX_REQUESTS_COUNT = 5
-const INTERVAL_MS = 10
-let PENDING_REQUESTS = 0
-
-// axios request interceptor
-axios.interceptors.request.use(function (config) {
+const MAX_REQUESTS_COUNT = 1;
+const INTERVAL_MS = 10;
+let PENDING_REQUESTS = 0;
+// create new axios instance
+const axiosLimited = axios.create({});
+/**
+ * Axios Request Interceptor
+ */
+axiosLimited.interceptors.request.use(function (config) {
   return new Promise((resolve, reject) => {
     let interval = setInterval(() => {
       if (PENDING_REQUESTS < MAX_REQUESTS_COUNT) {
         PENDING_REQUESTS++;
-        console.log(
-          `Request sent - Pending requests: ${PENDING_REQUESTS}`
-        );
+        console.log(`Request sent - Pending requests: ${PENDING_REQUESTS}`);
         config.meta = config.meta || {};
         config.meta.requestStartedAt = new Date().getTime();
         console.log({ config });
@@ -23,33 +24,38 @@ axios.interceptors.request.use(function (config) {
     }, INTERVAL_MS);
   });
 });
-
-// axios response interceptor
-axios.interceptors.response.use(
+/**
+ * Axios Response Interceptor
+ */
+axiosLimited.interceptors.response.use(
   function (response) {
-    PENDING_REQUESTS = Math.max(
-      0,
-      PENDING_REQUESTS - 1
-    );
-    response.responseTime =
-      new Date().getTime() - response.config.meta.requestStartedAt;
-    console.log(
-      `Request resolved - Pending requests: ${PENDING_REQUESTS}`
-    );
+    PENDING_REQUESTS = Math.max(0, PENDING_REQUESTS - 1);
+    console.log(`Request resolved - Pending requests: ${PENDING_REQUESTS}`);
     console.log({ response });
     return Promise.resolve(response);
   },
   function (error) {
-    PENDING_REQUESTS = Math.max(
-      0,
-      PENDING_REQUESTS - 1
-    );
-    error.responseTime = 
-      new Date().getTime() - error.config.meta.requestStartedAt;
-    console.log(
-      `Request resolved - Pending requests: ${PENDING_REQUESTS}`
-    );
+    PENDING_REQUESTS = Math.max(0, PENDING_REQUESTS - 1);
+    console.log(`Request resolved - Pending requests: ${PENDING_REQUESTS}`);
     return Promise.reject(error);
+  }
+);
+// export default axiosLimited
+
+// axiosLimited.interceptors.request.use((x) => {
+//   x.meta = x.meta || {};
+//   x.meta.requestStartedAt = new Date().getTime();
+//   return x;
+// });
+axiosLimited.interceptors.response.use(
+  (x) => {
+    x.responseTime = new Date().getTime() - x.config.meta.requestStartedAt;
+    return x;
+  },
+  // Handle 4xx & 5xx responses
+  (x) => {
+    x.responseTime = new Date().getTime() - x.config.meta.requestStartedAt;
+    return x;
   }
 );
 
@@ -118,8 +124,8 @@ export default class File {
     let outputElem = document.getElementById(this.uuid);
     //   console.log(outputElem);
 
-    axios
-      .post(import.meta.env.HIGHLIGHT_URL, data)
+    axiosLimited
+      .post(import.meta.env.HIGHLIGHT_URL || 'localhost:8081/api/v1/highlight', data)
       .then((response) => {
         let newElement = document
           .createRange()
