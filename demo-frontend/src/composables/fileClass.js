@@ -1,5 +1,58 @@
-import axios from "axios";
 import { v4 as uuidv4 } from 'uuid';
+import axios from 'axios';
+
+const MAX_REQUESTS_COUNT = 5
+const INTERVAL_MS = 10
+let PENDING_REQUESTS = 0
+
+// axios request interceptor
+axios.interceptors.request.use(function (config) {
+  return new Promise((resolve, reject) => {
+    let interval = setInterval(() => {
+      if (PENDING_REQUESTS < MAX_REQUESTS_COUNT) {
+        PENDING_REQUESTS++;
+        console.log(
+          `Request sent - Pending requests: ${PENDING_REQUESTS}`
+        );
+        config.meta = config.meta || {};
+        config.meta.requestStartedAt = new Date().getTime();
+        console.log({ config });
+        clearInterval(interval);
+        resolve(config);
+      }
+    }, INTERVAL_MS);
+  });
+});
+
+// axios response interceptor
+axios.interceptors.response.use(
+  function (response) {
+    PENDING_REQUESTS = Math.max(
+      0,
+      PENDING_REQUESTS - 1
+    );
+    response.responseTime =
+      new Date().getTime() - response.config.meta.requestStartedAt;
+    console.log(
+      `Request resolved - Pending requests: ${PENDING_REQUESTS}`
+    );
+    console.log({ response });
+    return Promise.resolve(response);
+  },
+  function (error) {
+    PENDING_REQUESTS = Math.max(
+      0,
+      PENDING_REQUESTS - 1
+    );
+    error.responseTime = 
+      new Date().getTime() - error.config.meta.requestStartedAt;
+    console.log(
+      `Request resolved - Pending requests: ${PENDING_REQUESTS}`
+    );
+    return Promise.reject(error);
+  }
+);
+
 export default class File {
   static jsDelivrBaseUrl = "https://cdn.jsdelivr.net/gh/";
 
@@ -77,17 +130,13 @@ export default class File {
         //   console.log(outputElem);
         this.highlightedCode = response.data;
         this.status = "highlighted";
-        this.request.endTimestamp = Date.now();
-        this.request.duration =
-          this.request.endTimestamp - this.request.startTimestamp;
+        this.request.duration = response.responseTime
       })
       .catch((error) => {
         console.log(error);
         outputElem.innerHTML = "Error in Highlighting Service";
         this.status = "failed";
-        this.request.endTimestamp = Date.now();
-        this.request.duration =
-          this.request.endTimestamp - this.request.startTimestamp;
+        this.request.duration = error.responseTime
       });
   }
 

@@ -10,9 +10,7 @@ export const useFilesStore = defineStore({
     languageFilesDict: {}
   }),
 
-  getters: {
-    doubleCount: (state) => state.counter * 2,
-  },
+  getters: {},
 
   actions: {
     deleteAllFiles() {
