@@ -40,6 +40,9 @@ export default class File {
   }
 
   fetchRawCode() {
+    // do not fetch again if already fetched
+    if (this.rawCode != '') { return }
+    
     axiosDefault
       .get(`${File.jsDelivrBaseUrl}${this.identifier}`)
       .then((response) => {
