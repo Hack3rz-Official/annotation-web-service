@@ -144,6 +144,7 @@ class SHModel:
         if file is not None:
             logger.debug("[SHModel] loading model configuration from passed in-memory file")
             self._model.load_state_dict(torch.load(file, map_location='cpu'))
+            file.seek(0) # used to ensure that the same model can be read multiple times
         elif os.path.exists(self._module_path):
             logger.debug(F"[SHModel] loading model configuration from disk: {self._module_path}")
             self._model.load_state_dict(torch.load(self._module_path, map_location='cpu'))
