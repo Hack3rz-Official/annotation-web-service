@@ -32,7 +32,7 @@ export default class File {
       this.languageLong = "java";
     } else if (language == "kt" || language == "kotlin") {
       this.languageShort = "kt";
-      this.languageLong = "kt";
+      this.languageLong = "kotlin";
     } else if (language == "go") {
       this.languageShort = "go";
       this.languageLong = "go";

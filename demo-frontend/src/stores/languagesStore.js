@@ -19,7 +19,7 @@ export const useLanguagesStore = defineStore({
       {
         humanReadable: "Kotlin",
         extension: "kt",
-        technical: "kt",
+        technical: "kotlin",
         selectedAmount: 0,
       },
     ],
