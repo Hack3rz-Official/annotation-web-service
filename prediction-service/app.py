@@ -5,8 +5,14 @@ from flask_mongoengine import MongoEngine
 from src.util.SHModelHelper import init_models
 from src import blueprint as api_v1
 
+import logging
+
 def create_app():
     app = Flask(__name__)
+
+    logging.basicConfig()
+    logger = logging.getLogger('waitress')
+    logger.setLevel(logging.DEBUG)
 
     # Connect to database
     app.config["MONGODB_SETTINGS"] = {
@@ -25,7 +31,7 @@ def create_app():
 
     init_models()
 
-    # safes current model of each language to root directory
+    logger.info("Prediction Service started successfully!")
 
     return app
 

@@ -2,7 +2,8 @@ import os
 from src.repository.model import ModelRepository
 from functools import wraps
 from time import process_time
-
+import logging
+logger = logging.getLogger('waitress')
 
 def measure(func):
     @wraps(func)
@@ -12,7 +13,7 @@ def measure(func):
             return func(*args, **kwargs)
         finally:
             end_ = int(round(process_time() * 1000)) - start
-            print(
+            logger.debug(
                 f"Total execution time {func.__name__}: {end_ if end_ > 0 else 0} ms"
             )
 
@@ -32,12 +33,12 @@ def get_model_path(lang_name):
 @measure
 def load_db_model_to_current_directory(db_model, lang_name):
     if db_model:
-        print(f"[SHModel] Newest Model loaded from DB with createdTime {db_model.createdTime}", flush=True)
+        logger.debug(f"[SHModel] Newest Model loaded from DB with createdTime {db_model.createdTime}")
         with open(get_model_path(lang_name), "wb") as file:
             model_file = db_model.file.read()
             file.write(model_file)
     else:
-        print(f"[SHModel] No model found in DB for lang {lang_name}, new model will be created", flush=True)
+        logger.debug(f"[SHModel] No model found in DB for lang {lang_name}, new model will be created")
 
 
 @measure

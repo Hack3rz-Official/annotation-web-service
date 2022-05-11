@@ -1,6 +1,7 @@
 from src.model.model import Model
 from src.repository import store
-
+import logging
+logger = logging.getLogger('waitress')
 
 class ModelRepository:
     """
@@ -26,7 +27,7 @@ class ModelRepository:
             'JAVA': None,
             'KOTLIN': None
         }
-        print("[ModelRepository] models have been reset")
+        logger.debug("[ModelRepository] models have been reset")
 
     def check_for_better_model(self, lang_name):
         """

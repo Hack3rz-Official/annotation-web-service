@@ -3,7 +3,9 @@ from flask_restx import Resource, Namespace, fields, reqparse
 from flask import abort
 from src.util.SHModelUtils import SHModel
 from src.repository.model import ModelRepository
+import logging
 
+logger = logging.getLogger('waitress')
 api = Namespace("prediction", description="Prediction operations")
 
 prediction_response_dto = api.model("PredictionResponseDTO", {
@@ -44,9 +46,11 @@ class PredictionController(Resource):
                 logger.debug(F"No model for lang {lang} found. Initiating new model.")
                 sh_model = SHModel(lang, os.environ.get('MODEL_NAME'))
             else:
+                logger.debug(F"Using {lang} model with createdTime: {model.createdTime} and accuracy: {model.accuracy}")
                 sh_model = SHModel(lang, os.environ.get('MODEL_NAME'), model.file)
 
             sh_model.setup_for_prediction()
             return {'h_code_values': sh_model.predict(data['tok_ids'])}
         except Exception as e:
+            logger.error("Model error: " + str(e))
             abort(500, "Model error: " + str(e))

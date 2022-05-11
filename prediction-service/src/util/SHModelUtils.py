@@ -4,6 +4,9 @@ from typing import Optional, Final, Tuple, List
 import torch
 import torch.nn.functional
 
+import logging
+logger = logging.getLogger('waitress')
+
 # constants
 # JAVA
 # ---------------------------------
@@ -139,10 +142,10 @@ class SHModel:
             is_bidirectional=self._is_bidirectional
         )
         if file is not None:
-            print("[SHModel] loading model configuration from provided file")
+            logger.debug("[SHModel] loading model configuration from provided file")
             self._model.load_state_dict(torch.load(file, map_location='cpu'))
         elif os.path.exists(self._module_path):
-            print(F"[SHModel] loading model configuration from disk: {self._module_path}")
+            logger.debug(F"[SHModel] loading model configuration from disk: {self._module_path}")
             self._model.load_state_dict(torch.load(self._module_path, map_location='cpu'))
         else:
             self.persist_model()
