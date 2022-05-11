@@ -38,8 +38,6 @@ class Hack3rzTest(TestCase):
     # called before running every test
     def setUp(self):
         assert self.db.get_db().name == "aws_test"
-
-        # TODO drop all collections at once?
         Model.drop_collection()
 
     def save_sh_model_to_db(self, lang_name, accuracy):
@@ -70,5 +68,6 @@ class Hack3rzTest(TestCase):
         super().tearDownClass()
         self.delete_test_models()
         self.env_patcher.stop()
+        Model.drop_collection()
 
 
