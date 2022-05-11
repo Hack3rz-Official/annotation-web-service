@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+from importlib import reload
+
 from flask_mongoengine import MongoEngine
 from unittest import TestCase, mock
 import os
@@ -8,7 +10,6 @@ from app import create_app
 from src.model.model import Model
 from src.repository.model import ModelRepository
 from src.util.SHModelHelper import get_model_path
-
 
 class Hack3rzTest(TestCase):
 
@@ -34,11 +35,19 @@ class Hack3rzTest(TestCase):
         self.app.testing = True
         self.db = MongoEngine()
         self.model_repository = ModelRepository()
-    
-    # called before running every test
+
     def setUp(self):
+        """
+        Called before running a single test
+        """
         assert self.db.get_db().name == "aws_test"
         Model.drop_collection()
+
+    def tearDown(self):
+        """
+        Called after running a single test
+        """
+        self.model_repository.reset()
 
     def save_sh_model_to_db(self, lang_name, accuracy):
         """
@@ -65,9 +74,11 @@ class Hack3rzTest(TestCase):
 
     @classmethod
     def tearDownClass(self):
+        """
+        Called after running all the tests
+        """
         super().tearDownClass()
-        self.delete_test_models()
         self.env_patcher.stop()
         Model.drop_collection()
-
+        self.delete_test_models()
 

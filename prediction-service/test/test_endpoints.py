@@ -1,9 +1,28 @@
 import json
+import os
+
 from hack3rz_test import Hack3rzTest
 from app import create_app
 
+from src.util.SHModelUtils import SHModel
+
 
 class Tests(Hack3rzTest):
+
+    def test_predict_java_with_existing_model(self):
+
+        # create the model locally on the disk
+        SHModel("java", os.environ.get('MODEL_NAME'))
+        self.save_sh_model_to_db("JAVA", 0.123)
+
+        with self.app.test_client() as client:
+            response = client.post('/api/v1/prediction', json={
+                'lang_name': 'java',
+                'tok_ids': [42, 42, 75, 76]
+            })
+            self.assertEqual(response.status_code, 200)
+            response_body = json.loads(response.get_data())
+            self.assertTrue(len(response_body['h_code_values']) == 4)
 
     def test_predict_java(self):
         with self.app.test_client() as client:
@@ -31,7 +50,7 @@ class Tests(Hack3rzTest):
                 'lang_name': 'kotlin',
                 'tok_ids': [42, 42, 75, 76]
             })
-            self.assertEqual(response.status_code, 200)
+            self.assertEqual(response.status_code, 200, response.get_data())
             response_body = json.loads(response.get_data())
             self.assertTrue(len(response_body['h_code_values']) == 4)
 

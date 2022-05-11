@@ -40,3 +40,9 @@ def load_db_model_to_current_directory(db_model, lang_name):
         print(f"[SHModel] No model found in DB for lang {lang_name}, new model will be created", flush=True)
 
 
+@measure
+def init_models():
+    model_repository = ModelRepository()
+    model_repository.check_for_better_model("PYTHON3")
+    model_repository.check_for_better_model("KOTLIN")
+    model_repository.check_for_better_model("JAVA")

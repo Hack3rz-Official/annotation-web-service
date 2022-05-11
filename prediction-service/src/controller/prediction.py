@@ -2,6 +2,7 @@ import os
 from flask_restx import Resource, Namespace, fields, reqparse
 from flask import abort
 from src.util.SHModelUtils import SHModel
+from src.repository.model import ModelRepository
 
 api = Namespace("prediction", description="Prediction operations")
 
@@ -31,13 +32,21 @@ class PredictionController(Resource):
     @api.expect(prediction_parser)
     @api.marshal_with(prediction_response_dto)
     def post(self):
+        model_repository = ModelRepository()
         data = prediction_parser.parse_args()
+        lang = data['lang_name']
         for tok_id in data["tok_ids"]:
             if not isinstance(tok_id, int):
                 abort(400, 'only integers are allowed')
         try:
-            model = SHModel(data['lang_name'], os.environ.get('MODEL_NAME'))
-            model.setup_for_prediction()
-            return {'h_code_values': model.predict(data['tok_ids'])}
+            model = model_repository.get_or_fetch_model(lang.upper())
+            if model is None:
+                logger.debug(F"No model for lang {lang} found. Initiating new model.")
+                sh_model = SHModel(lang, os.environ.get('MODEL_NAME'))
+            else:
+                sh_model = SHModel(lang, os.environ.get('MODEL_NAME'), model.file)
+
+            sh_model.setup_for_prediction()
+            return {'h_code_values': sh_model.predict(data['tok_ids'])}
         except Exception as e:
             abort(500, "Model error: " + str(e))

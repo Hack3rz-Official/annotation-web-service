@@ -2,8 +2,7 @@ import os
 from flask import Flask
 from flask_mongoengine import MongoEngine
 
-from src.repository.model import ModelRepository
-from src.util.SHModelHelper import load_db_model_to_current_directory    
+from src.util.SHModelHelper import init_models
 from src import blueprint as api_v1
 
 def create_app():
@@ -24,15 +23,9 @@ def create_app():
     # Register API
     app.register_blueprint(api_v1)
 
-    # returns binary file of newest model from db for python3, kotlin, java
-    db_model_python = ModelRepository.find_best_model("PYTHON3")
-    db_model_kotlin = ModelRepository.find_best_model("KOTLIN")
-    db_model_java = ModelRepository.find_best_model("JAVA")
+    init_models()
 
     # safes current model of each language to root directory
-    load_db_model_to_current_directory(db_model_python, "PYTHON3")
-    load_db_model_to_current_directory(db_model_kotlin, "KOTLIN")
-    load_db_model_to_current_directory(db_model_java, "JAVA")
 
     return app
 
