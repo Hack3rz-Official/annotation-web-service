@@ -1,3 +1,4 @@
+from cgi import test
 import json
 from unittest.mock import patch, MagicMock
 from hack3rz_test import Hack3rzTest
@@ -30,7 +31,9 @@ class TrainingServiceTest(Hack3rzTest):
 
     def test_split_objects(self):
         """Tests for a correct data split of an annotations array. After the split it will be asserted that 
-        the shapes are correct, respectively according to the desired train_percentage split.
+        the shapes are correct, respectively according to the desired train_percentage split. Furthermore, we split the array with annotations
+        for training and testing purposes into two arrays (data and labels) to ensure that the correct data and labels are used for training
+        and validation purposes and that we do not mix them. 
 
         Args:
             training_data represents fetched training data from the db. train_percentage is a float between 0-1
@@ -42,6 +45,40 @@ class TrainingServiceTest(Hack3rzTest):
         annotations = self.annotation_repository.find_data_to_train_with("java")
         train_percentage = 0.8
         annotation_train, annotation_val = split_objects(annotations, train_percentage)
+
+        # training data = [ann_objs1, ann_objs2....]
+        test_training_data = []
+        test_range = 10
+        for i in range(test_range):
+            if i<test_range*train_percentage:
+                test_training_data.append([["training", "training", "training"], [1,1,1]])
+            else:
+                test_training_data.append([["test", "test", "test"], [-1,-1,-1]])            
+
+        anno_train, anno_val = split_objects(test_training_data, train_percentage)
+
+        anno_train_data = np.array([])
+        anno_train_targets= np.array([])
+        anno_val_data = np.array([])
+        anno_val_targets = np.array([])
+
+        # seperate data and targets of anno_train and anno_val for testing purposes
+        for train, val in zip(anno_train, anno_val):
+            if type(train[0][0]) == str:
+                anno_train_data = np.append(anno_train_data, train[0][0])
+            if type(train[1][0]) == int:
+                anno_train_targets = np.append(anno_train_targets, train[1][0])
+            if type(val[0][0]) == str:
+                anno_val_data = np.append(anno_val_data, val[0][0])
+            if type(val[1][0]) == int:
+                anno_val_targets = np.append(anno_val_targets, val[1][0])   
+
+        self.assertIn("training", anno_train_data)
+        self.assertIn(1, anno_train_targets)
+        self.assertIn("test", anno_val_data)
+        self.assertIn(-1, anno_val_targets)
+        self.assertEqual(len(anno_train), 8)
+        self.assertEqual(len(anno_val), 2)
         self.assertTrue(0<= train_percentage <=1)
         self.assertEqual(len(annotation_train),np.ceil(len(annotations)*train_percentage))
         self.assertEqual(len(annotation_val),np.ceil(len(annotations)*(1-train_percentage)))
