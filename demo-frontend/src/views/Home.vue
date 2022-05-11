@@ -4,6 +4,7 @@ import FileDetailModalVue from "../components/FileDetailModal.vue";
 import LoadFiles from "../components/LoadFiles.vue";
 import FilePreview from "../components/FilePreview.vue";
 import Statistics from "../components/Statistics.vue"
+import Settings from "../components/Settings.vue"
 import { useFilesStore } from "../stores/filesStore";
 
 const filesStore = useFilesStore();
@@ -33,6 +34,12 @@ function setActiveTab(tabName) {
         @click="setActiveTab('statistics')"
         >Statistics</a
       >
+      <a
+        class="tab tab-lifted"
+        :class="{ '!bg-base-200 tab-active': activeTab == 'settings' }"
+        @click="setActiveTab('settings')"
+        >Settings</a
+      >
     </div>
 
     <div
@@ -46,6 +53,12 @@ function setActiveTab(tabName) {
       class="card w-full bg-base-200 shadow-xl rounded-t-none"
     >
       <statistics></statistics>
+    </div>
+     <div
+      v-show="activeTab == 'settings'"
+      class="card w-full bg-base-200 shadow-xl rounded-t-none"
+    >
+      <settings></settings>
     </div>
 
     <!-- Action Buttons -->
