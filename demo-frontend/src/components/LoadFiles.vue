@@ -25,21 +25,16 @@ watch(githubRepoUrl, (newRepoUrl, oldRepoUrl) => {
   githubRepo.value = splitted[4];
 });
 
-// set the selectedAmount to the maximum after loading files
-filesStore.$subscribe((mutation, state) => {
-  if (mutation.events.key == 'languageFilesDict') {
-    for (let language of languagesStore.languages) {
-      language.selectedAmount = filesStore.filterFilesByLanguage(language.extension).length
-    }
-  }
-})
-
 // make sure the user can not enter an amount higher than the amount of available files
 function selectedAmountChanged(extension) {
-  let language = languagesStore.languages.find((elem) => {return elem.extension == extension})
-  let availableFiles = filesStore.filterFilesByLanguage(language.extension).length
+  let language = languagesStore.languages.find((elem) => {
+    return elem.extension == extension;
+  });
+  let availableFiles = filesStore.filterFilesByLanguage(
+    language.extension
+  ).length;
   if (language.selectedAmount > availableFiles) {
-    language.selectedAmount = availableFiles
+    language.selectedAmount = availableFiles;
   }
 }
 
@@ -65,6 +60,13 @@ async function loadFilesFromRepo() {
     tree_sha
   );
   filesStore.languageFilesDict = sortTreeByLanguages(tree);
+
+  // set the selectedAmount to the maximum after loading files
+  for (let language of languagesStore.languages) {
+    language.selectedAmount = filesStore.filterFilesByLanguage(
+      language.extension
+    ).length;
+  }
 }
 </script>
 
