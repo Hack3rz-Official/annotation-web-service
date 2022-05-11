@@ -9,13 +9,6 @@ const editMode = ref(true);
 const selectedLanguage = ref(null);
 
 filesStore.$subscribe((mutation, state) => {
-  // prevent updates when typing in the rawCode field
-  console.log('mutation', mutation)
-  console.log('state', state)
-  // if (mutation.events.key == "rawCode") {
-  //   return;
-  // }
-
   // prevent updates when file is being edited
   if (filesStore.activeFile && filesStore.activeFile.dirty) {
     return
