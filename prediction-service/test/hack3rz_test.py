@@ -44,18 +44,15 @@ class Hack3rzTest(TestCase):
 
     def save_sh_model_to_db(self, lang_name, accuracy):
         """
-        Loads the model from the disk (if it exists) and saves it to the database
+        Loads the model from the disk and saves it to the database
         :param lang_name: string with the language of the model
         :param accuracy: float with the accuracy of the model
         """
         print("[TRAIN] New Model saved from directory to DB ", flush=True)
         model = Model(language=lang_name, accuracy=accuracy)
         model_path = get_model_path(lang_name)
-        try:
-            with open(model_path, "rb") as binary_file:
-                model.file.put(binary_file)
-        except FileNotFoundError:
-            print(F"[TRAIN] Error: No model with path {model_path} found on disk.")
+        with open(model_path, "rb") as binary_file:
+            model.file.put(binary_file)
         model.save()
 
     @staticmethod
