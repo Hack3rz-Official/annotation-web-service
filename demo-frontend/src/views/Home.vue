@@ -1,12 +1,18 @@
 <script setup>
+import { ref } from "vue";
 import FileDetailModalVue from "../components/FileDetailModal.vue";
 import LoadFiles from "../components/LoadFiles.vue";
-import FilePreview from "../components/FilePreview.vue"
+import FilePreview from "../components/FilePreview.vue";
+import Statistics from "../components/Statistics.vue"
 import { useFilesStore } from "../stores/filesStore";
-import { useLanguagesStore } from "../stores/languagesStore";
 
 const filesStore = useFilesStore();
-const languagesStore = useLanguagesStore();
+
+const activeTab = ref("load-files");
+
+function setActiveTab(tabName) {
+  activeTab.value = tabName;
+}
 </script>
 
 <template>
@@ -14,8 +20,33 @@ const languagesStore = useLanguagesStore();
     <!-- FileDetailModal -->
     <file-detail-modal-vue></file-detail-modal-vue>
 
-    <!-- LoadFiles -->
-    <load-files></load-files>
+    <div class="tabs">
+      <a
+        class="tab tab-lifted"
+        :class="{ '!bg-base-200 tab-active': activeTab == 'load-files' }"
+        @click="setActiveTab('load-files')"
+        >Load Files</a
+      >
+      <a
+        class="tab tab-lifted"
+        :class="{ '!bg-base-200 tab-active': activeTab == 'statistics' }"
+        @click="setActiveTab('statistics')"
+        >Statistics</a
+      >
+    </div>
+
+    <div
+      v-show="activeTab == 'load-files'"
+      class="card w-full bg-base-200 shadow-xl rounded-t-none"
+    >
+      <load-files></load-files>
+    </div>
+    <div
+      v-show="activeTab == 'statistics'"
+      class="card w-full bg-base-200 shadow-xl rounded-t-none"
+    >
+      <statistics></statistics>
+    </div>
 
     <!-- Action Buttons -->
     <div class="my-4">
@@ -44,6 +75,5 @@ const languagesStore = useLanguagesStore();
 </template>
 
 <style scoped lang="scss">
-
 </style>
 
