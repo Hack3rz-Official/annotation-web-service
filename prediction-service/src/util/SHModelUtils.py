@@ -142,7 +142,7 @@ class SHModel:
             is_bidirectional=self._is_bidirectional
         )
         if file is not None:
-            logger.debug("[SHModel] loading model configuration from provided file")
+            logger.debug("[SHModel] loading model configuration from passed in-memory file")
             self._model.load_state_dict(torch.load(file, map_location='cpu'))
         elif os.path.exists(self._module_path):
             logger.debug(F"[SHModel] loading model configuration from disk: {self._module_path}")
