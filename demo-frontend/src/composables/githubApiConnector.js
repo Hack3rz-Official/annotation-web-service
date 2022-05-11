@@ -1,10 +1,10 @@
-import axios from "axios";
+import { axiosDefault } from "./axios";
 
 const GITHUB_API_URL = "https://api.github.com";
 
 export async function getCommitsFromRepo(owner, repo) {
   try {
-    const response = await axios.get(
+    const response = await axiosDefault.get(
       `${GITHUB_API_URL}/repos/${owner}/${repo}/commits`
     );
     console.log(response);
@@ -16,7 +16,7 @@ export async function getCommitsFromRepo(owner, repo) {
 
 export async function getFilesFromTree(owner, repo, tree_sha) {
   try {
-    const response = await axios.get(
+    const response = await axiosDefault.get(
       `${GITHUB_API_URL}/repos/${owner}/${repo}/git/trees/${tree_sha}?recursive=true`
     );
     console.log(response);
