@@ -5,7 +5,8 @@ db = MongoEngine()
 
 class Model(db.Document):
     file = db.FileField()
-    language = db.StringField()
+    supported_languages = ('JAVA', 'PYTHON3', 'KOTLIN')
+    language = db.StringField(required=True, choices=supported_languages)
     createdTime = db.DateTimeField()
     accuracy = db.FloatField()
     meta = {

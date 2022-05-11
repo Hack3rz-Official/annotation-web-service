@@ -58,14 +58,15 @@ class Tests(Hack3rzTest):
             self.assertEqual(response.status_code, 400)
 
     def test_predict_with_model_from_db_python(self):
-        super().save_sh_model_to_db("python3", 0.1234)
-        self.assertIsNotNone(self.model_repository.find_best_model("python3"))
+        lang = "PYTHON3"
+        super().save_sh_model_to_db(lang, 0.1234)
+        self.assertIsNotNone(self.model_repository.find_best_model(lang))
 
-        self.app  = create_app()
+        self.app = create_app()
         self.app.testing = True
         with self.app.test_client() as client:
             response = client.post('/api/v1/prediction', json={
-                'lang_name': 'python3',
+                'lang_name': lang.lower(),
                 'tok_ids': [42, 42, 75, 76]
             })
             self.assertEqual(response.status_code, 200)
@@ -73,14 +74,15 @@ class Tests(Hack3rzTest):
             self.assertTrue(len(response_body['h_code_values']) == 4)
 
     def test_predict_with_model_from_db_kotlin(self):
-        super().save_sh_model_to_db("kotlin", 0.1234)
-        self.assertIsNotNone(self.model_repository.find_best_model("kotlin"))
+        lang = "KOTLIN"
+        super().save_sh_model_to_db(lang, 0.1234)
+        self.assertIsNotNone(self.model_repository.find_best_model(lang))
 
-        self.app  = create_app()
+        self.app = create_app()
         self.app.testing = True
         with self.app.test_client() as client:
             response = client.post('/api/v1/prediction', json={
-                'lang_name': 'kotlin',
+                'lang_name': lang.lower(),
                 'tok_ids': [42, 42, 75, 76]
             })
             self.assertEqual(response.status_code, 200)
@@ -88,14 +90,15 @@ class Tests(Hack3rzTest):
             self.assertTrue(len(response_body['h_code_values']) == 4)
     
     def test_predict_with_model_from_db_java(self):
-        super().save_sh_model_to_db("java", 0.1234)
-        self.assertIsNotNone(self.model_repository.find_best_model("java"))
+        lang = "JAVA"
+        super().save_sh_model_to_db(lang, 0.1234)
+        self.assertIsNotNone(self.model_repository.find_best_model(lang))
 
-        self.app  = create_app()
+        self.app = create_app()
         self.app.testing = True
         with self.app.test_client() as client:
             response = client.post('/api/v1/prediction', json={
-                'lang_name': 'java',
+                'lang_name': lang.lower(),
                 'tok_ids': [42, 42, 75, 76]
             })
             self.assertEqual(response.status_code, 200)

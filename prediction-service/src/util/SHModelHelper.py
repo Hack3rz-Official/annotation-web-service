@@ -1,17 +1,35 @@
 import os
+from src.repository.model import ModelRepository
+from functools import wraps
+from time import process_time
+
+
+def measure(func):
+    @wraps(func)
+    def _time_it(*args, **kwargs):
+        start = int(round(process_time() * 1000))
+        try:
+            return func(*args, **kwargs)
+        finally:
+            end_ = int(round(process_time() * 1000)) - start
+            print(
+                f"Total execution time {func.__name__}: {end_ if end_ > 0 else 0} ms"
+            )
+
+    return _time_it
 
 
 def get_model_path(lang_name):
-    """Gets the path of a model based on its programming language
-
-    Args:
-        String which is "python3", "java" or "kotlin"
-    
-    Returns:
-        Path of requested model
     """
-    return F"{lang_name}_{os.environ.get('MODEL_NAME')}.pt"
+    Creates the path of the model based on the language name and the
+    model name specified in the MODEL_NAME environment variable
+    :param lang_name: string with the language of the model
+    :return: String the path for the model
+    """
+    return F"{lang_name.lower()}_{os.environ.get('MODEL_NAME')}.pt"
 
+
+@measure
 def load_db_model_to_current_directory(db_model, lang_name):
     if db_model:
         print(f"[SHModel] Newest Model loaded from DB with createdTime {db_model.createdTime}", flush=True)
@@ -19,6 +37,6 @@ def load_db_model_to_current_directory(db_model, lang_name):
             model_file = db_model.file.read()
             file.write(model_file)
     else:
-        print("[SHModel] No model found in DB, creating new model", flush=True)
+        print(f"[SHModel] No model found in DB for lang {lang_name}, new model will be created", flush=True)
 
 
