@@ -9,7 +9,11 @@ const maxValue = ref(10);
 
 <template>
   <div class="card-body">
+    <p class="">
       maximum number of concurrent requests:
+      <span class="font-bold">{{ settingsStore.maxRequests }}</span>
+    </p>
+
     <input
       type="range"
       min="1"
@@ -19,7 +23,9 @@ const maxValue = ref(10);
       v-model="settingsStore.maxRequests"
     />
     <div class="w-full flex justify-between text-xs px-2">
-      <span v-for="val of maxValue" :key="val" class="text-center ml-2"> {{ val }}</span>
+      <span v-for="val of maxValue" :key="val" class="text-center ml-2">
+        {{ val }}</span
+      >
     </div>
   </div>
 </template>
