@@ -11,6 +11,7 @@ export default class File {
     this.identifier = this.computeIdentifier();
     this.uuid = uuidv4()
     this.rawCode = "";
+    this.dirty = false;
     this.size = 0; // size of code in Bytes
     this.loc = 0; // lines of code
     this.highlightedCode = "";
@@ -31,7 +32,7 @@ export default class File {
       this.languageLong = "java";
     } else if (language == "kt" || language == "kotlin") {
       this.languageShort = "kt";
-      this.languageLong = "kotlin";
+      this.languageLong = "kt";
     } else if (language == "go") {
       this.languageShort = "go";
       this.languageLong = "go";
@@ -77,6 +78,7 @@ export default class File {
         //   console.log(outputElem);
         this.highlightedCode = response.data;
         this.status = "highlighted";
+        this.dirty = false;
         this.request.endTimestamp = Date.now();
         this.request.duration =
           this.request.endTimestamp - this.request.startTimestamp;

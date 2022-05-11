@@ -10,8 +10,15 @@ const selectedLanguage = ref(null);
 
 filesStore.$subscribe((mutation, state) => {
   // prevent updates when typing in the rawCode field
-  if (mutation.events.key == "rawCode") {
-    return;
+  console.log('mutation', mutation)
+  console.log('state', state)
+  // if (mutation.events.key == "rawCode") {
+  //   return;
+  // }
+
+  // prevent updates when file is being edited
+  if (filesStore.activeFile && filesStore.activeFile.dirty) {
+    return
   }
 
   // make sure edit mode is on when file is not highlighted yet
@@ -33,6 +40,10 @@ filesStore.$subscribe((mutation, state) => {
 watch(selectedLanguage, (newSelectedLanguage, oldSelectedLanguage) => {
   filesStore.activeFile.setLanguage(newSelectedLanguage);
 });
+
+function setFileDirty() {
+  filesStore.activeFile.dirty = true;
+}
 
 function toggleEditModeOn() {
   editMode.value = true;
@@ -106,7 +117,7 @@ function updateHighlightedCodeDisplay() {
                 :value="language.technical"
               >
                 {{ language.humanReadable }}
-              </option>
+              </option>    
             </select>
           </div>
 
@@ -138,6 +149,7 @@ function updateHighlightedCodeDisplay() {
                 h-full
               "
               v-model="filesStore.activeFile.rawCode"
+              @keypress="setFileDirty()"
             ></textarea>
           </div>
 
