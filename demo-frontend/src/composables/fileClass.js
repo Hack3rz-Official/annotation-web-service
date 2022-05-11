@@ -1,4 +1,4 @@
-import axios from "axios";
+import { axiosLimited, axiosDefault } from "./axios";
 import { v4 as uuidv4 } from 'uuid';
 export default class File {
   static jsDelivrBaseUrl = "https://cdn.jsdelivr.net/gh/";
@@ -40,7 +40,7 @@ export default class File {
   }
 
   fetchRawCode() {
-    axios
+    axiosDefault
       .get(`${File.jsDelivrBaseUrl}${this.identifier}`)
       .then((response) => {
         // console.log(response);
@@ -66,7 +66,7 @@ export default class File {
     let outputElem = document.getElementById(this.uuid);
     //   console.log(outputElem);
     
-    axios
+    axiosLimited
       .post(import.meta.env.VITE_HIGHLIGHT_URL, data)
       .then((response) => {
         let newElement = document
@@ -80,16 +80,16 @@ export default class File {
         this.status = "highlighted";
         this.dirty = false;
         this.request.endTimestamp = Date.now();
-        this.request.duration =
-          this.request.endTimestamp - this.request.startTimestamp;
+        this.request.duration = response.responseTime;
+        console.log('actual response time: ', response.responseTime)
       })
       .catch((error) => {
         console.log(error);
         outputElem.innerHTML = "Error in Highlighting Service";
         this.status = "failed";
         this.request.endTimestamp = Date.now();
-        this.request.duration =
-          this.request.endTimestamp - this.request.startTimestamp;
+        this.request.duration = response.responseTime;
+        console.log('actual response time: ', response.responseTime)
       });
   }
 
