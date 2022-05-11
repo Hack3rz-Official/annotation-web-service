@@ -2,6 +2,7 @@
 import { ref, computed } from "vue";
 import { useFilesStore } from "../stores/filesStore";
 import { useLanguagesStore } from "../stores/languagesStore";
+import { computeSum, computeAverage, computeMedian } from "../composables/mathHelpers"
 
 const filesStore = useFilesStore();
 const languagesStore = useLanguagesStore();
@@ -77,26 +78,26 @@ function recomputeTableData() {
     let files = filesStore.filterFetchedFilesByLanguage(language.extension);
     let highlightedFiles = files.filter((file) => { return file.status == 'highlighted' })
     let times = highlightedFiles.map((file) => { return file.request.duration })
-    let avgTime = Math.round(times.reduce((partialSum, a) => partialSum + a, 0) / times.length);
     console.log(language)
     console.log(files)
     out.push({
       name: language.humanReadable,
       filesCount: files.length,
       filesHighlightedCount: highlightedFiles.length,
-      avgTime: avgTime,
+      avgTime: Math.round(computeAverage(times)),
+      medianTime: Math.round(computeMedian(times)),
     });
   }
   // stats total (all files)
   let files = filesStore.files
   let highlightedFiles = files.filter((file) => { return file.status == 'highlighted' })
   let times = highlightedFiles.map((file) => { return file.request.duration })
-  let avgTime = Math.round(times.reduce((partialSum, a) => partialSum + a, 0) / times.length);
   out.push({
       name: 'Total',
       filesCount: files.length,
       filesHighlightedCount: highlightedFiles.length,
-      avgTime: avgTime,
+      avgTime: Math.round(computeAverage(times)),
+      medianTime: Math.round(computeMedian(times)),
   });
   tableData.value = out;
 }
@@ -123,6 +124,7 @@ function recomputeTableData() {
             <th># Files</th>
             <th># Highlighted</th>
             <th>Avg Time (ms)</th>
+            <th>Median Time (ms)</th>
           </tr>
         </thead>
         <tbody>
@@ -135,6 +137,7 @@ function recomputeTableData() {
             <td>{{ language.filesCount }}</td>
             <td>{{ language.filesHighlightedCount }}</td>
             <td>{{ language.avgTime }}</td>
+            <td>{{ language.medianTime }}</td>
           </tr>
         </tbody>
       </table>
