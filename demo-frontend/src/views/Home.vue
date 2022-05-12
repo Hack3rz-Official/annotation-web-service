@@ -1,7 +1,8 @@
 <script setup>
 import { ref } from "vue";
 import FileDetailModalVue from "../components/FileDetailModal.vue";
-import LoadFiles from "../components/LoadFiles.vue";
+import LoadRepoFiles from "../components/LoadRepoFiles.vue";
+import LoadBenchmarkFilesVue from "../components/LoadBenchmarkFiles.vue";
 import FilePreview from "../components/FilePreview.vue";
 import Statistics from "../components/Statistics.vue"
 import Settings from "../components/Settings.vue"
@@ -9,7 +10,7 @@ import { useFilesStore } from "../stores/filesStore";
 
 const filesStore = useFilesStore();
 
-const activeTab = ref("load-files");
+const activeTab = ref("load-repo-files");
 
 function setActiveTab(tabName) {
   activeTab.value = tabName;
@@ -24,9 +25,15 @@ function setActiveTab(tabName) {
     <div class="tabs">
       <a
         class="tab tab-lifted"
-        :class="{ '!bg-base-200 tab-active': activeTab == 'load-files' }"
-        @click="setActiveTab('load-files')"
-        >Load Files</a
+        :class="{ '!bg-base-200 tab-active': activeTab == 'load-repo-files' }"
+        @click="setActiveTab('load-repo-files')"
+        >Load Repo Files</a
+      >
+      <a
+        class="tab tab-lifted"
+        :class="{ '!bg-base-200 tab-active': activeTab == 'load-benchmark-files' }"
+        @click="setActiveTab('load-benchmark-files')"
+        >Load Benchmark Files</a
       >
       <a
         class="tab tab-lifted"
@@ -43,10 +50,16 @@ function setActiveTab(tabName) {
     </div>
 
     <div
-      v-show="activeTab == 'load-files'"
+      v-show="activeTab == 'load-repo-files'"
       class="card w-full bg-base-200 shadow-xl rounded-t-none"
     >
-      <load-files></load-files>
+      <load-repo-files></load-repo-files>
+    </div>
+    <div
+      v-show="activeTab == 'load-benchmark-files'"
+      class="card w-full bg-base-200 shadow-xl rounded-t-none"
+    >
+      <load-benchmark-files-vue></load-benchmark-files-vue>
     </div>
     <div
       v-show="activeTab == 'statistics'"

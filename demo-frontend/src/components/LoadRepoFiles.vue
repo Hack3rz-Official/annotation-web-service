@@ -84,10 +84,6 @@ async function loadFilesFromRepo() {
           Load Files from Repo
         </button>
       </div>
-      or
-      <button class="btn" @click="filesStore.loadTestFiles">
-        load demo files
-      </button>
     </div>
 
     <div v-show="Object.keys(filesStore.languageFilesDict).length > 0">
