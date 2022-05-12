@@ -27,6 +27,29 @@ const maxValue = ref(10);
         {{ val }}</span
       >
     </div>
+
+    <p class="mt-5">
+      Performance Mode:
+      <span class="font-bold">{{ settingsStore.performanceMode ? 'ON' : 'OFF' }}</span>
+    </p>
+    <div class="form-control">
+      <div class="input-group">
+        <button
+          class="btn btn- w-1/2"
+          :class="{ 'btn-outline': !settingsStore.performanceMode }"
+          @click="settingsStore.togglePerformanceMode"
+        >
+          On
+        </button>
+        <button
+          class="btn btn- w-1/2"
+          :class="{ 'btn-outline': settingsStore.performanceMode }"
+          @click="settingsStore.togglePerformanceMode"
+        >
+          Off
+        </button>
+      </div>
+    </div>
   </div>
 </template>
 

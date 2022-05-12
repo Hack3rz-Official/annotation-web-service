@@ -7,8 +7,10 @@ import FilePreview from "../components/FilePreview.vue";
 import Statistics from "../components/Statistics.vue"
 import Settings from "../components/Settings.vue"
 import { useFilesStore } from "../stores/filesStore";
+import { useSettingsStore } from "../stores/settingsStore";
 
 const filesStore = useFilesStore();
+const settingsStore = useSettingsStore();
 
 const activeTab = ref("load-repo-files");
 
@@ -20,7 +22,7 @@ function setActiveTab(tabName) {
 <template>
   <main class="container mx-auto px-3 gap-y-3">
     <!-- FileDetailModal -->
-    <file-detail-modal-vue></file-detail-modal-vue>
+    <file-detail-modal-vue v-if="!settingsStore.performanceMode"></file-detail-modal-vue>
 
     <div class="tabs">
       <a
@@ -91,9 +93,9 @@ function setActiveTab(tabName) {
     </div>
 
     <!-- File Previews for each loaded file -->
-    <div class="flex flex-wrap gap-3 relative">
+    <div v-if="!settingsStore.performanceMode" class="flex flex-wrap gap-3 relative">
       <!-- eslint-disable-next-line vue/no-v-for-template-key -->
-      <template v-for="file in filesStore.files" :key="file.identifier">
+      <template v-for="file in filesStore.files" :key="file.uuid">
         <file-preview :file="file"></file-preview>
       </template>
     </div>
