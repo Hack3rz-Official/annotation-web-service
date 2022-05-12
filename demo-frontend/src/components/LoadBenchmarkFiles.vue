@@ -11,8 +11,8 @@ const languagesStore = useLanguagesStore();
 const sizes = ref(["small", "medium", "large"]);
 
 function loadFile(language, size) {
-  let file = getBenchmarkFile(language, size);
   for (let i = 1; i <= 10; i++) {
+    let file = getBenchmarkFile(language, size);
     filesStore.files.push(file);
   }
 }
