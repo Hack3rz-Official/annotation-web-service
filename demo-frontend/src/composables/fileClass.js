@@ -75,8 +75,9 @@ export default class File {
       code: this.rawCode,
       language: this.languageLong,
     };
+    let outputElem = null;
     if (!settingsStore.performanceMode) {
-      let outputElem = document.getElementById(this.uuid);
+      outputElem = document.getElementById(this.uuid);
     }
     //   console.log(outputElem);
 
