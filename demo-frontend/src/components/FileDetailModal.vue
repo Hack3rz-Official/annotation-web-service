@@ -55,6 +55,15 @@ function updateHighlightedCodeDisplay() {
   outputElem.innerHTML = null;
   outputElem.appendChild(newElement);
 }
+
+// for debugging
+function logRawCode() {
+  const file = filesStore.activeFile
+  file.loc = file.computeLoc()
+  console.log(file)
+  console.log(file.loc)
+
+}
 </script>
 
 <template>
@@ -98,6 +107,13 @@ function updateHighlightedCodeDisplay() {
             >
               Save & Highlight
             </button>
+
+            <!-- <button
+              class="btn btn-secondary w-full"
+              @click="logRawCode()"
+            >
+              Log Raw
+            </button> -->
 
             <select
               class="select select-primary w-full max-w-xs"

@@ -22,7 +22,10 @@ export const useFilesStore = defineStore({
       this.activeFile = file;
     },
     loadTestFiles() {
-      this.files = useFileFixtures();
+      const fixtureFiles = useFileFixtures();
+      for (let file of fixtureFiles) {
+        this.files.push(file)
+      }
       for (let file of this.files) {
         file.fetchRawCode();
       }
@@ -40,6 +43,9 @@ export const useFilesStore = defineStore({
       } else {
         return this.languageFilesDict[language];
       }
+    },
+    filterFetchedFilesByLanguage(language) {
+      return this.files.filter((file) => { return file.languageShort == language })
     }
   },
 });
