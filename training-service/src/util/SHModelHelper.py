@@ -47,7 +47,7 @@ def from_best_sh_model_to_db_model(lang_name, accuracy):
         An object of class Model which is the representation of an SHModel for the database annotation called models.
     """
     print("[TRAIN] New Model saved from directory to DB ", flush=True)
-    model = Model(language=lang_name, accuracy=accuracy)
+    model = Model(language=lang_name.upper(), accuracy=accuracy)
     with open(get_model_path(lang_name), "rb") as binary_file:
         model.file.put(binary_file)
 
