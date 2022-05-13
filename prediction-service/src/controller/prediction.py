@@ -51,7 +51,9 @@ class PredictionController(Resource):
 
             # TODO: potential performance boost if model is not re-instantiated and setup for every request
             sh_model.setup_for_prediction()
-            return {'h_code_values': sh_model.predict(data['tok_ids'])}
+            values = sh_model.predict(data['tok_ids'])
+            model_repository.async_check_for_better_model(lang.upper())
+            return {'h_code_values': values}
         except Exception as e:
             logger.error("Model error: " + str(e))
             abort(500, "Model error: " + str(e))

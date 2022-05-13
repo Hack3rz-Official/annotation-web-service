@@ -1,18 +1,17 @@
 import os
 from flask import Flask
 from flask_mongoengine import MongoEngine
-
-from src.util.SHModelHelper import init_models
+from src.repository.model import ModelRepository
 from src import blueprint as api_v1
 
 import logging
+logging.basicConfig()
+logger = logging.getLogger('waitress')
+logger.setLevel(logging.DEBUG)
+
 
 def create_app():
     app = Flask(__name__)
-
-    logging.basicConfig()
-    logger = logging.getLogger('waitress')
-    logger.setLevel(logging.DEBUG)
 
     # Connect to database
     app.config["MONGODB_SETTINGS"] = {
@@ -29,7 +28,9 @@ def create_app():
     # Register API
     app.register_blueprint(api_v1)
 
-    init_models()
+    # Load initial models
+    model_repository = ModelRepository()
+    model_repository.update_models()
 
     logger.info("Prediction Service started successfully!")
 

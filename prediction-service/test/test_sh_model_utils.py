@@ -19,8 +19,6 @@ class SHModelUtilsTest(Hack3rzTest):
         # load model from db
         model = self.model_repository.get_or_fetch_model(lang.upper())
 
-        print(model.file)
-
         # instantiate SHModel with model from db
         sh_model = SHModel(lang.lower(), os.environ.get('MODEL_NAME'), model.file)
 
