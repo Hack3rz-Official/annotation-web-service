@@ -51,7 +51,7 @@ docker-compose up --scale prediction=2 --scale annotation=2
 ```
 
 Sometimes builds fail on machines with different processor architectures (e.g. on M1 MacBooks). In other cases the build might fail, because there are old versions of the docker containers stored. Use the following command for a clean new build:
-```nashorn
+```
 docker-compose up -d --force-recreate --renew-anon-volumes --build --scale prediction=2 --scale annotation=2
 ```
 

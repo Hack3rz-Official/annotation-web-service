@@ -47,3 +47,9 @@ $ docker run -p 8085:8085 -it <YOUR_DOCKER_HUB_ID>/training-service:v1.0.0
 ```
 
 Finally, the function should be running at ```http://127.0.0.1:8085/api/v1/training```
+
+## Running Tests
+Run the following command to execute all tests within the `/test` folder. Make sure you activate the virtual environment and install the dependencies first.
+```
+python3 -m unittest discover test
+```
