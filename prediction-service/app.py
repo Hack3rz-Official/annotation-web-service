@@ -1,10 +1,14 @@
 import os
 from flask import Flask
 from flask_mongoengine import MongoEngine
-
 from src.repository.model import ModelRepository
-from src.util.SHModelHelper import load_db_model_to_current_directory    
 from src import blueprint as api_v1
+
+import logging
+logging.basicConfig()
+logger = logging.getLogger('waitress')
+logger.setLevel(logging.DEBUG)
+
 
 def create_app():
     app = Flask(__name__)
@@ -24,15 +28,11 @@ def create_app():
     # Register API
     app.register_blueprint(api_v1)
 
-    # returns binary file of newest model from db for python3, kotlin, java
-    db_model_python = ModelRepository.find_best_model("PYTHON3")
-    db_model_kotlin = ModelRepository.find_best_model("KOTLIN")
-    db_model_java = ModelRepository.find_best_model("JAVA")
+    # Load initial models
+    model_repository = ModelRepository()
+    model_repository.update_models()
 
-    # safes current model of each language to root directory
-    load_db_model_to_current_directory(db_model_python, "PYTHON3")
-    load_db_model_to_current_directory(db_model_kotlin, "KOTLIN")
-    load_db_model_to_current_directory(db_model_java, "JAVA")
+    logger.info("Prediction Service started successfully!")
 
     return app
 

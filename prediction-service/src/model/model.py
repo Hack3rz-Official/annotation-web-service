@@ -3,9 +3,17 @@ import datetime
 
 db = MongoEngine()
 
+
 class Model(db.Document):
+    """
+    The Model database document that is used to store and retrieve the model from the database.
+    """
+
     file = db.FileField()
-    language = db.StringField()
+    "A GridFS like file object that supports common methods such as .read(), .readline() and .seek()"
+
+    supported_languages = ('JAVA', 'PYTHON3', 'KOTLIN')
+    language = db.StringField(required=True, choices=supported_languages)
     createdTime = db.DateTimeField()
     accuracy = db.FloatField()
     meta = {

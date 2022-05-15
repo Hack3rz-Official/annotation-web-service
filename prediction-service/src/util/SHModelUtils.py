@@ -4,6 +4,9 @@ from typing import Optional, Final, Tuple, List
 import torch
 import torch.nn.functional
 
+import logging
+logger = logging.getLogger('waitress')
+
 # constants
 # JAVA
 # ---------------------------------
@@ -97,13 +100,15 @@ class SHModel:
     Handles the loading, fine-tuning, prediction and persisting of Syntax Highlighting base models.
     """
 
-    def __init__(self, lang_name: str, model_name: str):
+    def __init__(self, lang_name: str, model_name: str, file=None):
         """
         Creates a new model, or loads the model's latest state from disk if it exists.
         :param lang_name: The name of the target language as one of: JAVA_LANG_NAME,
         KOTLIN_LANG_NAME or PYTHON3_LANG_NAME
         :param model_name: Arbitrary name of the model, this will be used to save and load
         the model to disc, together with the name of the language.
+        :param file: An optional file-like object (has to implement :meth:`read`, :meth:`readline`, :meth:`tell`,
+            and :meth:`seek`), that contains the model configuration
         """
         torch.manual_seed(1)
         #
@@ -136,7 +141,12 @@ class SHModel:
             num_layers=self._hidden_layers,
             is_bidirectional=self._is_bidirectional
         )
-        if os.path.exists(self._module_path):
+        if file is not None:
+            logger.debug("[SHModel] loading model configuration from passed in-memory file")
+            self._model.load_state_dict(torch.load(file, map_location='cpu'))
+            file.seek(0) # used to ensure that the same model can be read multiple times
+        elif os.path.exists(self._module_path):
+            logger.debug(F"[SHModel] loading model configuration from disk: {self._module_path}")
             self._model.load_state_dict(torch.load(self._module_path, map_location='cpu'))
         else:
             self.persist_model()

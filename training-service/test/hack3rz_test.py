@@ -63,7 +63,7 @@ class Hack3rzTest(TestCase):
         """
         model = SHModel(lang_name, os.environ.get('MODEL_NAME'))
         print("[TRAIN] New Model saved from directory to DB ", flush=True)
-        model = Model(language=lang_name, accuracy=accuracy)
+        model = Model(language=lang_name.upper(), accuracy=accuracy)
         with open(lang_name + "_" + os.environ.get('MODEL_NAME') + ".pt", "rb") as binary_file:
             model.file.put(binary_file)
         model.save()
