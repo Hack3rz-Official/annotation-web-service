@@ -27,8 +27,10 @@ def train_models(model="all"):
         training_data = annotation_repository.find_data_to_train_with(lang_name)
         print("[TRAIN] training data loaded from DB: " + str(len(training_data)), flush=True)
 
-        if len(training_data) < int(os.environ.get('TRAINING_BATCH_SIZE')):
-            print("[TRAIN] Not enough data to train model", flush=True)
+        training_batch_size = int(os.environ.get('TRAINING_BATCH_SIZE'))
+        training_data_len = len(training_data)
+        if training_data_len < training_batch_size:
+            print(f"[TRAIN] Not enough data to train model: training data: {training_data_len}, training batch size: {training_batch_size}", flush=True)
             continue
 
         annotations_train, annotations_val = split_objects(training_data)
