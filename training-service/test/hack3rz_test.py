@@ -30,7 +30,7 @@ class Hack3rzTest(TestCase):
             "MONGO_PORT": "27017",
             "MONGO_HOST": "localhost",
             "MONGO_AUTH_DATABASE": "admin",
-            "TRAINING_BATCH_SIZE": "100",
+            "MIN_TRAINING_BATCH_SIZE": "100",
             "MODEL_NAME": "test_best"
         }, clear=True)
         self.env_patcher.start()
@@ -40,19 +40,21 @@ class Hack3rzTest(TestCase):
         self.db = MongoEngine()
         self.annotation_repository = AnnotationRepository()
         self.model_repository = ModelRepository()
-    
-    # called before running every test
-    def setUp(self):
-        """ Is called before running every test. Ensures that the collections where models and annotations are stored
-        are empty. After this, the function load_training_test_data() is called to populate the collections on the db.       
         
+    def setUp(self):
         """
-        self.assertEqual(self.db.get_db().name,"aws_test")
-
-        # TODO drop all collections at once?
+        Called before running a single test
+        """
+        assert self.db.get_db().name == "aws_test"
         Annotation.drop_collection()
         Model.drop_collection()
         self.load_training_test_data()
+
+    def tearDown(self):
+        """
+        Called after running a single test
+        """
+        pass
 
     def save_sh_model_to_db(self,lang_name, accuracy):
         """Saves an SHModel to the db on the collection "models". 
@@ -61,10 +63,10 @@ class Hack3rzTest(TestCase):
             Corresponding language name (string) of the model and its accuracy. Both args will be saved in a separate coloumn on the db.
         
         """
-        model = SHModel(lang_name, os.environ.get('MODEL_NAME'))
+        model = SHModel(lang_name.lower(), os.environ.get('MODEL_NAME'))
         print("[TRAIN] New Model saved from directory to DB ", flush=True)
         model = Model(language=lang_name.upper(), accuracy=accuracy)
-        with open(lang_name + "_" + os.environ.get('MODEL_NAME') + ".pt", "rb") as binary_file:
+        with open(lang_name.lower() + "_" + os.environ.get('MODEL_NAME') + ".pt", "rb") as binary_file:
             model.file.put(binary_file)
         model.save()
 
@@ -87,3 +89,6 @@ class Hack3rzTest(TestCase):
         super().tearDownClass()
 
         self.env_patcher.stop()
+        
+        Annotation.drop_collection()
+        Model.drop_collection()

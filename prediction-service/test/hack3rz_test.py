@@ -26,7 +26,7 @@ class Hack3rzTest(TestCase):
             "MONGO_PORT": "27017",
             "MONGO_HOST": "localhost",
             "MONGO_AUTH_DATABASE": "admin",
-            "TRAINING_BATCH_SIZE": "100",
+            "MIN_TRAINING_BATCH_SIZE": "100",
             "MODEL_NAME": "test_best"
         }, clear=True)
         self.env_patcher.start()
@@ -56,7 +56,7 @@ class Hack3rzTest(TestCase):
         :param accuracy: float with the accuracy of the model
         """
         print("[TRAIN] New Model saved from directory to DB ", flush=True)
-        model = Model(language=lang_name, accuracy=accuracy)
+        model = Model(language=lang_name.upper(), accuracy=accuracy)
         model_path = get_model_path(lang_name)
         with open(model_path, "rb") as binary_file:
             model.file.put(binary_file)

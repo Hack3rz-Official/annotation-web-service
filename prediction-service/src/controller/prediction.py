@@ -44,10 +44,10 @@ class PredictionController(Resource):
             model = model_repository.get_or_fetch_model(lang.upper())
             if model is None:
                 logger.debug(F"No model for lang {lang} found. Initiating new model.")
-                sh_model = SHModel(lang, os.environ.get('MODEL_NAME'))
+                sh_model = SHModel(lang.lower(), os.environ.get('MODEL_NAME'))
             else:
                 logger.debug(F"Using {lang} model with createdTime: {model.createdTime} and accuracy: {model.accuracy}")
-                sh_model = SHModel(lang, os.environ.get('MODEL_NAME'), model.file)
+                sh_model = SHModel(lang.lower(), os.environ.get('MODEL_NAME'), model.file)
 
             # TODO: potential performance boost if model is not re-instantiated and setup for every request
             sh_model.setup_for_prediction()

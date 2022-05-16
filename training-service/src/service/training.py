@@ -1,49 +1,51 @@
-from distutils.log import error
+from threading import Lock
+import logging
 import numpy as np
 import os
-from sklearn.utils import shuffle
-from sklearn.model_selection import train_test_split
 from src.repository.annotation import AnnotationRepository
 from src.repository.model import ModelRepository
 import config as config
 from src.util.SHModelHelper import from_db_model_to_sh_model, from_best_sh_model_to_db_model
 
+logger = logging.getLogger('waitress')
+lock = Lock()
 annotation_repository = AnnotationRepository()
 model_repository = ModelRepository()
 FALLBACK_ACCURACY = 0
 
 def train_models(model="all"):
-    """Trains models if there is at least the number of TRAINING_BATCH_SIZE entries on db collection "annotation".
+    """Trains models if there is at least the number of MIN_TRAINING_BATCH_SIZE entries on db collection "annotation".
     
     Returns:
         String, based on which condition is fullfilled.  
     """
-    print("[TRAIN] ### TRAINING STARTED ### ", flush=True)
+    # only one thread can execute code there
+    with lock:
+        logger.debug(f"[TRAINING] ### TRAINING STARTED with model {model} ### ")
+        
+        trained_languages = []
+        languages_to_train = config.SUPPORTED_LANGUAGES if model == "all" else [model]
+        for lang_name in languages_to_train:
+            logger.debug(f"[TRAINING] Starting model training for {lang_name}")
 
-    trained_languages = []
-    languages_to_train = config.SUPPORTED_LANGUAGES if model == "all" else [model]
-    for lang_name in languages_to_train:
-        print("[TRAIN] Starting model training for " + lang_name, flush=True)
+            training_data = annotation_repository.find_data_to_train_with(lang_name)
+            logger.debug(f"[TRAINING] Training data loaded from DB: {len(training_data)}")
 
-        training_data = annotation_repository.find_data_to_train_with(lang_name)
-        print("[TRAIN] training data loaded from DB: " + str(len(training_data)), flush=True)
+            min_training_batch_size = int(os.environ.get('MIN_TRAINING_BATCH_SIZE'))
+            training_data_len = len(training_data)
+            if training_data_len < min_training_batch_size:
+                logger.debug(f"[TRAINING] Not enough data to train model: training data: {training_data_len}, minimum training batch size: {min_training_batch_size}")
+                continue
 
-        training_batch_size = int(os.environ.get('TRAINING_BATCH_SIZE'))
-        training_data_len = len(training_data)
-        if training_data_len < training_batch_size:
-            print(f"[TRAIN] Not enough data to train model: training data: {training_data_len}, training batch size: {training_batch_size}", flush=True)
-            continue
+            annotations_train, annotations_val = split_objects(training_data)
+            improve_model(annotations_train, annotations_val, lang_name)
+            trained_languages.append(lang_name)
 
-        annotations_train, annotations_val = split_objects(training_data)
-    
-        improve_model(annotations_train, annotations_val, lang_name)
-        trained_languages.append(lang_name)
+        logger.debug("[TRAINING] ### TRAINING DONE ###")
 
-    print("[TRAIN] ### TRAINING DONE ### ", flush=True)
-
-    if not trained_languages:
-        return "No languages trained. Not enough training data."
-    return "Models trained for: " + str(trained_languages)
+        if not trained_languages:
+            return "No languages trained. Not enough training data."
+        return "Models trained for: " + str(trained_languages)
 
 
 def data_preprocessing(annotation_data):
@@ -99,27 +101,31 @@ def improve_model(annotations_train, annotations_val, lang_name):
     
     # compute accuracy of model on GLOBAL validation set
     validation_data = annotation_repository.find_validation_data(lang_name)
-    print("[TRAIN] validation data loaded from DB: " + str(len(validation_data)), flush=True)
-    X_val_previous, T_val_previous = data_preprocessing(validation_data)
-    X_val_all = np.append(X_val, X_val_previous)
-    T_val_all = np.append(T_val, T_val_previous)
-    new_acc = compute_accuracy(best_sh_model, X_val_all, T_val_all)
-
-    print(f"[TRAIN] new_acc = {new_acc} and cur_acc = {cur_acc}, ", flush=True)
+    logger.debug(f"[TRAINING] Previous validation data from db loaded: {len(validation_data)}")
+    if validation_data:
+        X_val_previous, T_val_previous = data_preprocessing(validation_data)
+        X_val = np.append(X_val, X_val_previous)
+        T_val = np.append(T_val, T_val_previous)
+    
+    # compute accuracy with the entire historic validation dataset
+    new_acc = compute_accuracy(best_sh_model, X_val, T_val)
+    logger.debug(f"[TRAINING] Validated with {len(X_val)} data")
+    
+    logger.debug(f"[TRAINING] new_acc = {new_acc} and cur_acc = {cur_acc}")
     if new_acc > cur_acc:
-        print("[SHModel] Persisting model to directory ", flush=True)
+        logger.debug("[SHModel] Persisting model to directory")
         best_sh_model.persist_model()
         improved_db_model = from_best_sh_model_to_db_model(lang_name, new_acc)
         model_repository.save(improved_db_model)
+        logger.debug(f"[TRAINING] Flag {len(annotations_train)} as trained data and {len(annotations_val)} as validated data")
         annotation_repository.update_trained_time(annotations_train)
         annotation_repository.update_validated_time(annotations_val)
         return 
 
-    print("[TRAIN] No improvement: do nothing", flush=True)
+    logger.debug("[TRAINING] No improvement: do nothing")
 
 
-
-def train(model, X_train, T_train, epochs=10, error_convergence=0.001):
+def train(model, X_train, T_train, epochs=10):
     """Trains the model based on a number on epochs. Before the start of the training process, the model will be set into the finetuning mode.
     Training data will be shuffled before the start of the process.
     
@@ -129,32 +135,23 @@ def train(model, X_train, T_train, epochs=10, error_convergence=0.001):
     Returns:
         Array with losses.
     """
+    logger.debug("[TRAINING] Model training started...")
     model.setup_for_finetuning()
-    X_train, T_train = shuffle_data(X_train, T_train)
-    losses = np.array([])
-    delta = 100
+    avg_epoch_losses = []
     for epoch in range(epochs):
-        print("[TRAIN] Epoch: ", epoch+1)
-        epoch_losses = np.array([])
-        for idx, x in enumerate(X_train):
-            if delta < error_convergence:
-                break
-            loss_of_sample = model.finetune_on(x, T_train[idx])
-            if idx != 0:
-                delta = epoch_losses[idx-1]-loss_of_sample
-                print("[TRAIN] current delta: ", delta, flush=True)
-            epoch_losses = np.append(epoch_losses, loss_of_sample)
-        if delta < error_convergence:
-            print(f'[TRAIN] delta {round(delta,6)} < error_convergence {error_convergence}', flush=True)
-            print("")
+        epoch_losses = []
+        X_train, T_train = shuffle_data(X_train, T_train)
+        for idx, x in enumerate(X_train):  
+            loss = model.finetune_on(x, T_train[idx])
+            epoch_losses.append(loss)
+                        
+        cur_avg_epoch_loss = sum(epoch_losses)/len(epoch_losses)
+        avg_epoch_losses.append(cur_avg_epoch_loss)
+        logger.debug(f"[TRAINING] Epoch: {epoch+1}/{epochs}, Average Loss {cur_avg_epoch_loss}")
+        
+        if epoch > 0 and cur_avg_epoch_loss >= avg_epoch_losses[epoch-1]:
+            logger.debug(f"[TRAINING] EARLY EPOCH STOPPING: current avg epoch loss {round(cur_avg_epoch_loss, 10)} >= previous avg epoch loss {round(avg_epoch_losses[epoch-1], 10)}")
             break
-        avg_epoch_loss = np.mean(epoch_losses)
-        print(f'[TRAIN] Average Loss {avg_epoch_loss} in epoch {epoch+1}', flush=True)  
-        losses = np.append(losses, avg_epoch_loss)
-
-          
-    return losses
-
 
 def shuffle_data(X, T):
     """Shuffles two arrays accordingly. 
@@ -164,13 +161,10 @@ def shuffle_data(X, T):
         
     Returns:
         Returns two shuffled np arrays.
-    
     """
-    print("[TRAIN] shuffling data...", flush=True)
     assert len(X) == len(T)
-    X, T = shuffle(X, T, random_state=0)
-    return X, T
-
+    p = np.random.permutation(len(X))
+    return X[p], T[p]
 
 
 def split_objects(annotations, train_percentage=0.8):
@@ -183,7 +177,7 @@ def split_objects(annotations, train_percentage=0.8):
     """
     # training data = [ann_objs1, ann_objs2....]
     
-    split = int(train_percentage*len(annotations))
+    split = int(train_percentage * len(annotations))
     
     annotations_train = annotations[:split]
     annotations_val = annotations[split:]
@@ -207,7 +201,7 @@ def compute_accuracy(model, X, T):
     correct = 0
     total = 0
     for idx, x in enumerate(X):
-        h_codes = model.predict(x)  # [2,3,4,6]
+        h_codes = model.predict(x)
         for j, h_code in enumerate(h_codes):
             if h_code == T[idx][j]:
                 correct += 1

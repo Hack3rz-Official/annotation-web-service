@@ -1,7 +1,8 @@
 import os
 from src.util.SHModelUtils import SHModel
 from src.model.model import Model
-
+import logging
+logger = logging.getLogger('waitress')
 
 def get_model_path(lang_name):
     """Gets the path of a model based on its programming language
@@ -12,7 +13,7 @@ def get_model_path(lang_name):
     Returns:
         Path of requested model
     """
-    return F"{lang_name}_{os.environ.get('MODEL_NAME')}.pt"
+    return F"{lang_name.lower()}_{os.environ.get('MODEL_NAME')}.pt"
 
 
 def from_db_model_to_sh_model(db_model, lang_name):
@@ -26,14 +27,14 @@ def from_db_model_to_sh_model(db_model, lang_name):
         SHModel of a specific language
     """
     if db_model:
-        print(f"[SHModel] Newest Model loaded from DB with createdTime {db_model.createdTime}", flush=True)
+        logger.debug(f"[SHModel] Newest Model loaded from DB with createdTime {db_model.createdTime}")
         with open(get_model_path(lang_name), "wb") as file:
             model_file = db_model.file.read()
             file.write(model_file)
     else:
-        print("[SHModel] No model found in DB, creating new model", flush=True)
+        logger.debug("[SHModel] No model found in DB, creating new model")
 
-    return SHModel(lang_name, os.environ.get('MODEL_NAME'))
+    return SHModel(lang_name.lower(), os.environ.get('MODEL_NAME'))
 
 
 def from_best_sh_model_to_db_model(lang_name, accuracy):
@@ -46,7 +47,7 @@ def from_best_sh_model_to_db_model(lang_name, accuracy):
     Returns:
         An object of class Model which is the representation of an SHModel for the database annotation called models.
     """
-    print("[TRAIN] New Model saved from directory to DB ", flush=True)
+    logger.debug("[TRAIN] New Model saved from directory to DB ")
     model = Model(language=lang_name.upper(), accuracy=accuracy)
     with open(get_model_path(lang_name), "rb") as binary_file:
         model.file.put(binary_file)

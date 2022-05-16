@@ -38,7 +38,9 @@ class AnnotationRepository:
             None, updates the field trainedTime on the used training data on the db such that it won´t be used
             for future training processes and thus prevent a potential overfit.
         """
-        annotations.update(trainedTime=datetime.datetime.now())
+        for annotation in annotations:
+            annotation.trainedTime=datetime.datetime.now()
+            annotation.save()
 
     @staticmethod
     def update_validated_time(annotations):
@@ -51,4 +53,6 @@ class AnnotationRepository:
             None, updates the field validatedTime on the used validation data on the db such that it can be 
             fetched and used for validating a future model.
         """
-        annotations.update(validatedTime=datetime.datetime.now())
+        for annotation in annotations:
+            annotation.validatedTime=datetime.datetime.now()
+            annotation.save()
