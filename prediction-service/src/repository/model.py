@@ -95,4 +95,4 @@ class ModelRepository:
         :param lang_name: the language
         :return: Model: the model
         """
-        return Model.objects(language=lang_name).order_by('-createdTime').first()
+        return Model.objects(language=lang_name.upper()).order_by('-createdTime').first()

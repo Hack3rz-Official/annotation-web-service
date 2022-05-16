@@ -8,12 +8,17 @@ import config as config
 from src.service.training import train_models
 from src import blueprint as api_v1
 
+import logging
+logging.basicConfig()
+logger = logging.getLogger('waitress')
+logger.setLevel(logging.DEBUG)
+    
 def training_service():
-    print("Training Service is alive!", flush=True)
+    logger.debug("Training Service is alive!")
     train_models()
 
 sched = BackgroundScheduler(daemon=True)
-sched.add_job(training_service, 'interval', minutes=5)
+#sched.add_job(training_service, 'interval', minutes=5)
 sched.start()
 
 def create_app():
@@ -36,6 +41,8 @@ def create_app():
 
     # Register API
     app.register_blueprint(api_v1)
+        
+    logger.info("Training Service started successfully!")
     
     return app
 

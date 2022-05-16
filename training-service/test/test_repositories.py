@@ -1,6 +1,7 @@
 from hack3rz_test import Hack3rzTest
 from src.repository.annotation import AnnotationRepository
 import time
+from src.service.training import split_objects
 
 annotation_repository = AnnotationRepository()
 
@@ -25,7 +26,7 @@ class RepositoriesTest(Hack3rzTest):
         lang_name = "python3"
         training_data = annotation_repository.find_data_to_train_with(lang_name)
         self.assertEqual(len(training_data), 10)
-        annotation_repository.update_trained_time(training_data)
+        annotation_repository.update_trained_time(training_data)  
         training_data = annotation_repository.find_data_to_train_with(lang_name)
         self.assertEqual(len(training_data), 0)
 
@@ -49,17 +50,35 @@ class RepositoriesTest(Hack3rzTest):
         """
         
         lang_name = "python3"
+        training_data = annotation_repository.find_data_to_train_with(lang_name)
         validation_data = annotation_repository.find_validation_data(lang_name)
+
         # should be an empty array since per default no validation data is on the aws data base
+        self.assertEqual(len(training_data), 10)
         self.assertEqual(len(validation_data), 0)
 
         # fetch training data objects (10) and mark them as validation data
-        validation_data = annotation_repository.find_data_to_train_with(lang_name)
-        annotation_repository.update_validated_time(validation_data)
+        annotation_repository.update_validated_time(training_data)
         validation_data = annotation_repository.find_validation_data(lang_name)
-        self.assertEqual(len(validation_data),10)
-
-
+        self.assertEqual(len(validation_data), len(training_data))
+        
+    
+    def test_annotation_update_trained_time_and_validation_time(self):
+        lang_name = "python3"
+        training_data = annotation_repository.find_data_to_train_with(lang_name)
+        annotations_train, annotations_val = split_objects(training_data)
+        
+        self.assertEqual(len(annotations_train), 8)
+        self.assertEqual(len(annotations_val), 2)
+        
+        annotation_repository.update_trained_time(annotations_train) 
+        annotation_repository.update_validated_time(annotations_val) 
+         
+        training_data = annotation_repository.find_data_to_train_with(lang_name)
+        validation_data = annotation_repository.find_validation_data(lang_name)
+        self.assertEqual(len(training_data), 0)
+        self.assertEqual(len(validation_data), 2)
+        
 
     def test_model_find_best_model(self):
         """Tests if find_best_model() is actually returning the desired model which is in this test case the model with the accuracy of
