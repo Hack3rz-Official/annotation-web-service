@@ -42,13 +42,12 @@ class RepositoriesTest(Hack3rzTest):
 
 
     def test_annotation_update_validated_time(self):
-        """Tests if find_validation_data() returns validastion data for correct number of entries for the "python3" language.
+        """Tests if find_validation_data() returns validation data for correct number of entries for the "python3" language.
         To do so, we first need to flag some data on the aws_test db as validation data. Additionally, update_validated_time() is tested indirectly. When update_validated_time() is executed successfully, the 
         fetched entries will be marked with a timestamp. This implies when trying to fetch the data again the return value must
-        be 10 since we always want to validate on a global set of validation data (in contrast to the find_data_to_train_with() function)
+        be 10 since we always want to validate on a global set of validation data (in contrast to the find_data_to_train_with() function).
         
         """
-        
         lang_name = "python3"
         training_data = annotation_repository.find_data_to_train_with(lang_name)
         validation_data = annotation_repository.find_validation_data(lang_name)
@@ -64,6 +63,14 @@ class RepositoriesTest(Hack3rzTest):
         
     
     def test_annotation_update_trained_time_and_validation_time(self):
+        """Tests if the update functions of the annotation entries are working simultanously & successfully. Since the function find_data_to_train_with() 
+        fetches an array with 10 annotation objects and the split_objects() splits the array into two arrays, annotations_train shoud have length 8 and 
+        annotations_val shoud have length 2. Furthermore after updating their trainedTime or validatedTime field the find functions should return 0 for 
+        the training_data array and 2 for the validation_data. This design is chosen because we want always to validate our models on the biggest possible
+        validation set and therefore the validation set will grow with the number of entries in our db while the training data is always depending on the 
+        MIN_BATCH_SIZE variable. 
+
+        """
         lang_name = "python3"
         training_data = annotation_repository.find_data_to_train_with(lang_name)
         annotations_train, annotations_val = split_objects(training_data)

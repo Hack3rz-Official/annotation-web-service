@@ -71,7 +71,7 @@ def improve_model(annotations_train, annotations_val, lang_name):
     """Fetches best model respectively most recent model from db and converts the db file into SHModel. Then it splits X & T in training, 
     validation and test data. The accuracy is computed before (with validation set) & after (with test set) training the fetched model.
     If accuracy of the fetched model is higher after training than the current used model the new model will be saved to the current directory 
-    such that the old model will be overwritten.
+    such that the old model will be overwritten. Additionally, the training and validation data are updated with a timestamp.
     
     Args: 
         Array with lexing tokens (training data) X, array with highlighting tokens (targets) T, string with language name lang_name,
@@ -127,7 +127,8 @@ def improve_model(annotations_train, annotations_val, lang_name):
 
 def train(model, X_train, T_train, epochs=10):
     """Trains the model based on a number on epochs. Before the start of the training process, the model will be set into the finetuning mode.
-    Training data will be shuffled before the start of the process.
+    Training data will be shuffled before the start of the process. There will be an early stopping of the training process if the average loss of the current epoch is higher than the average 
+    loss of the previous epoch. 
     
     Args:
         An SHModel, two arrays which contain training data and targets, number of epochs (default is 10).
