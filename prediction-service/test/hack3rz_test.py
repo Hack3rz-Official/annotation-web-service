@@ -1,6 +1,4 @@
 #!/usr/bin/env python3
-from importlib import reload
-
 from flask_mongoengine import MongoEngine
 from unittest import TestCase, mock
 import os
@@ -20,12 +18,7 @@ class Hack3rzTest(TestCase):
         warnings.simplefilter('ignore', category=DeprecationWarning)
         
         self.env_patcher = mock.patch.dict(os.environ, {
-            "MONGO_USERNAME": "hack3rz",
-            "MONGO_PASSWORD": "palm_tree_poppin_out_the_powder_blue_sky",
-            "MONGO_DATABASE_NAME": "aws_test",
-            "MONGO_PORT": "27017",
-            "MONGO_HOST": "localhost",
-            "MONGO_AUTH_DATABASE": "admin",
+            "DB_CONNECTION_STRING": "mongodb://hack3rz:palm_tree_poppin_out_the_powder_blue_sky@localhost:27017/aws_test?authSource=admin",
             "MIN_TRAINING_BATCH_SIZE": "100",
             "MODEL_NAME": "test_best"
         }, clear=True)

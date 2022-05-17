@@ -1,6 +1,6 @@
 import os
 from flask import Flask
-from flask_mongoengine import MongoEngine
+from mongoengine import connect
 from flask_cors import CORS
 from apscheduler.schedulers.background import BackgroundScheduler
 
@@ -28,16 +28,7 @@ def create_app():
     CORS(app, resources={r"/api/*": {"origins": "http://localhost:" + os.environ.get('SWAGGER_UI_PORT', "0"), "send_wildcard": "False"}})
 
     # Connect to database
-    app.config["MONGODB_SETTINGS"] = {
-        'db': os.environ.get('MONGO_DATABASE_NAME'),
-        'host': os.environ.get('MONGO_HOST', "test"),
-        'port': int(os.environ.get('MONGO_PORT', 0)),
-        'username': os.environ.get('MONGO_USERNAME'),
-        'password': os.environ.get('MONGO_PASSWORD'),
-        'authSource': os.environ.get('MONGO_AUTH_DATABASE')
-    }
-    db = MongoEngine()
-    db.init_app(app)
+    connect(host=os.environ.get('DB_CONNECTION_STRING'))
 
     # Register API
     app.register_blueprint(api_v1)
