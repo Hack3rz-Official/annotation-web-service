@@ -109,15 +109,14 @@ class TrainingServiceTest(Hack3rzTest):
             
     @patch('src.util.SHModelUtils.SHModel.finetune_on')
     def test_train_early_stopping(self, finetune_on_mock):
-        """Tests the training process. Mocks a return values of the finetune_on() with the array [1,0.9,0.8,0.7,0.6,0.5,0.4,0.3,0.25,0.25]  .
-        Since its difficult to test the actual training process, we count the number of finetune_on calls 
-        the model is generating during the process. The seeked number should be 10 since after ten iterations the delta should be 0 and . If the function is called
-        10 times then the test was successful. 
+        """Tests the training process which must end in an early stopping due to entering the break out condition.  The Mocks return values of the finetune_on() function.
+        Since its difficult to test the actual training process, we count the number of finetune_on calls  the model is generating during the process. 
+        The seeked number should be a_len*5 (40) since after this amount of iterations the average loss of the current epoch equals the average loss of the previous epoch.
 
         Args:
-            finetune_mock which is an array of ten floats is used for the above explained purposes.
-            best_sh_model which is a newly instantiated SHModel, a training set with training points and targets and a fixed number of 20
-            epochs (default is 10).
+            finetune_mock which is an array of 10*a_len values (80) floats is used for the above explained purposes.
+            best_sh_model which is a newly instantiated SHModel, a training set with training points and targets and a fixed number 
+            of epochs (10).
 
         Returns:
             Array with losses (if assigned)
@@ -139,11 +138,12 @@ class TrainingServiceTest(Hack3rzTest):
 
     @patch('src.util.SHModelUtils.SHModel.finetune_on')
     def test_train_no_early_stopping(self, finetune_on_mock):
-        """Tests the training process. Mocks a return values of the finetune_on() with the array [1,0.9,0.8,0.7,0.6,0.5,0.4,0.3,0.25,0.25]  .
+        """Tests the training process. In contrast to the above test, the train process should not be terminated by the early stopping but by reaching 
+        the maximum amount of epochs (10).
         Since its difficult to test the actual training process, we count the number of finetune_on calls 
-        the model is generating during the process. The seeked number should be 10 since after ten iterations the delta should be 0 and . If the function is called
-        10 times then the test was successful. 
-
+        the model is generating during the process. The seeked number should be 10*a_len (80) since after iterating through all the epochs the number of function calls 
+        must be 80. 
+        
         Args:
             finetune_mock which is an array of ten floats is used for the above explained purposes.
             best_sh_model which is a newly instantiated SHModel, a training set with training points and targets and a fixed number of 20
