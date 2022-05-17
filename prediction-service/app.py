@@ -1,8 +1,8 @@
 import os
 from flask import Flask
-from flask_mongoengine import MongoEngine
 from src.repository.model import ModelRepository
 from src import blueprint as api_v1
+from mongoengine import connect
 
 import logging
 logging.basicConfig()
@@ -14,16 +14,7 @@ def create_app():
     app = Flask(__name__)
 
     # Connect to database
-    app.config["MONGODB_SETTINGS"] = {
-        'db': os.environ.get('MONGO_DATABASE_NAME'),
-        'host': os.environ.get('MONGO_HOST', "test"),
-        'port': int(os.environ.get('MONGO_PORT', 0)),
-        'username': os.environ.get('MONGO_USERNAME'),
-        'password': os.environ.get('MONGO_PASSWORD'),
-        'authSource': os.environ.get('MONGO_AUTH_DATABASE')
-    }
-    db = MongoEngine()
-    db.init_app(app)
+    connect(host=os.environ.get('DB_CONNECTION_STRING'))
 
     # Register API
     app.register_blueprint(api_v1)
