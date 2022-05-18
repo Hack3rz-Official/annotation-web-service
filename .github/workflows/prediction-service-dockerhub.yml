@@ -7,8 +7,6 @@ on:
       - 'v*'
     paths:
       - 'prediction-service/**'
-  pull_request:
-    types: [opened, synchronize, reopened]
 jobs:
   build:
     name: DockerHub Image
@@ -19,6 +17,11 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v2
+      - name: Docker meta
+        id: meta
+        uses: docker/metadata-action@v4
+        with:
+          images: ${{ secrets.DOCKER_HUB_USERNAME }}/prediction-service
       - name: Login to Docker Hub
         uses: docker/login-action@v1
         with:
@@ -32,6 +35,6 @@ jobs:
           context: prediction-service/
           file: prediction-service/Dockerfile
           push: true
-          tags: ${{ secrets.DOCKER_HUB_USERNAME }}/prediction-service:latest
+          tags: ${{ steps.meta.outputs.tags }}
           cache-from: type=registry,ref=${{ secrets.DOCKER_HUB_USERNAME }}/prediction-service:buildcache
           cache-to: type=registry,ref=${{ secrets.DOCKER_HUB_USERNAME }}/prediction-service:buildcache,mode=max
