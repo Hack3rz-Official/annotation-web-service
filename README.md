@@ -64,6 +64,36 @@ When the container is launched initially a new database and user are created wit
 Make sure the mongodb container is running. Connect to the CLI of the container and use the following command to access the DB:
 `mongo --username "$MONGO_USERNAME" --password "$MONGO_PASSWORD"`
 
+### Deploy to azure
+Currently not possible to automate with github action because our student subscription via UZH doesn't have the privilege to create a service account which is required for automating azure deployments. Please make sure your azure account is an owner of the Azure's resource group called hack3rz and you have installed Azure CLI on your machine.
+```bash
+# Make sure docker desktop is running
+az login # if not already done
+az acr login --name hack3rzacr # if not already done
+docker-compose -f docker-compose-azure.yml build
+docker-compose -f docker-compose-azure.yml push
+docker login azure # if not already done
+docker context create aci hack3rzacicontext # if not already done
+docker context use hack3rzacicontext
+docker compose -f docker-compose-azure.yml down
+docker compose -f docker-compose-azure.yml up
+docker context use default
+```
+
+The public domain name is ```hack3rz-aws.switzerlandnorth.azurecontainer.io```. The demo is accessible via [http://hack3rz-aws.switzerlandnorth.azurecontainer.io:8080](http://hack3rz-aws.switzerlandnorth.azurecontainer.io:8080)
+
+A test request can be made with the following command:
+```
+curl -X 'POST' \
+  'http://hack3rz-aws.switzerlandnorth.azurecontainer.io:8081/api/v1/highlight' \
+  -H 'accept: */*' \
+  -H 'Content-Type: application/json' \
+  -d '{
+  "code": "public static void main(String args[]){ System.out.println(\"testing\") }",
+  "language": "java"
+}'
+```
+
 ## Organization
 
  
@@ -108,7 +138,6 @@ The hotfix branch will be created if we encounter issues after a production rele
 - Prefix: `hotfix/`
 - Name: vX.X.X, the version to be fixed
 - e.g.: `hotfix/v1.2.3`
-
 
 ### Authors
 

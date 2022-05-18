@@ -1,5 +1,8 @@
 FROM node:lts-alpine
 
+ARG VITE_HIGHLIGHT_URL                     
+ENV VITE_HIGHLIGHT_URL=$VITE_HIGHLIGHT_URL
+
 # install simple http server for serving static content
 RUN npm install -g http-server
 
