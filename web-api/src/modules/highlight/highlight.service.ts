@@ -22,7 +22,7 @@ export class HighlightService {
    * Additionally, the different steps are timed for debugging purposes.
    *  @param {HighlightRequestDto} highlightRequestDto The request dto containing the language and the code to be highlighted.
    */
-  async highlight(highlightRequestDto: HighlightRequestDto): Promise<any> {
+  async highlight(highlightRequestDto: HighlightRequestDto): Promise<string> {
     this.logger.debug(`lex.url=${this.config.get('lex.url')}`);
 
     let start_time = new Date().getTime();
