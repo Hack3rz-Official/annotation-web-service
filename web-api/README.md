@@ -3,6 +3,7 @@
 The Web API service acts as a gateway and is the central entry point of the Annotation Web Service through which each user request is processed.
 It communicates first with the Annotation Service and consecutively with the Prediction Service before it returns a styled HTML response to the client.
 
+A more detailed documentation can be found in [the wiki](https://github.com/Hack3rz-Official/annotation-web-service/wiki/Web-API).
 
 ## **REST API Documentation**
 
