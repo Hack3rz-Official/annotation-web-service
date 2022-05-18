@@ -15,6 +15,13 @@ export class HighlightService {
     private htmlGeneratorService: HtmlGeneratorService,
   ) {}
 
+  /**
+   * This method calls the lexing service and maps the returned tokens,
+   * it then uses the tokens to make the prediction service call to predict the
+   * h code values based on the tokens.
+   * Additionally, the different steps are timed for debugging purposes.
+   *  @param {HighlightRequestDto} highlightRequestDto The request dto containing the language and the code to be highlighted.
+   */
   async highlight(highlightRequestDto: HighlightRequestDto): Promise<any> {
     this.logger.debug(`lex.url=${this.config.get('lex.url')}`);
 

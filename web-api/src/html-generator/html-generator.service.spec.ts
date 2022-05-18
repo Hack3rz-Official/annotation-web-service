@@ -18,6 +18,7 @@ describe('HtmlGeneratorService', () => {
     service = module.get<HtmlGeneratorService>(HtmlGeneratorService);
   });
 
+  /** Test if the service is defined */
   it('should be defined', () => {
     expect(service).toBeDefined();
   });
