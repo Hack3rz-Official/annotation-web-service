@@ -7,8 +7,6 @@ on:
       - 'v*'
     paths:
       - 'annotation-service/**'
-  pull_request:
-    types: [opened, synchronize, reopened]
 jobs:
   build:
     name: DockerHub Image
