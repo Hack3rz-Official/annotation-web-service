@@ -17,6 +17,10 @@ describe('HighlightService', () => {
   let htmlGeneratorService: HtmlGeneratorService;
 
   beforeEach(async () => {
+    /**
+     * This is set up before running each test.
+     * It is used to create the mock data / post request.
+     */
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         HighlightService,

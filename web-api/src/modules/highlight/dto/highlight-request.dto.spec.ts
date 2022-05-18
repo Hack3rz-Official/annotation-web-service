@@ -6,6 +6,10 @@ describe('HighlightRequestDto', () => {
     expect(new HighlightRequestDto()).toBeDefined();
   });
 
+  /**
+   * This test is used to make sure that the different validation requirements
+   * specified for the highlight request dto are met (i.e., error messages in `expected`).
+   */
   it('should validate the HighlightRequestDto definition', async () => {
     const target: ValidationPipe = new ValidationPipe({
       transform: true,
@@ -16,6 +20,7 @@ describe('HighlightRequestDto', () => {
       metatype: HighlightRequestDto,
       data: '{}',
     };
+    // These error messages should appear when trying to use a completely invalid dto.
     const expected: string[] = [
       'code must be a string',
       'code should not be empty',
