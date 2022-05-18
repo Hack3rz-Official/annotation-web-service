@@ -16,7 +16,7 @@ export class HtmlGeneratorService {
     highlightRequestDto: HighlightRequestDto,
     lexingData: Array<any>,
     hCodeValues: Array<any>,
-  ) {
+  ): string {
     let out = '';
 
     for (const [index, token] of lexingData.entries()) {
