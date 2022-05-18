@@ -1,148 +1,148 @@
-version: '3.8'
+version: "3.8"
 
 services:
+    demo-frontend:
+        build:
+            context: ./demo-frontend
+            args:
+                - VITE_HIGHLIGHT_URL=http://localhost:${WEB_API_PORT}/api/v1/highlight
+        container_name: "demo-frontend"
+        image: demo-frontend:latest
+        env_file:
+            - .env
+        ports:
+            - "${DEMO_FRONTEND_PORT}:${DEMO_FRONTEND_PORT}"
+        depends_on:
+            - web-api
+        networks:
+            - aws-network
 
-  demo-frontend:
-    build: ./demo-frontend
-    container_name: "demo-frontend"
-    image: demo-frontend:latest
-    env_file:
-      - .env
-    environment:
-      - HIGHLIGHT_URL=http://localhost:${WEB_API_PORT}/api/v1/highlight
-    ports: 
-      - "${DEMO_FRONTEND_PORT}:${DEMO_FRONTEND_PORT}"
-    depends_on:
-      - web-api
-    networks:
-      - aws-network
+    web-api:
+        build: ./web-api
+        container_name: "web-api"
+        image: web-api:latest
+        command: npm run start:prod
+        env_file:
+            - .env
+        environment:
+            - LEX_URL=http://nginx:${NGINX_PORT}/api/v1/annotation
+            - PREDICT_URL=http://nginx:${NGINX_PORT}/api/v1/prediction
+        ports:
+            - "${WEB_API_PORT}:${WEB_API_PORT}"
+        depends_on:
+            - nginx
+            - annotation
+        networks:
+            - aws-network
+        restart: unless-stopped
 
-  web-api:
-    build: ./web-api
-    container_name: "web-api"
-    image: web-api:latest
-    command: npm run start:prod
-    env_file:
-        - .env
-    environment:
-      - LEX_URL=http://nginx:${NGINX_PORT}/api/v1/annotation
-      - PREDICT_URL=http://nginx:${NGINX_PORT}/api/v1/prediction
-    ports:
-      - "${WEB_API_PORT}:${WEB_API_PORT}"
-    depends_on:
-      - nginx
-      - annotation
-    networks:
-      - aws-network
-    restart: unless-stopped
+    swagger-ui:
+        container_name: "swagger-ui"
+        image: swaggerapi/swagger-ui
+        volumes:
+            - ./web-api/openapi.json:/usr/share/nginx/html/web-api.json
+            - ./annotation-service/openapi.json:/usr/share/nginx/html/annotation-service.json
+            - ./prediction-service/openapi.json:/usr/share/nginx/html/prediction-service.json
+            - ./training-service/openapi.json:/usr/share/nginx/html/training-service.json
+        env_file:
+            - .env
+        environment:
+            URLS: '[
+                { url: "web-api.json", name: "Web API" },
+                { url: "annotation-service.json", name: "Annotation Service" },
+                { url: "prediction-service.json", name: "Prediction Service" },
+                { url: "training-service.json", name: "Training Service" },
+                ]'
+        ports:
+            - "${SWAGGER_UI_PORT}:8080"
+        depends_on:
+            - web-api
+            - annotation
+            - prediction
+            - training
+        networks:
+            - aws-network
+        restart: always
 
-  swagger-ui:
-    container_name: "swagger-ui"
-    image: swaggerapi/swagger-ui
-    volumes:      
-      - ./web-api/openapi.json:/usr/share/nginx/html/web-api.json
-      - ./annotation-service/openapi.json:/usr/share/nginx/html/annotation-service.json
-      - ./prediction-service/openapi.json:/usr/share/nginx/html/prediction-service.json
-      - ./training-service/openapi.json:/usr/share/nginx/html/training-service.json
-    env_file:
-        - .env
-    environment:
-      URLS: "[
-          { url: \"web-api.json\", name: \"Web API\" },
-          { url: \"annotation-service.json\", name: \"Annotation Service\" },
-          { url: \"prediction-service.json\", name: \"Prediction Service\" },
-          { url: \"training-service.json\", name: \"Training Service\" },
-        ]"
-    ports:
-      - "${SWAGGER_UI_PORT}:8080"
-    depends_on:
-      - web-api
-      - annotation
-      - prediction
-      - training
-    networks:
-      - aws-network
-    restart: always
+    annotation:
+        build: ./annotation-service
+        # container_name: "annotation-service"
+        image: annotation-service:latest
+        env_file:
+            - .env
+        expose:
+            - "${ANNOTATION_SERVICE_PORT}"
+        depends_on:
+            - prediction
+            - mongodb
+        networks:
+            - aws-network
+        restart: unless-stopped
 
-  annotation:
-    build: ./annotation-service
-    # container_name: "annotation-service"
-    image: annotation-service:latest
-    env_file:
-      - .env
-    expose:
-      - "${ANNOTATION_SERVICE_PORT}"
-    depends_on:
-      - prediction
-      - mongodb
-    networks:
-      - aws-network
-    restart: unless-stopped
+    prediction:
+        build: ./prediction-service
+        # container_name: "prediction-service"
+        image: prediction-service:latest
+        env_file:
+            - .env
+        expose:
+            - "${PREDICTION_SERVICE_PORT}"
+        depends_on:
+            - mongodb
+        networks:
+            - aws-network
+        restart: unless-stopped
 
-  prediction:
-    build: ./prediction-service
-    # container_name: "prediction-service"
-    image: prediction-service:latest
-    env_file:
-      - .env
-    expose:
-      - "${PREDICTION_SERVICE_PORT}"
-    depends_on:
-      - mongodb
-    networks:
-      - aws-network
-    restart: unless-stopped
+    training:
+        build: ./training-service
+        container_name: "training-service"
+        image: training-service:latest
+        env_file:
+            - .env
+        ports:
+            - "${TRAINING_SERVICE_PORT}:${TRAINING_SERVICE_PORT}"
+        depends_on:
+            - mongodb
+        networks:
+            - aws-network
+        restart: unless-stopped
 
-  training:
-    build: ./training-service
-    container_name: "training-service"
-    image: training-service:latest
-    env_file:
-      - .env
-    ports:
-      - "${TRAINING_SERVICE_PORT}:${TRAINING_SERVICE_PORT}"
-    depends_on:
-      - mongodb
-    networks:
-      - aws-network
-    restart: unless-stopped
+    nginx:
+        image: nginx:latest
+        volumes:
+            - ./nginx.conf.template:/etc/nginx/templates/nginx.conf.template
+        env_file:
+            - .env
+        environment:
+            - NGINX_ENVSUBST_OUTPUT_DIR=/etc/nginx
+        ports:
+            - "${NGINX_PORT}:${NGINX_PORT}"
+        depends_on:
+            - annotation
+            - prediction
+        networks:
+            - aws-network
+        restart: unless-stopped
 
-  nginx:
-    image: nginx:latest
-    volumes:
-      - ./nginx.conf.template:/etc/nginx/templates/nginx.conf.template
-    env_file:
-      - .env
-    environment:
-      - NGINX_ENVSUBST_OUTPUT_DIR=/etc/nginx
-    ports:
-      - "${NGINX_PORT}:${NGINX_PORT}"
-    depends_on:
-      - annotation
-      - prediction
-    networks:
-      - aws-network
-    restart: unless-stopped
-    
-  mongodb:
-    image: mongo:5.0.6
-    container_name: MongoDB
-    volumes:
-      - ./data:/data/db
-      - ./mongo-init.sh:/docker-entrypoint-initdb.d/mongo-init.sh:ro
-    env_file:
-      - .env
-    environment:
-      - PUID=1000
-      - PGID=1000
-      - MONGO_INITDB_ROOT_USERNAME=admin
-      - MONGO_INITDB_ROOT_PASSWORD=${MONGO_PASSWORD}
-    # since this DB is also used during test runs in GitHub CI, port is exposed on host machine
-    ports:
-      - "27017:${MONGO_PORT}"
-    networks:
-      - aws-network
-    restart: unless-stopped
+    mongodb:
+        image: mongo:5.0.6
+        container_name: MongoDB
+        volumes:
+            - ./data:/data/db
+            - ./mongo-init.sh:/docker-entrypoint-initdb.d/mongo-init.sh:ro
+        env_file:
+            - .env
+        environment:
+            - PUID=1000
+            - PGID=1000
+            - MONGO_INITDB_ROOT_USERNAME=admin
+            - MONGO_INITDB_ROOT_PASSWORD=${MONGO_PASSWORD}
+        # since this DB is also used during test runs in GitHub CI, port is exposed on host machine
+        ports:
+            - "27017:${MONGO_PORT}"
+        networks:
+            - aws-network
+        restart: unless-stopped
 
 networks:
-  aws-network:
+    aws-network:
