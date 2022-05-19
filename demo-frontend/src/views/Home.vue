@@ -4,13 +4,16 @@ import FileDetailModalVue from "../components/FileDetailModal.vue";
 import LoadRepoFiles from "../components/LoadRepoFiles.vue";
 import LoadBenchmarkFilesVue from "../components/LoadBenchmarkFiles.vue";
 import FilePreview from "../components/FilePreview.vue";
-import Statistics from "../components/Statistics.vue"
-import Settings from "../components/Settings.vue"
+import FilePreviewCoverVue from "../components/FilePreviewCover.vue";
+import Statistics from "../components/Statistics.vue";
+import Settings from "../components/Settings.vue";
 import { useFilesStore } from "../stores/filesStore";
 import { useSettingsStore } from "../stores/settingsStore";
+import { useLanguagesStore } from "../stores/languagesStore";
 
 const filesStore = useFilesStore();
 const settingsStore = useSettingsStore();
+const languagesStore = useLanguagesStore();
 
 const activeTab = ref("load-repo-files");
 
@@ -22,7 +25,7 @@ function setActiveTab(tabName) {
 <template>
   <main class="container mx-auto px-3 gap-y-3">
     <!-- FileDetailModal -->
-    <file-detail-modal-vue v-if="!settingsStore.performanceMode"></file-detail-modal-vue>
+    <file-detail-modal-vue></file-detail-modal-vue>
 
     <div class="tabs">
       <a
@@ -33,7 +36,9 @@ function setActiveTab(tabName) {
       >
       <a
         class="tab tab-lifted"
-        :class="{ '!bg-base-200 tab-active': activeTab == 'load-benchmark-files' }"
+        :class="{
+          '!bg-base-200 tab-active': activeTab == 'load-benchmark-files',
+        }"
         @click="setActiveTab('load-benchmark-files')"
         >Load Benchmark Files</a
       >
@@ -69,12 +74,27 @@ function setActiveTab(tabName) {
     >
       <statistics></statistics>
     </div>
-     <div
+    <div
       v-show="activeTab == 'settings'"
       class="card w-full bg-base-200 shadow-xl rounded-t-none"
     >
       <settings></settings>
     </div>
+
+    <!-- Filter
+    <div class="flex mt-4">
+      <p>Filter:</p>
+      <div
+        v-for="language of languagesStore.languages"
+        :key="language.technical"
+        class="form-control w-max"
+      >
+        <label class="label cursor-pointer justify-start">
+          <span class="label-text mr-2">{{ language.humanReadable }}</span>
+          <input type="checkbox" v-model="language.filterActive" class="checkbox" />
+        </label>
+      </div>
+    </div> -->
 
     <!-- Action Buttons -->
     <div class="my-4">
@@ -93,15 +113,44 @@ function setActiveTab(tabName) {
     </div>
 
     <!-- File Previews for each loaded file -->
-    <div v-if="!settingsStore.performanceMode" class="flex flex-wrap gap-3 relative">
-      <!-- eslint-disable-next-line vue/no-v-for-template-key -->
-      <template v-for="file in filesStore.files" :key="file.uuid">
-        <file-preview :file="file"></file-preview>
-      </template>
+    <div class="flex gap-x-52" :class="{'flex-col': !settingsStore.performanceMode}">
+      <div
+        v-for="language in languagesStore.languages"
+        :key="language.technical"
+        class="relative my-3"
+        v-show="
+          filesStore.filterFetchedFilesByLanguage(language.extension).length > 0
+        "
+      >
+        <file-preview-cover-vue
+          :language="language"
+          :files="filesStore.filterFetchedFilesByLanguage(language.extension)"
+        ></file-preview-cover-vue>
+        <div
+          v-if="!settingsStore.performanceMode"
+          class="
+            file-preview-container
+            flex flex-row-reverse
+            gap-3
+            relative
+            overflow-x-scroll
+            w-min
+            max-w-full
+          "
+        >
+          <!-- eslint-disable-next-line vue/no-v-for-template-key -->
+          <template v-for="file in filesStore.filterFetchedFilesByLanguage(language.extension)" :key="file.uuid">
+            <file-preview :file="file"></file-preview>
+          </template>
+        </div>
+      </div>
     </div>
   </main>
 </template>
 
 <style scoped lang="scss">
+.file-preview-container {
+  padding-right: 100px;
+}
 </style>
 

@@ -55,7 +55,6 @@ export default class File {
     axiosDefault
       .get(`${File.jsDelivrBaseUrl}${this.identifier}`)
       .then((response) => {
-        // console.log(response);
         this.rawCode = response.data;
         this.size = response.data.length;
         this.loc = this.computeLoc();
@@ -68,48 +67,52 @@ export default class File {
   }
 
   highlight() {
-    //   console.log("requested highlighting for file", file);
     this.status = "loading";
     this.request.startTimestamp = Date.now();
     let data = {
       code: this.rawCode,
       language: this.languageLong,
     };
-    let outputElem = null;
-    if (!settingsStore.performanceMode) {
-      outputElem = document.getElementById(this.uuid);
-    }
-    //   console.log(outputElem);
-
+    
     axiosLimited
       .post(import.meta.env.VITE_HIGHLIGHT_URL, data)
       .then((response) => {
-        if (!settingsStore.performanceMode) {
-          let newElement = document
-            .createRange()
-            .createContextualFragment(response.data);
-          outputElem.innerHTML = null;
-          outputElem.appendChild(newElement);
-        }
-        //   console.log(newElement);
-        //   console.log(outputElem);
         this.highlightedCode = response.data;
         this.status = "highlighted";
         this.dirty = false;
         this.request.endTimestamp = Date.now();
         this.request.duration = response.responseTime;
-        console.log("actual response time: ", response.responseTime);
+        if (!settingsStore.performanceMode) {
+          this.displayHighlightedCard()
+        }
+        if (!settingsStore.performanceMode) {
+          console.log("actual response time: ", response.responseTime);
+        }
       })
       .catch((error) => {
         console.log(error);
-        if (!settingsStore.performanceMode) {
-          outputElem.innerHTML = "Error in Highlighting Service";
-        }
         this.status = "failed";
         this.request.endTimestamp = Date.now();
         this.request.duration = response.responseTime;
-        console.log("actual response time: ", response.responseTime);
+        if (!settingsStore.performanceMode) {
+          console.log("actual response time: ", response.responseTime);
+        }
       });
+  }
+
+  async displayHighlightedCard() {
+    let outputElem = document.getElementById(this.uuid);
+    console.log(outputElem)
+    if (!outputElem) {
+      console.log(`No element with id ${this.uuid} found.`);
+      return;
+    }
+    let newElement = document
+      .createRange()
+      .createContextualFragment(this.highlightedCode);
+    outputElem.innerHTML = null;
+    outputElem.appendChild(newElement);
+    console.log(outputElem)
   }
 
   getFilenameShortened() {

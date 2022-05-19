@@ -20,10 +20,12 @@ setTimeout(() => {
       let interval = setInterval(() => {
         if (settingsStore.pendingRequests < settingsStore.maxRequests) {
           settingsStore.pendingRequests++;
-          console.log(`Request sent - Pending requests: ${settingsStore.pendingRequests}`);
+          if (!settingsStore.performanceMode) {
+            console.log(`Request sent - Pending requests: ${settingsStore.pendingRequests}`);
+          }
           config.meta = config.meta || {};
           config.meta.requestStartedAt = new Date().getTime();
-          console.log({ config });
+          // console.log({ config });
           clearInterval(interval);
           resolve(config);
         }
@@ -36,14 +38,18 @@ setTimeout(() => {
     function (response) {
       settingsStore.pendingRequests = Math.max(0, settingsStore.pendingRequests - 1);
       response.responseTime = new Date().getTime() - response.config.meta.requestStartedAt;
-      console.log(`Request resolved - Pending requests: ${settingsStore.pendingRequests}`);
-      console.log({ response });
+      if (!settingsStore.performanceMode) {
+        console.log(`Request resolved - Pending requests: ${settingsStore.pendingRequests}`);
+        console.log({ response });
+      }
       return Promise.resolve(response);
     },
     function (error) {
       settingsStore.pendingRequests = Math.max(0, settingsStore.pendingRequests - 1);
       response.responseTime = new Date().getTime() - response.config.meta.requestStartedAt;
-      console.log(`Request resolved - Pending requests: ${settingsStore.pendingRequests}`);
+      if (!settingsStore.performanceMode) {
+        console.log(`Request resolved - Pending requests: ${settingsStore.pendingRequests}`);
+      }
       return Promise.reject(error);
     }
   );

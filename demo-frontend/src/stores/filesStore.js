@@ -37,6 +37,13 @@ export const useFilesStore = defineStore({
         }
       }
     },
+    highlightSelectedFiles(files) {
+      for (let file of files) {
+        if (file.status != "highlighted") {
+          file.highlight();
+        }
+      }
+    },
     filterFilesByLanguage(language) {
       if (!this.languageFilesDict || !(language in this.languageFilesDict)) {
         return [];

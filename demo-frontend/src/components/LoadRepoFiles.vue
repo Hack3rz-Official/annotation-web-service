@@ -40,7 +40,7 @@ function selectedAmountChanged(extension) {
 
 function fetchFilteredFiles(language, limit = 5) {
   let filtered = filesStore.filterFilesByLanguage(language).slice(0, limit);
-  console.log(filtered);
+  // console.log(filtered);
   for (let path of filtered) {
     filesStore.files.push(new File(githubOwner.value, githubRepo.value, path));
   }
