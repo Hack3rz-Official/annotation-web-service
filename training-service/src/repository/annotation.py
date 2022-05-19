@@ -1,5 +1,4 @@
 from src.model.annotation import Annotation
-import datetime
 
 class AnnotationRepository:
 
@@ -28,7 +27,7 @@ class AnnotationRepository:
         return Annotation.objects(__raw__={"_id.language": lang_name.upper()}, validatedTime__exists=True)
 
     @staticmethod
-    def update_trained_time(annotations):
+    def update_trained_time(annotations, time):
         """Updates the field trainedTime on an object of class Annotation with the current timestamp.
 
         Args:
@@ -39,11 +38,11 @@ class AnnotationRepository:
             for future training processes and thus prevent a potential overfit.
         """
         for annotation in annotations:
-            annotation.trainedTime=datetime.datetime.now()
+            annotation.trainedTime=time
             annotation.save()
 
     @staticmethod
-    def update_validated_time(annotations):
+    def update_validated_time(annotations, time):
         """Updates the field validatedTime on an object of class Annotation with the current timestamp.
 
         Args:
@@ -54,5 +53,5 @@ class AnnotationRepository:
             fetched and used for validating a future model.
         """
         for annotation in annotations:
-            annotation.validatedTime=datetime.datetime.now()
+            annotation.validatedTime=time
             annotation.save()

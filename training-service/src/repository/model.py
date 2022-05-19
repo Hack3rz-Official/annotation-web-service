@@ -1,6 +1,4 @@
 from src.model.model import Model
-from src.util.SHModelUtils import SHModel
-import os
 
 class ModelRepository:
 
@@ -18,5 +16,5 @@ class ModelRepository:
 
     @staticmethod
     def save(model):
-        #Saves model to db.
+        # Saves model to db.
         model.save()

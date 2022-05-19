@@ -16,6 +16,8 @@ class Model(db.Document):
     language = db.StringField(required=True, choices=supported_languages)
     createdTime = db.DateTimeField()
     accuracy = db.FloatField()
+    trainingDataAmount = db.IntField()
+    validationDataAmount = db.IntField()
     meta = {
         'collection': 'models',
         'strict': False

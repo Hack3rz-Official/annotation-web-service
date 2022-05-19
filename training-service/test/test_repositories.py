@@ -1,6 +1,7 @@
 from hack3rz_test import Hack3rzTest
 from src.repository.annotation import AnnotationRepository
 import time
+import datetime
 from src.service.training import split_objects
 
 annotation_repository = AnnotationRepository()
@@ -26,7 +27,8 @@ class RepositoriesTest(Hack3rzTest):
         lang_name = "python3"
         training_data = annotation_repository.find_data_to_train_with(lang_name)
         self.assertEqual(len(training_data), 10)
-        annotation_repository.update_trained_time(training_data)  
+        time = datetime.datetime.now()
+        annotation_repository.update_trained_time(training_data, time)  
         training_data = annotation_repository.find_data_to_train_with(lang_name)
         self.assertEqual(len(training_data), 0)
 
@@ -57,7 +59,8 @@ class RepositoriesTest(Hack3rzTest):
         self.assertEqual(len(validation_data), 0)
 
         # fetch training data objects (10) and mark them as validation data
-        annotation_repository.update_validated_time(training_data)
+        time = datetime.datetime.now()
+        annotation_repository.update_validated_time(training_data, time)
         validation_data = annotation_repository.find_validation_data(lang_name)
         self.assertEqual(len(validation_data), len(training_data))
         
@@ -78,8 +81,9 @@ class RepositoriesTest(Hack3rzTest):
         self.assertEqual(len(annotations_train), 8)
         self.assertEqual(len(annotations_val), 2)
         
-        annotation_repository.update_trained_time(annotations_train) 
-        annotation_repository.update_validated_time(annotations_val) 
+        time = datetime.datetime.now()
+        annotation_repository.update_trained_time(annotations_train, time) 
+        annotation_repository.update_validated_time(annotations_val, time) 
          
         training_data = annotation_repository.find_data_to_train_with(lang_name)
         validation_data = annotation_repository.find_validation_data(lang_name)

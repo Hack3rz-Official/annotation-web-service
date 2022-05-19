@@ -16,13 +16,15 @@ class Model(db.Document):
     language = db.StringField(required=True, choices=supported_languages)
     createdTime = db.DateTimeField()
     accuracy = db.FloatField()
+    trainingDataAmount = db.IntField()
+    validationDataAmount = db.IntField()
     meta = {
         'collection': 'models',
         'strict': False
     }
 
     def save(self, *args, **kwargs):
-        #Populates the field createdTime when triggert on an object of class Model
+        # Populates the field createdTime when triggert on an object of class Model
         if not self.createdTime:
             self.createdTime = datetime.datetime.now()
         return super(Model, self).save(*args, **kwargs)
