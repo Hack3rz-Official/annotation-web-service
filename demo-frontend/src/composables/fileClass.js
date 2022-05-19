@@ -55,7 +55,6 @@ export default class File {
     axiosDefault
       .get(`${File.jsDelivrBaseUrl}${this.identifier}`)
       .then((response) => {
-        // console.log(response);
         this.rawCode = response.data;
         this.size = response.data.length;
         this.loc = this.computeLoc();
@@ -68,7 +67,6 @@ export default class File {
   }
 
   highlight() {
-    //   console.log("requested highlighting for file", file);
     this.status = "loading";
     this.request.startTimestamp = Date.now();
     let data = {
@@ -79,7 +77,6 @@ export default class File {
     if (!settingsStore.performanceMode) {
       outputElem = document.getElementById(this.uuid);
     }
-    //   console.log(outputElem);
 
     axiosLimited
       .post(import.meta.env.VITE_HIGHLIGHT_URL, data)
@@ -91,14 +88,14 @@ export default class File {
           outputElem.innerHTML = null;
           outputElem.appendChild(newElement);
         }
-        //   console.log(newElement);
-        //   console.log(outputElem);
         this.highlightedCode = response.data;
         this.status = "highlighted";
         this.dirty = false;
         this.request.endTimestamp = Date.now();
         this.request.duration = response.responseTime;
-        console.log("actual response time: ", response.responseTime);
+        if (!settingsStore.performanceMode) {
+          console.log("actual response time: ", response.responseTime);
+        }
       })
       .catch((error) => {
         console.log(error);
@@ -108,7 +105,9 @@ export default class File {
         this.status = "failed";
         this.request.endTimestamp = Date.now();
         this.request.duration = response.responseTime;
-        console.log("actual response time: ", response.responseTime);
+        if (!settingsStore.performanceMode) {
+          console.log("actual response time: ", response.responseTime);
+        }
       });
   }
 
