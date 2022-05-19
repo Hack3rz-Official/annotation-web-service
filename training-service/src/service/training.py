@@ -2,6 +2,7 @@ from threading import Lock
 import logging
 import numpy as np
 import os
+import datetime
 from src.repository.annotation import AnnotationRepository
 from src.repository.model import ModelRepository
 import config as config
@@ -109,17 +110,22 @@ def improve_model(annotations_train, annotations_val, lang_name):
     
     # compute accuracy with the entire historic validation dataset
     new_acc = compute_accuracy(best_sh_model, X_val, T_val)
-    logger.debug(f"[TRAINING] Validated with {len(X_val)} data")
+    validation_data_amount = len(X_val)
+    logger.debug(f"[TRAINING] Validated with {validation_data_amount} data")
     
     logger.debug(f"[TRAINING] new_acc = {new_acc} and cur_acc = {cur_acc}")
     if new_acc > cur_acc:
         logger.debug("[SHModel] Persisting model to directory")
         best_sh_model.persist_model()
-        improved_db_model = from_best_sh_model_to_db_model(lang_name, new_acc)
+        training_data_amount = len(annotations_train) + (best_db_model.trainingDataAmount if best_db_model else 0)
+        improved_db_model = from_best_sh_model_to_db_model(lang_name, new_acc, training_data_amount, validation_data_amount)
         model_repository.save(improved_db_model)
+        
         logger.debug(f"[TRAINING] Flag {len(annotations_train)} as trained data and {len(annotations_val)} as validated data")
-        annotation_repository.update_trained_time(annotations_train)
-        annotation_repository.update_validated_time(annotations_val)
+        time = datetime.datetime.now()
+        annotation_repository.update_trained_time(annotations_train, time)
+        annotation_repository.update_validated_time(annotations_val, time)
+        
         return 
 
     logger.debug("[TRAINING] No improvement: do nothing")

@@ -3,8 +3,6 @@ from flask import Flask
 from mongoengine import connect
 from flask_cors import CORS
 from apscheduler.schedulers.background import BackgroundScheduler
-
-import config as config
 from src.service.training import train_models
 from src import blueprint as api_v1
 
@@ -18,7 +16,7 @@ def training_service():
     train_models()
 
 sched = BackgroundScheduler(daemon=True)
-#sched.add_job(training_service, 'interval', minutes=5)
+sched.add_job(training_service, 'interval', minutes=5)
 sched.start()
 
 def create_app():

@@ -38,16 +38,16 @@ After having called the `Web API` with code to be syntax highlighted, the follow
 Regularly, the `Training Service` will be triggered to train the underlying prediction models. First, it will load training data from the Training Database. Then, it will train the underlying prediction models with 80% of the data and validate the improved model with the remaining 20% of the data. If the loss is smaller on the new model than the old one, the new model will be saved. Every time the `Prediction Service` is invoked, the new best model will be loaded and used for the prediction.
 
 ## Demo
-Here comes the demo page.
+A demo is accessible via [http://hack3rz-aws.switzerlandnorth.azurecontainer.io:8080](http://hack3rz-aws.switzerlandnorth.azurecontainer.io:8080).
 
-## Run It
+## Run It Locally
 Use the following command to run all services using docker-compose:
 ```
-docker-compose up --scale annotation=2
+docker-compose up --build --scale annotation=2
 ```
 To test the load-balancing and scaling make sure to scale some services:
 ```
-docker-compose up --scale prediction=2 --scale annotation=2
+docker-compose up --build --scale prediction=2 --scale annotation=2
 ```
 
 Sometimes builds fail on machines with different processor architectures (e.g. on M1 MacBooks). In other cases the build might fail, because there are old versions of the docker containers stored. Use the following command for a clean new build:
@@ -64,25 +64,22 @@ When the container is launched initially a new database and user are created wit
 Make sure the mongodb container is running. Connect to the CLI of the container and use the following command to access the DB:
 `mongo --username "$MONGO_USERNAME" --password "$MONGO_PASSWORD"`
 
-### Deploy to azure
-Currently not possible to automate with github action because our student subscription via UZH doesn't have the privilege to create a service account which is required for automating azure deployments. Please make sure your azure account is an owner of the Azure's resource group called hack3rz and you have installed Azure CLI on your machine.
+### Azure Deployment
+Currently it's not possible to automate the deployment with GitHub Actions because our student subscription via UZH doesn't have the privilege to create a service account which would be required for automated deployments. However, there is a possibility to manually deploy the Docker containers to Azure. Please make sure your Azure account is owner of Azure's resource group called hack3rz and you have installed Azure CLI on your machine. Then use the following commands to deploy the containers:
+
+1. Login to Azure with your credentials and setup context for Azure Container Instances (ACI):
 ```bash
-# Make sure docker desktop is running
-az login # if not already done
-az acr login --name hack3rzacr # if not already done
-docker-compose -f docker-compose-azure.yml build
-docker-compose -f docker-compose-azure.yml push
-docker login azure # if not already done
-docker context create aci hack3rzacicontext # if not already done
-docker context use hack3rzacicontext
-docker compose -f docker-compose-azure.yml down
-docker compose -f docker-compose-azure.yml up
-docker context use default
+az login
+az acr login --name hack3rzacr
+docker login azure
+docker context create aci hack3rzacicontext # run only once
+```
+2. Run the following shell script to deploy and redeploy the containers:
+```
+sh deploy-azure.sh
 ```
 
-The public domain name is ```hack3rz-aws.switzerlandnorth.azurecontainer.io```. The demo is accessible via [http://hack3rz-aws.switzerlandnorth.azurecontainer.io:8080](http://hack3rz-aws.switzerlandnorth.azurecontainer.io:8080)
-
-A test request can be made with the following command:
+3. After a successful deployment you can check the status of the deployed containers at [Azure Portal](https://portal.azure.com/#@UZH.onmicrosoft.com/resource/subscriptions/d295f317-9001-4571-b6af-87b3296d016d/resourceGroups/hack3rz/overview). The public domain name is ```hack3rz-aws.switzerlandnorth.azurecontainer.io```. The demo is accessible via [http://hack3rz-aws.switzerlandnorth.azurecontainer.io:8080](http://hack3rz-aws.switzerlandnorth.azurecontainer.io:8080). A test request can be made with the following command:
 ```
 curl -X 'POST' \
   'http://hack3rz-aws.switzerlandnorth.azurecontainer.io:8081/api/v1/highlight' \
