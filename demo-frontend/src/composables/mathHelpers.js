@@ -14,3 +14,9 @@ export function computeMedian(list) {
     }
     return sorted[middle];
 }
+
+export function computePercentage(total, subset) {
+    if (total == 0) { return 0 }
+    return Math.round(subset / total * 100)
+}
+

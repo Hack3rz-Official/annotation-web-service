@@ -73,26 +73,18 @@ export default class File {
       code: this.rawCode,
       language: this.languageLong,
     };
-    let outputElem = null;
-    if (!settingsStore.performanceMode) {
-      outputElem = document.getElementById(this.uuid);
-    }
-
+    
     axiosLimited
       .post(import.meta.env.VITE_HIGHLIGHT_URL, data)
       .then((response) => {
-        if (!settingsStore.performanceMode) {
-          let newElement = document
-            .createRange()
-            .createContextualFragment(response.data);
-          outputElem.innerHTML = null;
-          outputElem.appendChild(newElement);
-        }
         this.highlightedCode = response.data;
         this.status = "highlighted";
         this.dirty = false;
         this.request.endTimestamp = Date.now();
         this.request.duration = response.responseTime;
+        if (!settingsStore.performanceMode) {
+          this.displayHighlightedCard()
+        }
         if (!settingsStore.performanceMode) {
           console.log("actual response time: ", response.responseTime);
         }
@@ -109,6 +101,21 @@ export default class File {
           console.log("actual response time: ", response.responseTime);
         }
       });
+  }
+
+  async displayHighlightedCard() {
+    let outputElem = document.getElementById(this.uuid);
+    console.log(outputElem)
+    if (!outputElem) {
+      console.log(`No element with id ${this.uuid} found.`);
+      return;
+    }
+    let newElement = document
+      .createRange()
+      .createContextualFragment(this.highlightedCode);
+    outputElem.innerHTML = null;
+    outputElem.appendChild(newElement);
+    console.log(outputElem)
   }
 
   getFilenameShortened() {

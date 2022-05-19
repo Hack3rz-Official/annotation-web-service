@@ -1,9 +1,11 @@
 <script setup>
 import { useFilesStore } from "../stores/filesStore";
 import { useLanguagesStore } from "../stores/languagesStore";
+import { useSettingsStore } from "../stores/settingsStore";
 
 const filesStore = useFilesStore();
 const languagesStore = useLanguagesStore();
+const settingsStore = useSettingsStore();
 
 defineProps({
   file: {
@@ -15,7 +17,14 @@ defineProps({
 
 <template>
   <div
-    class="file-wrapper card card-compact w-full bg-base-200 shadow-md border-2"
+    class="
+      file-wrapper
+      card card-compact
+      w-full
+      bg-base-200
+      shadow-xl
+      border-2
+    "
   >
     <!-- overlay div for hover and click effect -->
     <div
@@ -42,7 +51,13 @@ defineProps({
       </button>
     </div>
     <!-- this card-body is shown when there is only raw code -->
-    <div class="card-body mt-3" v-show="!file.highlightedCode">
+    <div
+      class="card-body mt-3"
+      v-show="
+        !file.highlightedCode ||
+        (file.highlightedCode && settingsStore.performanceMode)
+      "
+    >
       <textarea
         id="raw-code"
         wrap="off"
@@ -59,7 +74,10 @@ defineProps({
       ></textarea>
     </div>
     <!-- this card-body is shown when code has been highlighted -->
-    <div class="card-body mt-3" v-show="file.highlightedCode">
+    <div
+      class="card-body mt-3"
+      v-show="!settingsStore.performanceMode && file.highlightedCode"
+    >
       <div
         :id="file.uuid"
         wrap="off"
@@ -92,9 +110,7 @@ defineProps({
       <div v-if="file.request.duration > 0" class="badge absolute m-2 right-0">
         {{ file.request.duration }} ms
       </div>
-      <div class="badge absolute m-2 left-0">
-        {{ file.loc }} lines
-      </div>
+      <div class="badge absolute m-2 left-0">{{ file.loc }} lines</div>
     </div>
   </div>
 </template>
@@ -103,6 +119,7 @@ defineProps({
 .file-wrapper {
   height: 400px;
   width: 290px;
+  min-width: 200px;
   .card-body {
     height: calc(100% - 50px);
     div,
@@ -115,5 +132,22 @@ defineProps({
 .text-tiny {
   font-size: 6px;
   line-height: 6px;
+}
+
+.card {
+  transform: translate(100px);
+  transition: 0.2s
+}
+
+.card:hover {
+    // transform: translateY(-0.5rem);
+}
+
+.card:focus-within~.card, .card:hover~.card {
+    transform: translateX(-0px);
+}
+
+.card:not(:first-child) {
+    margin-right: -100px;
 }
 </style>
