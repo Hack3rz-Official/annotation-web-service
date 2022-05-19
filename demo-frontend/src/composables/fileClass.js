@@ -91,9 +91,6 @@ export default class File {
       })
       .catch((error) => {
         console.log(error);
-        if (!settingsStore.performanceMode) {
-          outputElem.innerHTML = "Error in Highlighting Service";
-        }
         this.status = "failed";
         this.request.endTimestamp = Date.now();
         this.request.duration = response.responseTime;
