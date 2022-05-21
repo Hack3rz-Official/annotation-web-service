@@ -31,9 +31,8 @@ services:
         domainname: hack3rz-aws
         command: npm run start:prod
         env_file:
-            - .env
+            - .env.prod
         environment:
-            - DB_CONNECTION_STRING=mongodb://hack3rz:7Ne0WhnUlc1PrcS7ioea3xLSzwFypC7h4xGrPgFhrNDxUV2GNecU3sdLpsp7T0eHkKv8csDQHMhb7I9ZeZwhuw==@hack3rz.mongo.cosmos.azure.com:10255/aws?ssl=true&retrywrites=false&replicaSet=globaldb&maxIdleTimeMS=120000&appName=@hack3rz@
             - LEX_URL=http://hack3rz-aws.switzerlandnorth.azurecontainer.io:${ANNOTATION_SERVICE_PORT}/api/v1/annotation
             - PREDICT_URL=http://hack3rz-aws.switzerlandnorth.azurecontainer.io:${PREDICTION_SERVICE_PORT}/api/v1/prediction
         ports:
@@ -57,9 +56,7 @@ services:
         image: hack3rzacr.azurecr.io/annotation-service
         domainname: hack3rz-aws
         env_file:
-            - .env
-        environment:
-            - DB_CONNECTION_STRING=mongodb://hack3rz:7Ne0WhnUlc1PrcS7ioea3xLSzwFypC7h4xGrPgFhrNDxUV2GNecU3sdLpsp7T0eHkKv8csDQHMhb7I9ZeZwhuw==@hack3rz.mongo.cosmos.azure.com:10255/aws?ssl=true&retrywrites=false&replicaSet=globaldb&maxIdleTimeMS=120000&appName=@hack3rz@
+            - .env.prod
         ports:
             - "${ANNOTATION_SERVICE_PORT}:${ANNOTATION_SERVICE_PORT}"
         restart: always
@@ -78,9 +75,7 @@ services:
         image: hack3rzacr.azurecr.io/prediction-service
         domainname: hack3rz-aws
         env_file:
-            - .env
-        environment:
-            - DB_CONNECTION_STRING=mongodb://hack3rz:7Ne0WhnUlc1PrcS7ioea3xLSzwFypC7h4xGrPgFhrNDxUV2GNecU3sdLpsp7T0eHkKv8csDQHMhb7I9ZeZwhuw==@hack3rz.mongo.cosmos.azure.com:10255/aws?ssl=true&retrywrites=false&replicaSet=globaldb&maxIdleTimeMS=120000&appName=@hack3rz@
+            - .env.prod
         ports:
             - "${PREDICTION_SERVICE_PORT}:${PREDICTION_SERVICE_PORT}"
         restart: always
@@ -99,9 +94,7 @@ services:
         image: hack3rzacr.azurecr.io/training-service
         domainname: hack3rz-aws
         env_file:
-            - .env
-        environment:
-            - DB_CONNECTION_STRING=mongodb://hack3rz:7Ne0WhnUlc1PrcS7ioea3xLSzwFypC7h4xGrPgFhrNDxUV2GNecU3sdLpsp7T0eHkKv8csDQHMhb7I9ZeZwhuw==@hack3rz.mongo.cosmos.azure.com:10255/aws?ssl=true&retrywrites=false&replicaSet=globaldb&maxIdleTimeMS=120000&appName=@hack3rz@
+            - .env.prod
         ports:
             - "${TRAINING_SERVICE_PORT}:${TRAINING_SERVICE_PORT}"
         restart: always
