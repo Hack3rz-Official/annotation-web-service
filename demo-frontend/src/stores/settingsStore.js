@@ -1,5 +1,5 @@
 import { defineStore } from "pinia";
-import { useFilesStore } from "../stores/filesStore";
+import { useFilesStore } from './filesStore';
 
 export const useSettingsStore = defineStore({
   id: "settings",
