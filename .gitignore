@@ -9,3 +9,6 @@
 *.pyc
 *.coverage
 *coverage.xml
+
+# production env variables
+.env.prod

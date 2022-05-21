@@ -2,7 +2,7 @@
 import { useFilesStore } from "../stores/filesStore";
 import { useLanguagesStore } from "../stores/languagesStore";
 import { useSettingsStore } from "../stores/settingsStore";
-import { ref, computed } from "vue";
+import { computed } from "vue";
 import { computePercentage } from "../composables/mathHelpers";
 
 const filesStore = useFilesStore();

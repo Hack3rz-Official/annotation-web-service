@@ -2,7 +2,7 @@
 import { ref } from "vue";
 import { useFilesStore } from "../stores/filesStore";
 import { useLanguagesStore } from "../stores/languagesStore";
-import { computeSum, computeAverage, computeMedian } from "../composables/mathHelpers"
+import { computeAverage, computeMedian } from "../composables/mathHelpers"
 
 const filesStore = useFilesStore();
 const languagesStore = useLanguagesStore();
@@ -47,10 +47,8 @@ function recomputeStatistics() {
 }
 
 function recomputeSeries() {
-  //   console.log("recompute series");
   let out = [];
   for (let language of languagesStore.languages) {
-    // console.log(language);
     let d = {
       name: language.humanReadable,
       data: [],
@@ -58,8 +56,7 @@ function recomputeSeries() {
     for (let file of filesStore.filterFetchedFilesByLanguage(
       language.extension
     )) {
-      //   console.log(file);
-      if (!(file.status == "highlighted")) {
+      if (file.status !== 'highlighted') {
         continue;
       }
       d["data"].push([file.request.duration, file.loc]);
@@ -76,7 +73,7 @@ function recomputeTableData() {
   // stats for each language
   for (let language of languagesStore.languages) {
     let files = filesStore.filterFetchedFilesByLanguage(language.extension);
-    let highlightedFiles = files.filter((file) => { return file.status == 'highlighted' })
+    let highlightedFiles = files.filter((file) => { return file.status === 'highlighted' })
     let times = highlightedFiles.map((file) => { return file.request.duration })
     console.log(language)
     console.log(files)
@@ -90,7 +87,7 @@ function recomputeTableData() {
   }
   // stats total (all files)
   let files = filesStore.files
-  let highlightedFiles = files.filter((file) => { return file.status == 'highlighted' })
+  let highlightedFiles = files.filter((file) => { return file.status === 'highlighted' })
   let times = highlightedFiles.map((file) => { return file.request.duration })
   out.push({
       name: 'Total',

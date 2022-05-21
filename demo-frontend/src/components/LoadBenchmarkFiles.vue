@@ -1,5 +1,5 @@
 <script setup>
-import { ref, watch } from "vue";
+import { ref } from "vue";
 
 import { useFilesStore } from "../stores/filesStore";
 import { useLanguagesStore } from "../stores/languagesStore";
