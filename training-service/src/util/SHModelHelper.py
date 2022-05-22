@@ -40,7 +40,6 @@ def from_db_model_to_sh_model(db_model, lang_name):
 def from_best_sh_model_to_db_model(lang_name, accuracy, training_data_amount, validation_data_amount):
     """Saves a SHModel from current directory to the db with the language name and the accomplished accurarcy.
 
-
     Args:
         String lang_name and an accuracy (integer between [0,1]) 
 

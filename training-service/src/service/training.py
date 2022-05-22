@@ -81,10 +81,8 @@ def improve_model(annotations_train, annotations_val, lang_name):
     Returns: 
         None, but saves new trained model to db if the new accuracy (after the training process) is higher, than the accuracy of the current model
         which is used by the prediction service.
-    """
-    #RECALL: return value of split_objects function: annotations_train, annotations_val
+    """    
     
-
     # prepare training data
     X_train, T_train = data_preprocessing(annotations_train)
     # prepare validation data
@@ -181,14 +179,10 @@ def split_objects(annotations, train_percentage=0.8):
     
     Returns:
        2 arrays with default split of 0.8 training & 0.2 validation data 
-    """
-    # training data = [ann_objs1, ann_objs2....]
-    
+    """    
     split = int(train_percentage * len(annotations))
-    
     annotations_train = annotations[:split]
     annotations_val = annotations[split:]
-
     return annotations_train, annotations_val
 
 
@@ -202,7 +196,7 @@ def compute_accuracy(model, X, T):
     
     Returns:
         A value between 0 & 1 due to the divison of correct/total.
-"""
+    """
     assert X.shape == T.shape
     model.setup_for_prediction()
     correct = 0
