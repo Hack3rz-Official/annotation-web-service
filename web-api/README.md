@@ -11,11 +11,24 @@ A more detailed documentation can be found in [the wiki](https://github.com/Hack
 |:-------|:-----------|:-----------------|
 | POST   | /highlight | application/json |
 
+#### Request
+
+`POST /highlight`
+```
+curl -X 'POST' \
+    'http://localhost:8081/api/v1/highlight' \
+    -H 'accept: */*' \
+    -H 'Content-Type: application/json' \
+    -d '{
+        "language": "java",
+        "code": "public class Test { public void test() { System.out.println(\"Hello World\"); } }"
+    }'
+```
 **Sample Body:**
 ```
 {
-  "code": "public static void main(String[] args) {}",
   "language": "java"
+  "code": "public class Test { public void test() { System.out.println('Hello World'); } }",
 }
 ```
 **Sample Response:**
