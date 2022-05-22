@@ -12,30 +12,38 @@
 </p>
 
 ## Introduction
-A syntax highlighting web service based on AI. Please read the [project instructions](https://seal-uzh.notion.site/Annotation-WebService-b9621a3b1b5943cba21ede82d2fcbfe3) for more details about all functionalities. 
+A syntax highlighting web service based on AI. Please read the [project instructions](https://seal-uzh.notion.site/Annotation-WebService-b9621a3b1b5943cba21ede82d2fcbfe3) for more details about all functionalities.
 
-## Wiki
+## Microservices
 Under the hood, the Annotation WebService consists of the following independent microservices:
 
 | Microservice                                                                                                     | Description                                                                                | Technology                                                              | Status                                                                                                                                                            |
 |------------------------------------------------------------------------------------------------------------------|--------------------------------------------------------------------------------------------|-------------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| [Annotation Service](https://github.com/Hack3rz-Official/annotation-web-service/tree/develop/annotation-service) | Handles the lexing and highlighting of code.                                               | Java with [Spring Boot](https://github.com/spring-projects/spring-boot) | [![Quality gate](https://sonarcloud.io/api/project_badges/quality_gate?project=annotation-service)](https://sonarcloud.io/summary/new_code?id=annotation-service) |
+| [Annotation Service](https://github.com/Hack3rz-Official/annotation-web-service/tree/develop/annotation-service) | Handles the annotaion of code, i.e. lexing and highlighting.                                               | Java with [Spring Boot](https://github.com/spring-projects/spring-boot) | [![Quality gate](https://sonarcloud.io/api/project_badges/quality_gate?project=annotation-service)](https://sonarcloud.io/summary/new_code?id=annotation-service) |
 | [Prediction Service](https://github.com/Hack3rz-Official/annotation-web-service/tree/develop/prediction-service) | Handles the prediction of syntax highlighting.                                             | Python with [Flask](https://github.com/pallets/flask)                   | [![Quality gate](https://sonarcloud.io/api/project_badges/quality_gate?project=prediction-service)](https://sonarcloud.io/summary/new_code?id=prediction-service) |
 | [Training Service](https://github.com/Hack3rz-Official/annotation-web-service/tree/develop/training-service)     | Handles the regularly conducted training and exchange of the underlying prediction models. | Python with [Flask](https://github.com/pallets/flask)                   | [![Quality gate](https://sonarcloud.io/api/project_badges/quality_gate?project=training-service)](https://sonarcloud.io/summary/new_code?id=training-service)     |
-| [Web API](https://github.com/Hack3rz-Official/annotation-web-service/tree/develop/web-api)                       | The web API that acts as the primary entry point for the customers.                        | JS/TS with [Nest.js](https://github.com/nestjs/nest)                    | [![Quality gate](https://sonarcloud.io/api/project_badges/quality_gate?project=web-api-service)](https://sonarcloud.io/summary/new_code?id=web-api-service)       |
+| [Web API](https://github.com/Hack3rz-Official/annotation-web-service/tree/develop/web-api)                       | Acts as the primary entry point for the customers.                        | JS/TS with [Nest.js](https://github.com/nestjs/nest)                    | [![Quality gate](https://sonarcloud.io/api/project_badges/quality_gate?project=web-api-service)](https://sonarcloud.io/summary/new_code?id=web-api-service)       |
+
+Every microservice is running in a Docker container. An extensive documentation of each microservice is provided in the [Wiki](https://github.com/Hack3rz-Official/annotation-web-service/wiki).
 
 
 ## How it works
-The following illustration depicts the flow of the Annotation WebService.
+The following illustration depicts the general architecture of our Annotation WebService. It consists of two main flows namely the Syntax Highlighting Flow which is colored in red and the Training Flow colored in blue.
 
 ![Architecture](./architecture.png)
 
-After having called the `Web API` with code to be syntax highlighted, the following will be processed:
-1. The code will be lexed and highlighted. This is done by the `Annotation Service` microservice. The lexed code will be returned to the `Web API` whereas the highlighted code will be stored on the Training Database.
-2. The `Web API` will then forward the `tok_ids` extracted from the lexed code to the `Prediction Service` microservice where the syntax highlighting is beeing predicted. The predicted syntax highlighting will be returned to the `Web API`.
-3. Having received the predicted `h_code_values` the `Web API` will create a json file with the highlighted code which will be returned to the caller.
+### Syntax Highlighting Flow
+The red Syntax Highlighting Flow will be executed after a user request and handles the syntax highlighting of code from the user request as input to the highlighted code as output:
+1. A user is requesting syntax highlighting with source code and its corresponding programming language.
+2. The source code is sent to the *Annotation Service* where it will be lexed and highlighted. The *Annotation Service* returns the lexed code to the *Web API* and stores the whole request in the database which will be later used for the Training Flow.
+3. After having received the lexed code from the *Annotataion Service* the *Web API* redirects it to the *Prediction Service* where first the current model needs to be loaded from the database.
+4. After having loaded the best syntax highlighting model from the database, the *Prediction Service* will return the predicted `h_code_values` to the *Web API*.
+5. Finally, the *Web API* transforms the `h_code_values` and the corresponding source code to a styled HTML which will be sent to the user as highlighted code.
 
-Regularly, the `Training Service` will be triggered to train the underlying prediction models. First, it will load training data from the Training Database. Then, it will train the underlying prediction models with 80% of the data and validate the improved model with the remaining 20% of the data. If the loss is smaller on the new model than the old one, the new model will be saved. Every time the `Prediction Service` is invoked, the new best model will be loaded and used for the prediction.
+### Training Flow
+The blue Training Flow will automatically be triggered every 5 minutes and handles the training of the syntax highlighting models. The following steps will only be executed if there is enough training data on the database:
+1. The *Training Service* loads the currently best model, the training dataset and validation dataset from the database. Then, the currently best model will be finetuned on the training data.
+2. If the finetuned model does have a better accuracy on the same validation dataset as the currenntly best model, the *Training Service* will store the finetuned model as the new best model in the database and flag the training and validation dataset as used which will be considered during the next Training Flow. Otherwise, nothing will happen and the Training Flow will terminate.
 
 ## Demo
 A demo is accessible via [http://hack3rz-aws.switzerlandnorth.azurecontainer.io:8080](http://hack3rz-aws.switzerlandnorth.azurecontainer.io:8080).
@@ -55,16 +63,16 @@ Sometimes builds fail on machines with different processor architectures (e.g. o
 docker-compose up -d --force-recreate --renew-anon-volumes --build --scale prediction=2 --scale annotation=2
 ```
 
-## MongoDB
-The MongoDB is launched as a separate container. The credentials are stored within the environment of the other containers, so they can access it.
+### MongoDB
+The MongoDB is launched as a separate Docker container. The credentials are stored within the environment of the other containers, so they can access it.
 A folder `data` in the project root is mounted as a volume for the database. 
 When the container is launched initially a new database and user are created with the credentials from the environment file.
 
-### Testing the connection
+#### Testing the connection
 Make sure the mongodb container is running. Connect to the CLI of the container and use the following command to access the DB:
 `mongo --username "$MONGO_USERNAME" --password "$MONGO_PASSWORD"`
 
-### Azure Deployment
+## Azure Deployment
 Currently it's not possible to automate the deployment with GitHub Actions because our student subscription via UZH doesn't have the privilege to create a service account which would be required for automated deployments. However, there is a possibility to manually deploy the Docker containers to Azure. Please make sure your Azure account is owner of Azure's resource group called hack3rz and you have installed Azure CLI on your machine. Then use the following commands to deploy the containers:
 
 1. Login to Azure with your credentials and setup context for Azure Container Instances (ACI):
@@ -93,11 +101,11 @@ curl -X 'POST' \
 
 ## Organization
 
- 
-
 ### Project planning and version control
+
 We use GitHub for our code repositories, task- and issue-tracking, documentation, automated testing and planning as it offers a wide range of free features that we have access to with the GitHub Student Developer Pack. 
 
+![Project Board](./project-board.png)
 
 ### Branching Policy
 
@@ -119,6 +127,8 @@ Where possible, we create separate feature branches for each feature. This allow
 - Prefix: `feature/`
 - Name: Issue/task identifier and short description
 - e.g.: `feature/us1a_MyAwesomeFeature`
+
+![Git Flow Example](./git-flow.png)
 
 #### release
 
