@@ -16,5 +16,12 @@ class ModelRepository:
 
     @staticmethod
     def save(model):
-        # Saves model to db.
+        """Saves the model to the db
+
+        Args:
+            Model model. 
+        
+        Returns:
+            None
+        """
         model.save()

@@ -4,9 +4,6 @@ from hack3rz_test import Hack3rzTest
 from src.service.training import improve_model, data_preprocessing, split_objects, shuffle_data, compute_accuracy, train
 from src.util.SHModelUtils import SHModel
 
-# run within the test folder the following commoand to execute file
-# run with: python3 -m unittest test_training_service.py
-
 class TrainingServiceTest(Hack3rzTest):
 
     def test_data_preprocessing(self):
