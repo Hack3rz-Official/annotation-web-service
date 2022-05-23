@@ -39,6 +39,7 @@ function setFileDirty() {
 }
 
 function toggleEditModeOn() {
+  setFileDirty()
   editMode.value = true;
 }
 
