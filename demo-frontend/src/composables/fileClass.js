@@ -93,9 +93,9 @@ export default class File {
         console.log(error);
         this.status = "failed";
         this.request.endTimestamp = Date.now();
-        this.request.duration = response.responseTime;
+        this.request.duration = error.responseTime;
         if (!settingsStore.performanceMode) {
-          console.log("actual response time: ", response.responseTime);
+          console.log("actual response time: ", error.responseTime);
         }
       });
   }

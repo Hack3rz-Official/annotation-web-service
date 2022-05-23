@@ -46,7 +46,7 @@ setTimeout(() => {
     },
     function (error) {
       settingsStore.pendingRequests = Math.max(0, settingsStore.pendingRequests - 1);
-      response.responseTime = new Date().getTime() - response.config.meta.requestStartedAt;
+      error.responseTime = new Date().getTime() - error.config.meta.requestStartedAt;
       if (!settingsStore.performanceMode) {
         console.log(`Request resolved - Pending requests: ${settingsStore.pendingRequests}`);
       }
