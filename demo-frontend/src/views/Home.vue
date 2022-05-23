@@ -82,7 +82,7 @@ function setActiveTab(tabName) {
     </div>
 
     <!-- Action Buttons -->
-    <div class="my-4" v-show="filesStore.files.length > 0">
+    <div class="my-4" v-if="filesStore.files.length > 0">
       <button
         class="btn btn-primary mx-2"
         @click="filesStore.highlightAllFiles"
@@ -97,8 +97,31 @@ function setActiveTab(tabName) {
       </button>
     </div>
 
+    <div v-else class="hero mt-10">
+      <div class="hero-content flex-col lg:flex-row-reverse">
+        <img
+          src="@/assets/highlighting.png"
+          class="max-w-sm rounded-lg"
+        />
+        <div>
+          <h1 class="text-5xl font-bold">Annotation Web Service </h1>
+          <h2 class="text-3xl font-bold opacity-70">Demo</h2>
+          <p class="py-6">
+            Welcome to the frontend of our Syntax Highlighting Service. 
+            This Demo is intended to let you experience the capabilities of our service first-hand. You can load files from public Github repositories or use our benchmark files for testing.
+
+          </p>
+          <!-- <button class="btn btn-primary">Get Started</button> -->
+        </div>
+      </div>
+    </div>
+
     <!-- File Previews for each loaded file -->
-    <div style="min-height: 450px; " class="flex gap-x-52" :class="{'flex-col': !settingsStore.performanceMode}">
+    <div
+      style="min-height: 450px"
+      class="flex gap-x-52"
+      :class="{ 'flex-col': !settingsStore.performanceMode }"
+    >
       <div
         v-for="language in languagesStore.languages"
         :key="language.technical"
@@ -124,7 +147,12 @@ function setActiveTab(tabName) {
           "
         >
           <!-- eslint-disable-next-line vue/no-v-for-template-key -->
-          <template v-for="file in filesStore.filterFetchedFilesByLanguage(language.extension)" :key="file.uuid">
+          <template
+            v-for="file in filesStore.filterFetchedFilesByLanguage(
+              language.extension
+            )"
+            :key="file.uuid"
+          >
             <file-preview :file="file"></file-preview>
           </template>
         </div>
