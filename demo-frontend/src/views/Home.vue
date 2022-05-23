@@ -81,23 +81,8 @@ function setActiveTab(tabName) {
       <settings></settings>
     </div>
 
-    <!-- Filter
-    <div class="flex mt-4">
-      <p>Filter:</p>
-      <div
-        v-for="language of languagesStore.languages"
-        :key="language.technical"
-        class="form-control w-max"
-      >
-        <label class="label cursor-pointer justify-start">
-          <span class="label-text mr-2">{{ language.humanReadable }}</span>
-          <input type="checkbox" v-model="language.filterActive" class="checkbox" />
-        </label>
-      </div>
-    </div> -->
-
     <!-- Action Buttons -->
-    <div class="my-4">
+    <div class="my-4" v-show="filesStore.files.length > 0">
       <button
         class="btn btn-primary mx-2"
         @click="filesStore.highlightAllFiles"
@@ -113,7 +98,7 @@ function setActiveTab(tabName) {
     </div>
 
     <!-- File Previews for each loaded file -->
-    <div class="flex gap-x-52" :class="{'flex-col': !settingsStore.performanceMode}">
+    <div style="min-height: 450px; " class="flex gap-x-52" :class="{'flex-col': !settingsStore.performanceMode}">
       <div
         v-for="language in languagesStore.languages"
         :key="language.technical"
