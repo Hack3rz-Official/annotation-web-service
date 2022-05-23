@@ -29,8 +29,8 @@ const maxValue = ref(10);
     </div>
 
     <p class="mt-5">
-      Performance Mode:
-      <span class="font-bold">{{ settingsStore.performanceMode ? 'ON' : 'OFF' }}</span>
+      Performance Mode (activate if you load many files to prevent performance issues):
+      <!-- <span class="font-bold">{{ settingsStore.performanceMode ? 'ON' : 'OFF' }}</span> -->
     </p>
     <div class="form-control">
       <div class="input-group">

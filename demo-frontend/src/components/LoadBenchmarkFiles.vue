@@ -20,7 +20,7 @@ function loadFile(language, size) {
 
 <template>
   <div class="card-body">
-    <p>Add bundles of fixture files:</p>
+    <p>Click on the buttons in the below matrix to load pre-determined benchmark files of 25, 150 or 500 lines of code.</p>
     <div class="overflow-x-auto">
       <table class="table table-compact bg-transparent">
         <!-- head -->

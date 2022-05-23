@@ -72,6 +72,7 @@ async function loadFilesFromRepo() {
 
 <template>
   <div class="card-body">
+    Enter the URL of a public Github repository below to load real-world example files. 
     <div class="form-control flex flex-row justify-start items-center gap-4">
       <div class="input-group w-auto grow">
         <input
