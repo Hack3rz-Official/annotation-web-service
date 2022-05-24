@@ -101,11 +101,17 @@ curl -X 'POST' \
 ```
 
 ## Organization
+
+### Project planning
 As a team, we organized ourselves according to the widely known Scrum model (depicted below).
 
 ![Scrum](https://user-images.githubusercontent.com/37104494/170063971-617d418f-bdf5-4dac-a1e8-a5cfd78748ae.png)
 
-In addition to the classic sprint planning and review (demo) meetings, we had stand-up meetings where we updated each other about the current state of the user stories and seeked for help if needed. Depending on the progress during a sprint & the difficulty of tasks, we scheduled more meetings to ensure a clean sprint finish. As a Kanban boards we made use of the _Projects_-feature delivered by Github. Also, we generated meeting notes in Notion, which can be found [here](https://www.notion.so/witapp/Meeting-Notes-1b921b4894ee424ebe34ef99d8797341). All our meetings were held on Microsoft Teams.
+In addition to the classic sprint planning and review (demo) meetings, we had stand-up meetings where we updated each other about the current state of the user stories and seeked for help if needed. Depending on the progress during a sprint & the difficulty of tasks, we scheduled more meetings to ensure a clean sprint finish. As a Kanban boards we made use of the _Projects_-feature delivered by Github. 
+
+![Project Board](./project-board.png)
+
+Also, we generated meeting notes in Notion, which can be found [here](https://www.notion.so/witapp/Meeting-Notes-1b921b4894ee424ebe34ef99d8797341). All our meetings were held on Microsoft Teams.
 
 After the envisioning, we agreed upon the following timeline:
 
@@ -113,11 +119,9 @@ After the envisioning, we agreed upon the following timeline:
 
 Overall, we sticked to this plan. Some user stories were shifted between the sprints depending on the learnings the team made.
 
-### Project planning and version control
+### Version control
 
 We use GitHub for our code repositories, task- and issue-tracking, documentation, automated testing and planning as it offers a wide range of free features that we have access to with the GitHub Student Developer Pack. 
-
-![Project Board](./project-board.png)
 
 ### Branching Policy
 
