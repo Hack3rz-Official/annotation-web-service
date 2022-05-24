@@ -102,7 +102,12 @@ curl -X 'POST' \
 
 ## Organization
 
+After the envisioning, we agreed upon the below depicted timeline. Overall, we sticked to this plan. Some user stories were shifted between the sprints depending on the learnings the team made during the sprints. During our planning, we focused on parallelism of the tasks, since the team consists of five developers. Furthermore, we planned to tackle the difficult tasks as early as possible and included some buffer zones. 
+
+![Screenshot 2022-05-24 at 16 56 34](https://user-images.githubusercontent.com/37104494/170067269-1b298aed-91e7-44ba-a6de-e5b69f759f1a.png)
+
 ### Project planning
+
 As a team, we organized ourselves according to the widely known Scrum model (depicted below).
 
 ![Scrum](https://user-images.githubusercontent.com/37104494/170063971-617d418f-bdf5-4dac-a1e8-a5cfd78748ae.png)
@@ -112,12 +117,6 @@ In addition to the classic sprint planning and review (demo) meetings, we had st
 ![Project Board](./project-board.png)
 
 Also, we generated meeting notes in Notion, which can be found [here](https://www.notion.so/witapp/Meeting-Notes-1b921b4894ee424ebe34ef99d8797341). All our meetings were held on Microsoft Teams.
-
-After the envisioning, we agreed upon the following timeline:
-
-![Screenshot 2022-05-24 at 16 56 34](https://user-images.githubusercontent.com/37104494/170067269-1b298aed-91e7-44ba-a6de-e5b69f759f1a.png)
-
-Overall, we sticked to this plan. Some user stories were shifted between the sprints depending on the learnings the team made.
 
 ### Version control
 
