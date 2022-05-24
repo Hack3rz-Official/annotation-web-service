@@ -101,6 +101,10 @@ curl -X 'POST' \
 ```
 
 ## Organization
+As a team, we organized ourselves according to the widely known Scrum model (depicted below).
+![Scrum](https://user-images.githubusercontent.com/37104494/170063971-617d418f-bdf5-4dac-a1e8-a5cfd78748ae.png)
+
+In addition to the classic sprint planning and review (demo) meetings, we had stand-up meetings where we updated each other about the current state of the user stories and seeked for help if needed. Depending on the progress during a sprint & the difficulty of tasks, we scheduled more meetings to ensure a clean sprint finish. As a Kanban boards we made use of the _Projects_-feature delivered by Github. Also, we generated meeting notes, which can be found [here](https://www.notion.so/witapp/Meeting-Notes-1b921b4894ee424ebe34ef99d8797341).   
 
 ### Project planning and version control
 
