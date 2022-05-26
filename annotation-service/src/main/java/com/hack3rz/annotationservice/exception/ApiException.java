@@ -1,11 +1,13 @@
 package com.hack3rz.annotationservice.exception;
 
-import java.util.List;
-
+import lombok.Getter;
 import org.springframework.http.HttpStatus;
 
-import lombok.Getter;
+import java.util.List;
 
+/**
+ * Custom Exception for the REST endpoint
+ */
 @Getter
 public class ApiException  extends RuntimeException {
 

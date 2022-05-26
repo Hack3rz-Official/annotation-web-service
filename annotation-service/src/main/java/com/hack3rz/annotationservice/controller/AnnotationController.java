@@ -15,6 +15,9 @@ import javax.validation.Valid;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
+/**
+ * Controller that handles the annotation endpoint
+ */
 @RestController
 @RequestMapping(value = "/api/v1/annotation", produces = APPLICATION_JSON_VALUE)
 public class AnnotationController {
@@ -28,11 +31,10 @@ public class AnnotationController {
     public LTok[] annotateCode(@RequestBody @Valid AnnotateCodeRequestDTO dto) {
         log.info("Received a code annotation request for language: {}", dto.getLanguage());
 
-        // TODO: refactor logic into service so controller stays slim
-
         LTok[] lexingTokens = annotationService.lexCode(dto.getCode(), dto.getLanguage());
 
-        annotationService.persistCode(lexingTokens, dto.getCode(), dto.getLanguage());
+        // this method runs asynchronously so the method can return early
+        annotationService.persistCode(dto.getCode(), dto.getLanguage());
 
         return lexingTokens;
     }
