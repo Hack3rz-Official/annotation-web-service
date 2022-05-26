@@ -157,7 +157,7 @@ public class AnnotationService {
      * @param language the language
      * @return an instance of the resolver
      */
-    private Resolver getResolverByLanguage(SupportedLanguage language) {
+    public Resolver getResolverByLanguage(SupportedLanguage language) {
         Resolver resolver;
 
         if (language == PYTHON3) {

@@ -28,7 +28,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @ExtendWith(SpringExtension.class)
 @ActiveProfiles(profiles = "test")
 @AutoConfigureDataMongo
-public class AnnotationControllerTest {
+class AnnotationControllerTest {
 
     @Autowired
     private MockMvc mvc;
@@ -37,7 +37,7 @@ public class AnnotationControllerTest {
     private AnnotationService service;
 
     @Test
-    public void whenPostAnnotateCode_thenReturnLexingTokens() throws Exception {
+    void whenPostAnnotateCode_thenReturnLexingTokens() throws Exception {
         SupportedLanguage language = SupportedLanguage.JAVA;
         String code = "public static void main(String[] args) {}";
         LTok[] lToks = {new LTok(0,1,1), new LTok(1,2,2)};
