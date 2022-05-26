@@ -100,67 +100,6 @@ curl -X 'POST' \
 }'
 ```
 
-## Organization
-
-After the envisioning, we agreed upon the below depicted timeline. Overall, we sticked to this plan. Some user stories were shifted between the sprints depending on the learnings the team made during the sprints. During our planning, we focused on parallelism of the tasks, since the team consists of five developers. Furthermore, we planned to tackle the difficult tasks as early as possible and included some buffer zones. 
-
-![Screenshot 2022-05-24 at 16 56 34](https://user-images.githubusercontent.com/37104494/170067269-1b298aed-91e7-44ba-a6de-e5b69f759f1a.png)
-
-### Project planning
-
-As a team, we organized ourselves according to the widely known Scrum model (depicted below).
-
-![Scrum](https://user-images.githubusercontent.com/37104494/170063971-617d418f-bdf5-4dac-a1e8-a5cfd78748ae.png)
-
-In addition to the classic _Sprint Planning_ and _Review_ (demo) meetings, we had _Stand-Up_ meetings where we updated each other about the current state of the user stories and seeked for help if needed. Depending on the progress during a sprint and the difficulty of the tasks, more meetings were scheduled to ensure a clean sprint finish. The Github _Projects_ were used as Kanban boards. 
-
-![Project Board](./project-board.png)
-
-Also, we generated meeting notes in Notion, which can be found [here](https://www.notion.so/witapp/Meeting-Notes-1b921b4894ee424ebe34ef99d8797341). All our meetings were held on Microsoft Teams.
-
-### Version control
-
-We use GitHub for our code repositories, task- and issue-tracking, documentation, automated testing and planning as it offers a wide range of free features that we have access to with the GitHub Student Developer Pack. 
-
-### Branching Policy
-
-For this project, we will be using the popular Gitflow branching strategy. This enables us to develop features on different feature branches in parallel and merge them into the develop/main branch once a feature is completed and ready to be deployed on a development or production environment.
-
-#### main
-
-The main branch is always in a production-ready state and contains only code & features that can be released into production. Merges into main are part of the release and should only occur from release branches and only contain production-ready code. This allows us to setup a clean CI/CD workflow with an always up-to-date and working production environment deployed and running in the cloud.
-
-#### develop
-
-The develop branch can at times be in an unstable state, but should be deployable to a development system for testing or inspections. This allows us to setup a clean CI/CD workflow with an always up-to-date and working development environment deployed and running in the cloud. We merge from feature branches into the develop branch using merge/pull requests. For special cases (exceptions) we may also commit directly to develop.
-
-#### feature
-
-Where possible, we create separate feature branches for each feature. This allows us to work on our applications in parallel and once ready, code reviews on specific code changes for each feature.
-
-
-- Prefix: `feature/`
-- Name: Issue/task identifier and short description
-- e.g.: `feature/us1a_MyAwesomeFeature`
-
-![Git Flow Example](./git-flow.png)
-
-#### release
-
-Once we have all our feature branches merged into the develop branch, we create a release branch off of develop. This starts the next release cycle and allows us to work on the next iteration and if needed make changes to the current release on the newly created release branch. Once the release branch is ready to be deployed to production, we merge it first into main and finally into develop.
-
-- Prefix: `release/`
-- Name: vX.X.X
-- e.g.: `release/v1.2.3`
-
-#### hotfix
-
-The hotfix branch will be created if we encounter issues after a production release that need to be quickly fixed. They are created directly from the main branch and merged back into main and develop.
-
-- Prefix: `hotfix/`
-- Name: vX.X.X, the version to be fixed
-- e.g.: `hotfix/v1.2.3`
-
 ### Authors
 
 This project has been built by team Hack3rz:
