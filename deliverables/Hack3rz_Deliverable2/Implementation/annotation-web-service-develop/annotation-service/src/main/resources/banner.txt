@@ -1,8 +1,0 @@
-${AnsiColor.BLUE}██╗  ██╗  █████╗   ██████╗ ██╗  ██╗${AnsiColor.RED} ██████╗ ${AnsiColor.BLUE} ██████╗ ${AnsiColor.GREEN} ███████╗
-${AnsiColor.BLUE}██║  ██║ ██╔══██╗ ██╔════╝ ██║ ██╔╝${AnsiColor.RED} ╚════██╗${AnsiColor.BLUE} ██╔══██╗ ${AnsiColor.GREEN} ╚══███╔╝
-${AnsiColor.BLUE}███████║ ███████║ ██║      █████╔╝ ${AnsiColor.RED}  █████╔╝${AnsiColor.BLUE} ██████╔╝ ${AnsiColor.GREEN}  ███╔╝
-${AnsiColor.BLUE}██╔══██║ ██╔══██║ ██║      ██╔═██╗ ${AnsiColor.RED}  ╚═══██╗${AnsiColor.BLUE} ██╔══██╗ ${AnsiColor.GREEN} ███╔╝
-${AnsiColor.BLUE}██║  ██║ ██║  ██║ ╚██████╗ ██║  ██╗${AnsiColor.RED} ██████╔╝${AnsiColor.BLUE} ██║  ██║ ${AnsiColor.GREEN}███████╗
-${AnsiColor.BLUE}╚═╝  ╚═╝ ╚═╝  ╚═╝  ╚═════╝ ╚═╝  ╚═╝${AnsiColor.RED} ╚═════╝ ${AnsiColor.BLUE} ╚═╝  ╚═╝ ${AnsiColor.GREEN}╚══════╝
-
-${AnsiColor.BLUE}::: Running annotation-service with Spring Boot ${spring-boot.version} ::: ${AnsiColor.DEFAULT}
