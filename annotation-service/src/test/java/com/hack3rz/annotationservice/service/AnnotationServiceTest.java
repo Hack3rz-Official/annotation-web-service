@@ -1,12 +1,15 @@
 package com.hack3rz.annotationservice.service;
 
 import com.hack3rz.annotationservice.repository.AnnotationRepository;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.data.mongo.DataMongoTest;
 import org.springframework.context.annotation.ComponentScan;
+import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.util.Arrays;
@@ -18,10 +21,19 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 @DataMongoTest
 @ComponentScan("com.hack3rz.annotationservice")
 @ExtendWith(SpringExtension.class)
+@ActiveProfiles(profiles = "test")
 class AnnotationServiceTest {
 
     @Autowired
     private AnnotationService annotationService;
+
+    @Autowired
+    MongoTemplate mongoTemplate;
+
+    @AfterEach
+    void afterEach() {
+        mongoTemplate.getDb().drop();
+    }
 
     @Test
     void whenValidJavaCode_thenReturnLexedTokens() {
@@ -106,7 +118,7 @@ class AnnotationServiceTest {
     @Test
     void whenValidKotlinCode_thenReturnHighlightHTMLCode() {
         String code = "fun main() { println(\"Hello, World!\") }";
-        String expectedHighlightResult = "<code class=\"ANY\">fun</code> <code class=\"FUNCTION_IDENTIFIER\">main</code><code class=\"ANY\">(</code><code class=\"ANY\">)</code> <code class=\"ANY\">{</code> <code class=\"FUNCTION_IDENTIFIER\">println</code><code class=\"ANY\">(</code><code class=\"CHAR_STRING_LITERAL\">\"Hello, World!\"</code><code class=\"ANY\">)</code> <code class=\"ANY\">}</code>";
+        String expectedHighlightResult = "<code class=\"KEYWORD\">fun</code><code class=\"ANY\"> </code><code class=\"FUNCTION_DECLARATOR\">main</code><code class=\"ANY\">(</code><code class=\"ANY\">)</code><code class=\"ANY\"> </code><code class=\"ANY\">{</code><code class=\"ANY\"> </code><code class=\"FUNCTION_IDENTIFIER\">println</code><code class=\"ANY\">(</code><code class=\"CHAR_STRING_LITERAL\">\"</code><code class=\"CHAR_STRING_LITERAL\">Hello, World!</code><code class=\"CHAR_STRING_LITERAL\">\"</code><code class=\"ANY\">)</code><code class=\"ANY\"> </code><code class=\"ANY\">}</code>";
         String highlightedCode = annotationService.debugHighlightCode(code, KOTLIN);
         Assertions.assertTrue(highlightedCode.contains(expectedHighlightResult));
     }
