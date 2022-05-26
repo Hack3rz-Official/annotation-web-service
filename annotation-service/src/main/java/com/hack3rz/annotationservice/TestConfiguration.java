@@ -2,10 +2,12 @@ package com.hack3rz.annotationservice;
 
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
-import org.springframework.scheduling.annotation.EnableAsync;
 
+/**
+ * Test configuration
+ * Does not enable any async behaviour which facilitates testing
+ */
 @Configuration
-@EnableAsync
-@Profile("!test")
-public class ApplicationConfiguration {
+@Profile("test")
+public class TestConfiguration {
 }

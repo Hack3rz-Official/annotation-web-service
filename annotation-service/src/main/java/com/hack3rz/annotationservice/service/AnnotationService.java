@@ -9,6 +9,7 @@ import lexer.LTok;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.mongodb.repository.config.EnableMongoRepositories;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import resolver.JavaResolver;
@@ -28,6 +29,7 @@ import static org.springframework.http.HttpStatus.BAD_REQUEST;
  * Service for providing the lexed tokens
  */
 @Service
+@EnableMongoRepositories
 public class AnnotationService {
     private static final Logger log = LoggerFactory.getLogger(AnnotationService.class);
     private static final String INSTANTIATED_RESOLVER_OF_TYPE = "Instantiated resolver of type {}";
@@ -36,6 +38,13 @@ public class AnnotationService {
     @Autowired
     private AnnotationRepository repository;
 
+
+    /**
+     * Lexes the provided code
+     * @param code the code that should be lexed
+     * @param language the language of the provided code
+     * @return a list of lexing tokens
+     */
     public LTok[] lexCode(String code, SupportedLanguage language) {
         log.info("Received code to annotate...");
 
@@ -54,6 +63,12 @@ public class AnnotationService {
         return lexingTokens;
     }
 
+    /**
+     * Highlights the provided code
+     * @param code the coude that should be highlighted
+     * @param language the language of the provided code
+     * @return a list of highlight tokens
+     */
     public HTok[] highlightCode(String code, SupportedLanguage language) {
         log.info("Received code to highlight...");
 
@@ -72,6 +87,12 @@ public class AnnotationService {
         return highlightTokens;
     }
 
+    /**
+     * Creates highlighted HTML code for debugging purposes
+     * @param code the code to be highlighted
+     * @param language the language of the provided code
+     * @return highlighted HTML code
+     */
     public String debugHighlightCode(String code, SupportedLanguage language) {
         log.info("Received code to highlight...");
 
@@ -88,8 +109,13 @@ public class AnnotationService {
         return htmlCode;
     }
 
+    /**
+     * Persists the annotation to the database
+     * @param code the code
+     * @param language the language of the code
+     */
     @Async
-    public void persistCode(LTok[] lexingTokens, String code, SupportedLanguage language) {
+    public void persistCode(String code, SupportedLanguage language) {
         HTok[] highlightingTokens = highlightCode(code, language);
 
         // only for debugging purposes and to compare our solution to the java highlighter
@@ -108,15 +134,30 @@ public class AnnotationService {
     }
 
 
+    /**
+     * Plucks the token ids from a list of LToks
+     * @param lToks the list of LToks
+     * @return a list of token ids
+     */
     public List<Integer> pluckTokenIds(LTok[] lToks) {
         return Arrays.stream(lToks).map(lTok -> lTok.tokenId).collect(Collectors.toList());
     }
 
+    /**
+     * Plucks the HCode values from a list of HToks
+     * @param hToks the list of HToks
+     * @return a list of HCode values
+     */
     public List<Integer> pluckHCodeValues(HTok[] hToks) {
         return Arrays.stream(hToks).map(hTok -> hTok.hCodeValue).collect(Collectors.toList());
     }
 
-    private Resolver getResolverByLanguage(SupportedLanguage language) {
+    /**
+     * Picks the correct resolver based on the supported language
+     * @param language the language
+     * @return an instance of the resolver
+     */
+    public Resolver getResolverByLanguage(SupportedLanguage language) {
         Resolver resolver;
 
         if (language == PYTHON3) {

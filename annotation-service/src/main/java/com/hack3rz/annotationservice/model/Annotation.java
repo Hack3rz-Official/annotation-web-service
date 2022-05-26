@@ -7,6 +7,9 @@ import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.util.List;
 
+/**
+ * Model for the annotations collection in the database
+ */
 @Document("annotations")
 @Builder
 public class Annotation {
