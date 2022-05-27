@@ -17,6 +17,11 @@ def get_model_path(lang_name):
 
 @measure
 def load_db_model_to_current_directory(db_model, lang_name):
+    """
+    Loads the model from the database and saves it in the current directory
+    :param db_model: the model from the db
+    :param lang_name: the name of the language (used in the file name)
+    """
     if db_model:
         logger.debug(f"[SHModel] Newest Model loaded from DB with createdTime {db_model.createdTime}")
         with open(get_model_path(lang_name), "wb") as file:

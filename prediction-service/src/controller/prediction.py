@@ -30,10 +30,17 @@ prediction_parser.add_argument(
 
 @api.route("")
 class PredictionController(Resource):
+    """
+    The main class for the prediction endpoint.
+    """
 
     @api.expect(prediction_parser)
     @api.marshal_with(prediction_response_dto)
     def post(self):
+        """
+        Handles a post request to the prediction endpoint
+        :return: the highlight code values as a json formatted string
+        """
         model_repository = ModelRepository()
         data = prediction_parser.parse_args()
         lang = data['lang_name']
@@ -49,7 +56,7 @@ class PredictionController(Resource):
                 logger.debug(F"Using {lang} model with createdTime: {model.createdTime} and accuracy: {model.accuracy}")
                 sh_model = SHModel(lang.lower(), os.environ.get('MODEL_NAME'), model.file)
 
-            # TODO: potential performance boost if model is not re-instantiated and setup for every request
+            # FUTURE WORK: potential performance boost if model is not re-instantiated and setup for every request
             sh_model.setup_for_prediction()
             values = sh_model.predict(data['tok_ids'])
             model_repository.async_check_for_better_model(lang.upper())
