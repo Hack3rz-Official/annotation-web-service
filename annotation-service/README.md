@@ -12,10 +12,10 @@ A more detailed documentation can be found in the [Wiki for Annotation Service](
 
 ## Configuration
 The service expects the following environment variables:
-| Variable Name             | Description                                             | Example Value                                                                                     |
-|---------------------------|---------------------------------------------------------|---------------------------------------------------------------------------------------------------|
-| `ANNOTATION_SERVICE_PORT` | The port on which the server for this service will run. | `8083`                                                                                            |
-| `DB_CONNECTION_STRING`    | The connection string used to connect to the MongoDB.   | `mongodb://hack3rz:palm_tree_poppin_out_the_powder_blue_sky@127.0.0.1:27017/aws?authSource=admin` |
+| **Variable Name**             | **Description**                                             | **Example Value**                                                                                 |
+|-------------------------------|-------------------------------------------------------------|---------------------------------------------------------------------------------------------------|
+| `ANNOTATION_SERVICE_PORT`     | The port on which the server for this service will run.     | `8083`                                                                                            |
+| `DB_CONNECTION_STRING`        | The connection string used to connect to the MongoDB.       | `mongodb://hack3rz:palm_tree_poppin_out_the_powder_blue_sky@127.0.0.1:27017/aws?authSource=admin` |
 
 These variables can be placed in the `.env` file in this directory for local development. 
 
