@@ -1,9 +1,51 @@
 # Web API for Syntax Highlighting
+[![sonarcloud workflow](https://github.com/Hack3rz-Official/annotation-web-service/actions/workflows/web-api-service-dockerhub.yml/badge.svg)](https://github.com/Hack3rz-Official/annotation-web-service/actions/workflows/web-api-service-sonarcloud.yml)
+[![dockerhub workflow](https://github.com/Hack3rz-Official/annotation-web-service/actions/workflows/web-api-service-sonarcloud.yml/badge.svg)](https://github.com/Hack3rz-Official/annotation-web-service/actions/workflows/web-api-service-dockerhub.yml)
+[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=web-api-service&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=web-api-service)
+[![Coverage](https://sonarcloud.io/api/project_badges/measure?project=web-api-service&metric=coverage)](https://sonarcloud.io/summary/new_code?id=web-api-service)
 
 The Web API service acts as a gateway and is the central entry point of the Annotation Web Service through which each user request is processed.
 It communicates first with the Annotation Service and consecutively with the Prediction Service before it returns a styled HTML response to the client.
 
 A more detailed documentation can be found in [the wiki](https://github.com/Hack3rz-Official/annotation-web-service/wiki/Web-API).
+
+## Configuration
+The service expects the following environment variables:
+
+| **Variable Name** | **Description**                     | **Example Value**                     |
+|-------------------|-------------------------------------|---------------------------------------|
+| `LEX_URL`         | The URL of the lexing service.      | `http://nginx:4000/api/v1/annotation` |
+| `PREDICTION_URL`  | The URL of the prediction service.  | `http://nginx:4000/api/v1/prediction` |
+| `WEB_API_PORT`    | The port on which the web api runs. | `8081`                                |
+
+You can provide these environment variables using the `.env` file in the root of this directory. If you run the service using the global `docker-compose` then they will be passed automatically.
+
+
+## Run Service Locally
+Install the dependencies first, we use [npm](https://www.npmjs.com/) for this project.
+```bash
+# inside /web-api:
+$ npm install
+```
+
+And then start the service:
+```bash
+$ npm run start
+# or start in watch mode (with live-reload):
+$ npm run start:dev
+```
+The service should now be running on port 8081 and should be available at `http://localhost:8081/`.
+
+**Note:** Because this service depends on other microservices from the AnnotationWebService project, we recommended executing the docker-compose file in the project root to prevent dependency issues.
+
+## Running Tests
+Run the following command to execute the web service's tests.
+```bash
+$ yarn test
+# or with coverage:
+$ yarn test:cov
+```
+
 
 ## **REST API Documentation**
 
@@ -107,34 +149,3 @@ $ curl -X 'POST' \
 
 For a more detailed documentation of the REST API please use SwaggerUI (available at `localhost:8082` when running `docker-compose`) or consult the `openapi.json` specification.
 
-## Running the function locally via Docker
-Because this service depends on other microservices from the AnnotationWebService project, we recommended to execute the docker-compose file in the project root to prevent dependency issues:
-
-```bash
-# inside the project's root:
-$ docker-compose up
-```
-Alternatively you can launch the server without docker, as described in the following section.
-
-## Running the service locally
-Install the dependencies first, we use npm for this project.
-```bash
-# inside /web-api:
-$ npm install
-```
-
-And then start the service:
-```bash
-$ npm run start
-# or start in watch mode (with live-reload):
-$ npm run start:dev
-```
-The service should now be running on port 8081 and should be available at `http://localhost:8081/`.
-
-## Running Tests
-Run the following command to execute the web service's tests.
-```bash
-$ yarn test
-# or with coverage:
-$ yarn test:cov
-```
