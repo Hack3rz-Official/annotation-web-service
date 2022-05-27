@@ -35,7 +35,7 @@ def do_annotation(language, url, benchmark_filename):
                     size = os.path.getsize(language_file.name)
                     time = res.elapsed.total_seconds()
                     error = ""
-                    print(f"Size: {convert_size(size)} LOCs: {locs} Done in: {time}s")
+                    print(f"Size: {convert_size(size)} Done in: {time}s")
                     if res.status_code != 200:
                         error = res.text
                         print("Error during annotation: ", res.text)
