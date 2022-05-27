@@ -52,10 +52,6 @@ A demo is accessible via [http://hack3rz-aws.switzerlandnorth.azurecontainer.io:
 ## Run It Locally
 Use the following command to run all services using docker-compose:
 ```
-docker-compose up --build --scale annotation=2
-```
-To test the load-balancing and scaling make sure to scale some services:
-```
 docker-compose up --build --scale prediction=2 --scale annotation=2
 ```
 

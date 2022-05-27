@@ -6,6 +6,9 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.data.mongodb.repository.config.EnableMongoRepositories;
 
+/**
+ * The main SpringBoot application to run the API
+ */
 @SpringBootApplication()
 @EnableMongoRepositories
 public class AnnotationServiceApplication {

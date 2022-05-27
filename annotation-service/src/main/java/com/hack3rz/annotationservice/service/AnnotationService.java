@@ -26,7 +26,8 @@ import static com.hack3rz.annotationservice.enumeration.SupportedLanguage.PYTHON
 import static org.springframework.http.HttpStatus.BAD_REQUEST;
 
 /**
- * Service for providing the lexed tokens
+ * Service for providing the lexing and highlighting functionality
+ * This service basically wraps the provided lexing library
  */
 @Service
 @EnableMongoRepositories

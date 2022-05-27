@@ -1,4 +1,4 @@
-# Predcition Service
+# Prediction Service
 A repository containing all source code for the predict functionality which is based on the provided [UZH-ASE-AnnotationWS-BaseLearner](https://github.com/MEPalma/UZH-ASE-AnnotationWS-BaseLearner) repository.
 
 ## Run It Locally
@@ -39,7 +39,7 @@ $ python3 -m unittest <name-of-file.py>
 
 ## REST API Documentation
 
-The REST API to the service predict is described below.
+The REST API to the predict service is described below.
 
 ### Predict
 
@@ -47,26 +47,19 @@ The REST API to the service predict is described below.
 
 `POST /api/v1/prediction`
 
+```bash
     curl -X 'POST' \
         'http://localhost:8084/api/v1/prediction' \
         -H 'accept: application/json' \
         -H 'Content-Type: application/json' \
         -d '{
         "lang_name": "java",
-        "tok_ids": [
-            1,
-            2,
-            3,
-            4,
-            5,
-            6,
-            7,
-            8,
-            9,
-            10
-        ]
+        "tok_ids": [1,2,3,4,5,6,7,8,9,10]
     }'
+```
 
 #### Response
-
-    {"h_code_values": [10, 0, 3]}
+```json
+  { "h_code_values": [10, 0, 3] }
+```
+    

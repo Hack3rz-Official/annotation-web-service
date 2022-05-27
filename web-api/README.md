@@ -14,8 +14,8 @@ A more detailed documentation can be found in [the wiki](https://github.com/Hack
 #### Request
 
 `POST /highlight`
-```
-curl -X 'POST' \
+```bash
+$ curl -X 'POST' \
     'http://localhost:8081/api/v1/highlight' \
     -H 'accept: */*' \
     -H 'Content-Type: application/json' \
@@ -25,7 +25,7 @@ curl -X 'POST' \
     }'
 ```
 **Sample Body:**
-```
+```json
 {
   "language": "java"
   "code": "public class Test { public void test() { System.out.println('Hello World'); } }",
@@ -110,7 +110,7 @@ Because this service depends on other microservices from the AnnotationWebServic
 
 ```bash
 # inside the project's root:
-docker-compose up
+$ docker-compose up
 ```
 Alternatively you can launch the server without docker, as described in the following section.
 
@@ -118,21 +118,21 @@ Alternatively you can launch the server without docker, as described in the foll
 Install the dependencies first, we use npm for this project.
 ```bash
 # inside /web-api:
-npm install
+$ npm install
 ```
 
 And then start the service:
 ```bash
-npm run start
+$ npm run start
 # or start in watch mode (with live-reload):
-npm run start:dev
+$ npm run start:dev
 ```
 The service should now be running on port 8081 and should be available at `http://localhost:8081/`.
 
 ## Running Tests
 Run the following command to execute the web service's tests.
 ```bash
-yarn test
+$ yarn test
 # or with coverage:
-yarn test:cov
+$ yarn test:cov
 ```
