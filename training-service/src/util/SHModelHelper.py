@@ -27,12 +27,12 @@ def from_db_model_to_sh_model(db_model, lang_name):
         SHModel of a specific language
     """
     if db_model:
-        logger.debug(f"[SHModel] Newest Model loaded from DB with createdTime {db_model.createdTime}")
+        logger.info(f"[SHModel] Newest Model loaded from DB with createdTime {db_model.createdTime}")
         with open(get_model_path(lang_name), "wb") as file:
             model_file = db_model.file.read()
             file.write(model_file)
     else:
-        logger.debug("[SHModel] No model found in DB, creating new model")
+        logger.info("[SHModel] No model found in DB, creating new model")
 
     return SHModel(lang_name.lower(), os.environ.get('MODEL_NAME'))
 
@@ -46,7 +46,7 @@ def from_best_sh_model_to_db_model(lang_name, accuracy, training_data_amount, va
     Returns:
         An object of class Model which is the representation of an SHModel for the database annotation called models.
     """
-    logger.debug("[TRAIN] New Model saved from directory to DB ")
+    logger.info("[TRAIN] New Model saved from directory to DB ")
     model = Model(language=lang_name.upper(), accuracy=accuracy, trainingDataAmount=training_data_amount, validationDataAmount=validation_data_amount)
     with open(get_model_path(lang_name), "rb") as binary_file:
         model.file.put(binary_file)

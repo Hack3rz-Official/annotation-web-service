@@ -9,10 +9,13 @@ from src import blueprint as api_v1
 import logging
 logging.basicConfig()
 logger = logging.getLogger('waitress')
-logger.setLevel(logging.DEBUG)
+logger.setLevel(logging.INFO)
     
 def training_service():
-    logger.debug("Training Service is alive!")
+    """
+    Function that is used to schedule the training
+    """
+    logger.info("Training Service is alive!")
     train_models()
 
 sched = BackgroundScheduler(daemon=True)
@@ -20,6 +23,10 @@ sched.add_job(training_service, 'interval', minutes=5)
 sched.start()
 
 def create_app():
+    """
+    Main function for initializing the flask app
+    :return: the flask app
+    """
     app = Flask(__name__)
 
     # allow swagger-ui
