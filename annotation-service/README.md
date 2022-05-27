@@ -32,6 +32,8 @@ $ java -jar "build/libs/annotation-service-0.0.1-SNAPSHOT.jar"
 
 Please also make sure that a MongoDB instance is running and configured using the environment variable. If you run this service as part of the global docker-compose for all the services then the database is run and configured automatically.
 
+**Note:** Because this service depends on other microservices from the AnnotationWebService project, we recommended executing the docker-compose file in the project root to prevent dependency issues.
+
 ## Run Tests
 ```bash
 $ ./gradlew clean test --info

@@ -31,7 +31,9 @@ $ export PYTHONPATH="$PWD" # MacOS and Linux, for Windows see here: https://bic-
 $ python3 app.py
 ```
 
-Finally, the function should be accessible via `http://localhost:8084/api/v1/prediction`.
+Finally, the service should be accessible via `http://localhost:8084/api/v1/prediction`.
+
+**Note:** Because this service depends on other microservices from the AnnotationWebService project, we recommended executing the docker-compose file in the project root to prevent dependency issues.
 
 ## Run Tests
 First, make sure that MongoDB is also running locally by starting the Annotation Web Service with the docker-compose command as described in the project's main page. Then, execute the following code from the `/prediction-service` directory:

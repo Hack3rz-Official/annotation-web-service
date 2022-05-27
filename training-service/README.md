@@ -37,6 +37,8 @@ $ python3 app.py
 
 Finally, the service should be accessible via ```http://localhost:8085/api/v1/training```.
 
+**Note:** Because this service depends on other microservices from the AnnotationWebService project, we recommended executing the docker-compose file in the project root to prevent dependency issues.
+
 ## Running Tests
 First, make sure that MongoDB is also running locally by starting the Annotation Web Service with the docker-compose command as described in the project's main page. Then, execute the following code from the `/training-service` directory:
 
