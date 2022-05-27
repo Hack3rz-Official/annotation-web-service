@@ -84,6 +84,7 @@ $ curl -X 'POST' \
   // rest of response was omitted for readability purposes
 ]
 ```
+For a more detailed documentation of the REST API please use SwaggerUI (available at `localhost:8082` when running `docker-compose`) or consult the `openapi.json` specification.
 
 
 ## Documentation & Source Code

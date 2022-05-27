@@ -105,6 +105,8 @@ $ curl -X 'POST' \
 </html>
 ```
 
+For a more detailed documentation of the REST API please use SwaggerUI (available at `localhost:8082` when running `docker-compose`) or consult the `openapi.json` specification.
+
 ## Running the function locally via Docker
 Because this service depends on other microservices from the AnnotationWebService project, we recommended to execute the docker-compose file in the project root to prevent dependency issues:
 

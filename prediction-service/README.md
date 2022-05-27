@@ -84,4 +84,5 @@ The REST API to the predict service is described below.
 ```json
   { "h_code_values": [10, 0, 3] }
 ```
-    
+
+For a more detailed documentation of the REST API please use SwaggerUI (available at `localhost:8082` when running `docker-compose`) or consult the `openapi.json` specification.    

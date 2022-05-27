@@ -109,6 +109,10 @@ Alternatively, you can use a GUI like [mongoDBCompass](https://www.mongodb.com/p
 ### NGINX
 To demonstrate the scaling and redundancy possibilities within the API [NGINX](https://www.nginx.com/) is used to act as a load-balancer and reverse-proxy for the annotation and prediction microservices. Consequently, the Web API interacts with NGINX which in turn forwards the requests to the respective microservices. This allows us to scale both the annotation and prediction services. The load is distributed using a round-robin method. The configuration for NGINX can be found in the `nginx.conf.template` file.
 
+### Swagger REST API Documentation
+All the endpoints of each microservice are documented using [Swagger](https://swagger.io/). Each microservice contains a `openapi.json` file that documents the endpoints using the [OpenApi](https://swagger.io/specification/) specification.
+If the `docker-compose` is run there will be an additional swagger container running at `localhost:8082`.
+
 ## Azure Deployment
 Currently, it's not possible to automate the deployment with GitHub Actions because our student subscription via UZH does not have the privilege to create a service account which would be required for automated deployments. However, there is a possibility to manually deploy the Docker containers to Azure. Please make sure your Azure account is owner of Azure's resource group called hack3rz and you have installed Azure CLI on your machine. Then use the following commands to deploy the containers:
 
