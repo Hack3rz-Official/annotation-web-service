@@ -11,6 +11,10 @@ logger.setLevel(logging.DEBUG)
 
 
 def create_app():
+    """
+    Handles the initialization of the flask application.
+    :return: the flask app
+    """
     app = Flask(__name__)
 
     # Connect to database
@@ -30,4 +34,4 @@ def create_app():
 
 if __name__ == "__main__":
     app = create_app()
-    app.run(debug=True, port=os.environ.get('PREDICTION_SERVICE_PORT', 5000))
+    app.run(debug=True, port=os.environ.get('PREDICTION_SERVICE_PORT', 8084))

@@ -1,5 +1,5 @@
 <h1 align="center">
-  Annotation WebService
+  Annotation Web Service
   <br>
 </h1>
 <p align="center">
@@ -12,10 +12,12 @@
 </p>
 
 ## Introduction
-A syntax highlighting web service based on AI. Please read the [project instructions](https://seal-uzh.notion.site/Annotation-WebService-b9621a3b1b5943cba21ede82d2fcbfe3) for more details about all functionalities.
+Annotation Web Service (AWS) is a syntax highlighting web service based on a [deep learning (DL) model](https://github.com/MEPalma/UZH-ASE-AnnotationWS-BaseLearner). The goal was to build an API that uses the DL model to provide syntax highlighting for Java, Kotlin and Python3. Furthermore, the incoming requests should be used to train the DL model and to further improve its accuracy. 
+
+This `README.md` focuses on the technical aspects and the running and configuration of the services. A more in-depth description of the functionalities, technologies and our development process please consult our [Wiki](https://github.com/Hack3rz-Official/annotation-web-service/wiki). The original motivation and requirements for this project can be found in the [project instructions](https://seal-uzh.notion.site/Annotation-WebService-b9621a3b1b5943cba21ede82d2fcbfe3) provided by the lecturers of the course.
 
 ## Microservices
-Under the hood, the Annotation WebService consists of the following independent microservices:
+The Annotation Web Service consists of the following microservices:
 
 
 | Microservice                                                                                                     | Description                                                                                | Technology                                                              | Status                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                |
@@ -27,70 +29,108 @@ Under the hood, the Annotation WebService consists of the following independent 
 
 Every microservice is running in a Docker container. An extensive documentation of each microservice is provided in the [Wiki](https://github.com/Hack3rz-Official/annotation-web-service/wiki).
 
+## Utils and Proof-of-Concepts
+In addition to the microservices listed above, we have implemented a number of utils/helpers and a proof-of-concept of a demo-frontend that uses the API provided by the microservices.
+These tools are intended for internal use only. Thus, they do not adhere to the same code quality standards as the microservices. Nevertheless, they demonstrate how the API can be used in various environments.
 
-## How it works
-The following illustration depicts the general architecture of our Annotation WebService. It consists of two main flows namely the Syntax Highlighting Flow which is colored in red and the Training Flow colored in blue.
+| **Tool**                                                                                               | **Description**                                                                                               | **Technology**                       |
+|--------------------------------------------------------------------------------------------------------|---------------------------------------------------------------------------------------------------------------|--------------------------------------|
+| [Demo Frontend](https://github.com/Hack3rz-Official/annotation-web-service/tree/develop/demo-frontend) | A single page webapp that demonstrates how the API could be used by a potential customer.                     | JS/TS with [Vue](https://vuejs.org/) |
+| [Code Fetcher](https://github.com/Hack3rz-Official/annotation-web-service/tree/develop/code-fetcher)   | A command line tool to download source code from GitHub and send it to the API.                               | Python                               |
+| [Load Tester](https://github.com/Hack3rz-Official/annotation-web-service/tree/develop/load-tester)     | A simple script to send a lot of concurrent requests to the API and analyze the performance under heavy load. | Javascript with [K6](https://k6.io/) |
 
-![Architecture](./architecture.png)
 
-### Syntax Highlighting Flow
-The red Syntax Highlighting Flow will be executed after a user request and handles the syntax highlighting of code from the user request as input to the highlighted code as output:
-1. A user is requesting syntax highlighting with source code and its corresponding programming language.
-2. The source code is sent to the *Annotation Service* where it will be lexed and highlighted. The *Annotation Service* returns the lexed code to the *Web API* and stores the whole request in the database which will be later used for the Training Flow.
-3. After having received the lexed code from the *Annotataion Service* the *Web API* redirects it to the *Prediction Service* where first the current model needs to be loaded from the database.
-4. After having loaded the best syntax highlighting model from the database, the *Prediction Service* will return the predicted `h_code_values` to the *Web API*.
-5. Finally, the *Web API* transforms the `h_code_values` and the corresponding source code to a styled HTML which will be sent to the user as highlighted code.
+## Configuration
+The microservices rely on a number of environment variables for their configuration. The environment variables are defined in a `.env` file in the project root. This file is used within the `docker-compose.yml` to pass the configuration to the services. The following table displays an overview of the environment variables and their default values:
+| **Variable Name**          | **Description**                                                            | **Example Value**                                                                               |
+|----------------------------|----------------------------------------------------------------------------|-------------------------------------------------------------------------------------------------|
+| `MONGO_USERNAME`           | The username used for the MongoDB.                                         | `hack3rz`                                                                                       |
+| `MONGO_PASSWORD`           | The password used for the MongoDB.                                         | `palm_tree_poppin_out_the_powder_blue_sky`                                                      |
+| `MONGO_DATABASE_NAME`      | The database name for the MongoDB.                                         | `aws`                                                                                           |
+| `MONGO_DATABASE_TEST_NAME` | The test database name for the MongoDB.                                    | `aws_test`                                                                                      |
+| `MONGO_PORT`               | The port on which the MongoDB runs.                                        | `27017`                                                                                         |
+| `MONGO_HOST`               | The host for the MongoDB.                                                  | `mongodb`                                                                                       |
+| `MONGO_AUTH_DATABASE`      | The database used in MongoDB for the authentication (holds default users). | `admin`                                                                                         |
+| `DB_CONNECTION_STRING`     | The connection string for the MongoDB.                                     | `mongodb://hack3rz:palm_tree_poppin_out_the_powder_blue_sky@mongodb:27017/aws?authSource=admin` |
+| `MODEL_NAME`               | The prefix used when storing a model locally on the disk.                  | `best`                                                                                          |
+| `MIN_TRAINING_BATCH_SIZE`  | The minimum amount of annotations required before a training is started.   | `100`                                                                                           |
+| `DEMO_FRONTEND_PORT`       | The port on which the demo frontend runs.                                  | `80`                                                                                            |
+| `WEB_API_PORT`             | The port on which the web api runs.                                        | `8081`                                                                                          |
+| `SWAGGER_UI_PORT`          | The port on which the Swagger UI runs.                                     | `8082`                                                                                          |
+| `ANNOTATION_SERVICE_PORT`  | The port on which the annotation service runs.                             | `8083`                                                                                          |
+| `PREDICTION_SERVICE_PORT`  | The port on which the prediction service runs.                             | `8084`                                                                                          |
+| `TRAINING_SERVICE_PORT`    | The port on which the training service runs.                               | `8085`                                                                                          |
+| `NGINX_PORT=4000`          | The port on which the nginx load-balancer runs.                            | `4000`                                                                                          |
 
-### Training Flow
-The blue Training Flow will automatically be triggered every 5 minutes and handles the training of the syntax highlighting models. The following steps will only be executed if there is enough training data on the database:
-1. The *Training Service* loads the currently best model, the training dataset and validation dataset from the database. Then, the currently best model will be finetuned on the training data.
-2. If the fine-tuned model does have a better accuracy on the same validation dataset as the currenntly best model, the *Training Service* will store the finetuned model as the new best model in the database and flag the training and validation dataset as used which will be considered during the next Training Flow. Otherwise, nothing will happen and the Training Flow will terminate.
 
-## Demo
-A demo is accessible via [http://hack3rz-aws.switzerlandnorth.azurecontainer.io:8080](http://hack3rz-aws.switzerlandnorth.azurecontainer.io:8080).
+## Docker Containers
+The following table contains a list of all docker containers that are part of the `docker-compose` setup and their respective images used. All the images prefixed with `richner` were developed as part of this project and are publicly available on [DockerHub](https://hub.docker.com/u/richner).
+| **Name**      | **Description**                                                              | **Image**                                                                                |
+|---------------|------------------------------------------------------------------------------|------------------------------------------------------------------------------------------|
+| Demo Frontend | The single demo frontend.                                                    | [richner/demo-frontend:latest](https://hub.docker.com/r/richner/demo-frontend)           |
+| Web API       | The web API that wraps all the other microservices.                          | [richner/web-api:latest](https://hub.docker.com/r/richner/web-api)                       |
+| Swagger UI    | The swagger UI that holds the documentation for all services.                | [swaggerapi/swagger-ui](https://hub.docker.com/r/swaggerapi/swagger-ui)                  |
+| Annotation    | The annotation service.                                                      | [richner/annotation-service:latest](https://hub.docker.com/r/richner/annotation-service) |
+| Prediction    | The prediction service.                                                      | [richner/prediction-service:latest](https://hub.docker.com/r/richner/prediction-service) |
+| Training      | The training service.                                                        | [richner/training-service:latest](https://hub.docker.com/r/richner/training-service)     |
+| Nginx         | The NGINX load-balancer and reverse-proxy.                                   | [nginx:latest](https://hub.docker.com/_/nginx)                                           |
+| MongoDB       | The MongoDB that is used by the annotation, prediction and training service. | [mongo:5.0.6](https://hub.docker.com/_/mongo)                                            |
+
 
 ## Run It Locally
-Use the following command to run all services using docker-compose:
+Make sure that you use **Docker Compose V2** and activate it in your docker setup. Within Docker Desktop, go to "Settings" and toggle the “Use Docker Compose V2” option under the “General” tab. More information can be found [here](https://www.docker.com/blog/announcing-compose-v2-general-availability/). You can verify the setting by running:
+```bash
+$ docker-compose -v # should output v2.X.X
 ```
-docker-compose up --build --scale annotation=2
-```
-To test the load-balancing and scaling make sure to scale some services:
-```
-docker-compose up --build --scale prediction=2 --scale annotation=2
+
+Use the following command to run all services using `docker-compose`:
+```bash
+$ docker-compose up --build --scale prediction=2 --scale annotation=2
 ```
 
 Sometimes builds fail on machines with different processor architectures (e.g. on M1 MacBooks). In other cases the build might fail, because there are old versions of the docker containers stored. Use the following command for a clean new build:
+```bash
+$ docker-compose up -d --force-recreate --renew-anon-volumes --build --scale prediction=2 --scale annotation=2
 ```
-docker-compose up -d --force-recreate --renew-anon-volumes --build --scale prediction=2 --scale annotation=2
-```
+
+
+
 
 ### MongoDB
 The MongoDB is launched as a separate Docker container. The credentials are stored within the environment of the other containers, so they can access it.
-A folder `data` in the project root is mounted as a volume for the database. 
-When the container is launched initially a new database and user are created with the credentials from the environment file.
+A folder `data` in the project root is mounted as a volume for the database. This folder will persist the data in the database even when the containers are reset. If you want to reset the database you can just delete the contents of this folder. The file `mongo-init.sh` is used to initialize the database with a new user and the credentials provided by the environment file.
 
 #### Testing the connection
 Make sure the mongodb container is running. Connect to the CLI of the container and use the following command to access the DB:
-`mongo --username "$MONGO_USERNAME" --password "$MONGO_PASSWORD"`
+```bash
+$ mongo --username "$MONGO_USERNAME" --password "$MONGO_PASSWORD"
+```
+Alternatively, you can use a GUI like [mongoDBCompass](https://www.mongodb.com/products/compass) to access the database.
+### NGINX
+To demonstrate the scaling and redundancy possibilities within the API [NGINX](https://www.nginx.com/) is used to act as a load-balancer and reverse-proxy for the annotation and prediction microservices. Consequently, the Web API interacts with NGINX which in turn forwards the requests to the respective microservices. This allows us to scale both the annotation and prediction services. The load is distributed using a round-robin method. The configuration for NGINX can be found in the `nginx.conf.template` file.
+
+### Swagger REST API Documentation
+All the endpoints of each microservice are documented using [Swagger](https://swagger.io/). Each microservice contains a `openapi.json` file that documents the endpoints using the [OpenApi](https://swagger.io/specification/) specification.
+If the `docker-compose` is run there will be an additional swagger container running at `localhost:8082`.
 
 ## Azure Deployment
-Currently, it's not possible to automate the deployment with GitHub Actions because our student subscription via UZH doesn't have the privilege to create a service account which would be required for automated deployments. However, there is a possibility to manually deploy the Docker containers to Azure. Please make sure your Azure account is owner of Azure's resource group called hack3rz and you have installed Azure CLI on your machine. Then use the following commands to deploy the containers:
+Currently, it's not possible to automate the deployment with GitHub Actions because our student subscription via UZH does not have the privilege to create a service account which would be required for automated deployments. However, there is a possibility to manually deploy the Docker containers to Azure. Please make sure your Azure account is owner of Azure's resource group called hack3rz and you have installed Azure CLI on your machine. Then use the following commands to deploy the containers:
 
 1. Login to Azure with your credentials and setup context for Azure Container Instances (ACI):
 ```bash
-az login
-az acr login --name hack3rzacr
-docker login azure
-docker context create aci hack3rzacicontext # run only once
+$ az login
+$ az acr login --name hack3rzacr
+$ docker login azure
+$ docker context create aci hack3rzacicontext # run only once
 ```
 2. Run the following shell script to deploy and redeploy the containers:
-```
-sh deploy-azure.sh
+```bash
+$ sh deploy-azure.sh
 ```
 
 3. After a successful deployment you can check the status of the deployed containers at [Azure Portal](https://portal.azure.com/#@UZH.onmicrosoft.com/resource/subscriptions/d295f317-9001-4571-b6af-87b3296d016d/resourceGroups/hack3rz/overview). The public domain name is ```hack3rz-aws.switzerlandnorth.azurecontainer.io```. The demo is accessible via [http://hack3rz-aws.switzerlandnorth.azurecontainer.io:8080](http://hack3rz-aws.switzerlandnorth.azurecontainer.io:8080). A test request can be made with the following command:
-```
-curl -X 'POST' \
+```bash
+$ curl -X 'POST' \
   'http://hack3rz-aws.switzerlandnorth.azurecontainer.io:8081/api/v1/highlight' \
   -H 'accept: */*' \
   -H 'Content-Type: application/json' \
@@ -100,9 +140,27 @@ curl -X 'POST' \
 }'
 ```
 
-### Authors
+The container configuration for the deployment on azure can be found in the file `docker-compose-azure.yml`.
 
-This project has been built by team Hack3rz:
+### Deployment Caveats
+The current deployment configuration found in `docker-compose-azure.yml` is a preliminary version. The following restrictions apply:
+- CosmosDB instead of MongoDB is used
+- Swagger UI is not deployed
+- Nginx is not deployed
+- Training Service cronjob does not work
+- Only a single instance of the prediction service is deployed
+- Only a single instance of the annotation service is deployed
+
+Consequently, the deployment only acts as a proof-of-concept and does not yet fully reflect the local docker setup.
+
+## Demo
+A demo is accessible via [http://hack3rz-aws.switzerlandnorth.azurecontainer.io](http://hack3rz-aws.switzerlandnorth.azurecontainer.io).
+
+**Attention:** The restrictions / caveats mentioned above apply. Use `docker-compose` to test our service with its full functionality.
+
+## Authors
+
+This project has been built by team Hack3rz as part of the [Advanced Software Engineering](https://www.ifi.uzh.ch/en/seal/teaching/courses/ase.html) course at the [University of Zurich](https://www.uzh.ch/en.html) in the spring semester 2022:
 
 - [Michael Ziörjen](https://github.com/miczed)
 - [Sebastian Richner](https://github.com/SRichner)

@@ -6,7 +6,7 @@ import org.springframework.http.HttpStatus;
 import java.util.List;
 
 /**
- * Custom Exception for the REST endpoint
+ * Custom Exception for the REST endpoints
  */
 @Getter
 public class ApiException  extends RuntimeException {

@@ -27,6 +27,11 @@ public class AnnotationController {
     private AnnotationService annotationService;
 
 
+    /**
+     * Controller method that handles the POST request to the endpoint
+     * @param dto the DataTransferObject for this endpoint
+     * @return the lexing tokens (will automatically be serialized to JSON)
+     */
     @PostMapping()
     public LTok[] annotateCode(@RequestBody @Valid AnnotateCodeRequestDTO dto) {
         log.info("Received a code annotation request for language: {}", dto.getLanguage());

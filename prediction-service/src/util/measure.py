@@ -5,6 +5,11 @@ logger = logging.getLogger('waitress')
 
 
 def measure(func):
+    """
+    Function to measure the time it takes to execute a function
+    :param func: a function that will be measured
+    :return: the function wrapped with the measuring function
+    """
     @wraps(func)
     def _time_it(*args, **kwargs):
         start = int(round(process_time() * 1000))
