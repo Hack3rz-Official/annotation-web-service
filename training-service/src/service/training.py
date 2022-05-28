@@ -22,27 +22,27 @@ def train_models(model="all"):
     """
     # only one thread can execute code there
     with lock:
-        logger.debug(f"[TRAINING] ### TRAINING STARTED with model {model} ### ")
+        logger.info(f"[TRAINING] ### TRAINING STARTED with model {model} ### ")
         
         trained_languages = []
         languages_to_train = config.SUPPORTED_LANGUAGES if model == "all" else [model]
         for lang_name in languages_to_train:
-            logger.debug(f"[TRAINING] Starting model training for {lang_name}")
+            logger.info(f"[TRAINING] Starting model training for {lang_name}")
 
             training_data = annotation_repository.find_data_to_train_with(lang_name)
-            logger.debug(f"[TRAINING] Training data loaded from DB: {len(training_data)}")
+            logger.info(f"[TRAINING] Training data loaded from DB: {len(training_data)}")
 
             min_training_batch_size = int(os.environ.get('MIN_TRAINING_BATCH_SIZE'))
             training_data_len = len(training_data)
             if training_data_len < min_training_batch_size:
-                logger.debug(f"[TRAINING] Not enough data to train model: training data: {training_data_len}, minimum training batch size: {min_training_batch_size}")
+                logger.info(f"[TRAINING] Not enough data to train model: training data: {training_data_len}, minimum training batch size: {min_training_batch_size}")
                 continue
 
             annotations_train, annotations_val = split_objects(training_data)
             improve_model(annotations_train, annotations_val, lang_name)
             trained_languages.append(lang_name)
 
-        logger.debug("[TRAINING] ### TRAINING DONE ###")
+        logger.info("[TRAINING] ### TRAINING DONE ###")
 
         if not trained_languages:
             return "No languages trained. Not enough training data."
@@ -100,7 +100,7 @@ def improve_model(annotations_train, annotations_val, lang_name):
     
     # compute accuracy of model on GLOBAL validation set
     validation_data = annotation_repository.find_validation_data(lang_name)
-    logger.debug(f"[TRAINING] Previous validation data from db loaded: {len(validation_data)}")
+    logger.info(f"[TRAINING] Previous validation data from db loaded: {len(validation_data)}")
     if validation_data:
         X_val_previous, T_val_previous = data_preprocessing(validation_data)
         X_val = np.append(X_val, X_val_previous)
@@ -109,24 +109,24 @@ def improve_model(annotations_train, annotations_val, lang_name):
     # compute accuracy with the entire historic validation dataset
     new_acc = compute_accuracy(best_sh_model, X_val, T_val)
     validation_data_amount = len(X_val)
-    logger.debug(f"[TRAINING] Validated with {validation_data_amount} data")
+    logger.info(f"[TRAINING] Validated with {validation_data_amount} data")
     
-    logger.debug(f"[TRAINING] new_acc = {new_acc} and cur_acc = {cur_acc}")
+    logger.info(f"[TRAINING] new_acc = {new_acc} and cur_acc = {cur_acc}")
     if new_acc > cur_acc:
-        logger.debug("[SHModel] Persisting model to directory")
+        logger.info("[SHModel] Persisting model to directory")
         best_sh_model.persist_model()
         training_data_amount = len(annotations_train) + (best_db_model.trainingDataAmount if best_db_model else 0)
         improved_db_model = from_best_sh_model_to_db_model(lang_name, new_acc, training_data_amount, validation_data_amount)
         model_repository.save(improved_db_model)
         
-        logger.debug(f"[TRAINING] Flag {len(annotations_train)} as trained data and {len(annotations_val)} as validated data")
+        logger.info(f"[TRAINING] Flag {len(annotations_train)} as trained data and {len(annotations_val)} as validated data")
         time = datetime.datetime.now()
         annotation_repository.update_trained_time(annotations_train, time)
         annotation_repository.update_validated_time(annotations_val, time)
         
         return 
 
-    logger.debug("[TRAINING] No improvement: do nothing")
+    logger.info("[TRAINING] No improvement: do nothing")
 
 
 def train(model, X_train, T_train, epochs=10):
@@ -140,7 +140,7 @@ def train(model, X_train, T_train, epochs=10):
     Returns:
         Array with losses.
     """
-    logger.debug("[TRAINING] Model training started...")
+    logger.info("[TRAINING] Model training started...")
     model.setup_for_finetuning()
     avg_epoch_losses = []
     for epoch in range(epochs):
@@ -152,10 +152,10 @@ def train(model, X_train, T_train, epochs=10):
                         
         cur_avg_epoch_loss = sum(epoch_losses)/len(epoch_losses)
         avg_epoch_losses.append(cur_avg_epoch_loss)
-        logger.debug(f"[TRAINING] Epoch: {epoch+1}/{epochs}, Average Loss {cur_avg_epoch_loss}")
+        logger.info(f"[TRAINING] Epoch: {epoch+1}/{epochs}, Average Loss {cur_avg_epoch_loss}")
         
         if epoch > 0 and cur_avg_epoch_loss >= avg_epoch_losses[epoch-1]:
-            logger.debug(f"[TRAINING] EARLY EPOCH STOPPING: current avg epoch loss {round(cur_avg_epoch_loss, 10)} >= previous avg epoch loss {round(avg_epoch_losses[epoch-1], 10)}")
+            logger.info(f"[TRAINING] EARLY EPOCH STOPPING: current avg epoch loss {round(cur_avg_epoch_loss, 10)} >= previous avg epoch loss {round(avg_epoch_losses[epoch-1], 10)}")
             break
 
 def shuffle_data(X, T):
