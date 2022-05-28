@@ -14,10 +14,10 @@ const filesStore = useFilesStore();
 const languagesStore = useLanguagesStore();
 
 const githubRepoUrl = ref(
-  "https://github.com/Hack3rz-Official/annotation-web-service"
+  "https://github.com/Hack3rz-Official/demo-files"
 );
 const githubOwner = ref("Hack3rz-Official");
-const githubRepo = ref("annotation-web-service");
+const githubRepo = ref("demo-files");
 
 watch(githubRepoUrl, (newRepoUrl, oldRepoUrl) => {
   let splitted = newRepoUrl.split("/");

@@ -119,7 +119,7 @@ export default class File {
     // very imperformant string manipulations, but it works
     let full = `${this.githubRepo}/${this.githubFile.split(".")[0]}`;
     let recBreaker = 0;
-    while (full.length > 30 && recBreaker < 20) {
+    while (full.length > 20 && recBreaker < 20) {
       let splitted = full.split("/");
       let repIndex = splitted.length - 2;
 
