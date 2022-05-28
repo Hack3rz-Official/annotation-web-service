@@ -119,16 +119,16 @@ Currently, it's not possible to automate the deployment with GitHub Actions beca
 1. Login to Azure with your credentials and setup context for Azure Container Instances (ACI):
 ```bash
 $ az login
+$ az account set --subscription 02b30768-05c8-4ad0-acc8-dda03818d4d6
 $ az acr login --name hack3rzacr
 $ docker login azure
-$ docker context create aci hack3rzacicontext # run only once
 ```
 2. Run the following shell script to deploy and redeploy the containers:
 ```bash
 $ sh deploy-azure.sh
 ```
 
-3. After a successful deployment you can check the status of the deployed containers at [Azure Portal](https://portal.azure.com/#@UZH.onmicrosoft.com/resource/subscriptions/d295f317-9001-4571-b6af-87b3296d016d/resourceGroups/hack3rz/overview). The public domain name is ```hack3rz-aws.switzerlandnorth.azurecontainer.io```. The demo is accessible via [http://hack3rz-aws.switzerlandnorth.azurecontainer.io:8080](http://hack3rz-aws.switzerlandnorth.azurecontainer.io:8080). A test request can be made with the following command:
+3. After a successful deployment you can check the status of the deployed containers at [Azure Portal](https://portal.azure.com/#@UZH.onmicrosoft.com/resource/subscriptions/d295f317-9001-4571-b6af-87b3296d016d/resourceGroups/hack3rz/overview). The public domain name is ```hack3rz-aws.switzerlandnorth.azurecontainer.io```. The demo is accessible via [http://hack3rz-aws.switzerlandnorth.azurecontainer.io](http://hack3rz-aws.switzerlandnorth.azurecontainer.io). A test request can be made with the following command:
 ```bash
 $ curl -X 'POST' \
   'http://hack3rz-aws.switzerlandnorth.azurecontainer.io:8081/api/v1/highlight' \
@@ -148,6 +148,7 @@ The current deployment configuration found in `docker-compose-azure.yml` is a pr
 - Swagger UI is not deployed
 - Nginx is not deployed
 - Training Service cronjob does not work
+- There is no model update
 - Only a single instance of the prediction service is deployed
 - Only a single instance of the annotation service is deployed
 
