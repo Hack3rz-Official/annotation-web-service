@@ -9,24 +9,28 @@ This demo was created to show the capabilities of our Annotation Service in acti
 - Analyze response times with visualized Statistics
 - Simulate up to 10 concurrent requests
 
+A more detailed documentation can be found in the [demo part of our Wiki](https://github.com/Hack3rz-Official/annotation-web-service/wiki/Demo).
 
-## Architecture
-This is a Vue 3 SPA project leveraging the Tailwind styles library in combination with DaisyUI components. 
+## Configuration
+The service expects the following environment variables:
+| **Variable Name**             | **Description**                                             | **Example Value**                                                                                 |
+|-------------------------------|-------------------------------------------------------------|---------------------------------------------------------------------------------------------------|
+| `DEMO_FRONTEND_PORT`     | The port on which the frontend application will be hosted    | `80`                                                                                            |
+| `WEB_API_PORT`        | The port of the exposed web api service       | `8081` |
 
-## Setup
+These variables can be placed in the `.env` file in this directory for local development. 
 
-This demo is accessible after launching the project-wide docker-compose file at port :80
+## Run Service Locally
+Execute the following code from the `/demo-frontend` directory:
 
 ```bash
-# inside project root /:
-docker-compose up
-```
-You can also launch this app without docker for development:
-```bash
-# inside /demo-frontend:
 npm install
+npm build
 npm run dev
 ```
+
+**Note:** Because this service depends on other microservices from the AnnotationWebService project, we recommended executing the docker-compose file in the project root to prevent dependency issues.
+ 
 <br>
 
 ![Architecture](./aws_demo_frontend.png)
