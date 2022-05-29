@@ -15,7 +15,6 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 /**
  * Controller that handles the annotation endpoint
  */
-@CrossOrigin
 @RestController
 @RequestMapping(value = "/api/v1/annotation", produces = APPLICATION_JSON_VALUE)
 public class AnnotationController {
