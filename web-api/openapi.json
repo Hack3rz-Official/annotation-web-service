@@ -1,0 +1,118 @@
+{
+    "openapi": "3.0.1",
+    "info": {
+        "title": "Web API",
+        "version": "v1"
+    },
+    "servers": [
+        {
+            "url": "http://localhost:8081",
+            "description": "Local Setup"
+        }
+    ],
+    "paths": {
+        "/api/v1/highlight": {
+            "post": {
+                "tags": ["Highlight"],
+                "summary": "Highlight syntax of code",
+                "parameters": [],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/HighlightRequestDto"
+                            },
+                            "examples": {
+                                "Java":  {
+                                    "value": {
+                                        "language": "java",
+                                        "code": "public class Test { public void test() { System.out.println(\"Hello World\"); } }"
+                                    }
+                                },
+                                "Kotlin": {
+                                    "value": {
+                                        "language": "kotlin",
+                                        "code": "class Test { fun test() { println(\"Hello World\") } }"
+                                    }
+                                },
+                                "Python3": {
+                                    "value": {
+                                        "language": "python3",
+                                        "code": "print(\"Hello World\")"
+                                    }
+                                },
+                                "Unsupported Language": {
+                                    "value": {
+                                        "language": "go",
+                                        "code": "func main() { fmt.Println(\"hello world\") }"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "description": "HTML output"
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "components": {
+        "schemas": {
+            "HighlightRequestDto": {
+                "required": [
+                    "code",
+                    "language"
+                ],
+                "type": "object",
+                "properties": {
+                    "code": {
+                        "type": "string"
+                    },
+                    "language": {
+                        "type": "string",
+                        "enum": [
+                            "java",
+                            "kotlin",
+                            "python3"
+                        ]
+                    }
+                }
+            },
+            "HighlightResponse": {
+                "type": "string"
+            },
+            "Error": {
+                "type": "object",
+                "properties": {
+                    "statusCode:": {
+                        "type": "integer",
+                        "format": "int32"
+                    },
+                    "message": {
+                        "type": "array",
+                        "items" : {
+                            "type": "string"
+                        }
+                    },
+                    "error": {
+                        "type": "string"
+                    }
+                }
+            }
+        }
+    }
+}

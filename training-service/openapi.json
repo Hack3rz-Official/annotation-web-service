@@ -1,0 +1,90 @@
+{
+  "openapi": "3.0.1",
+  "info": {
+    "title": "Training Service API Documentation",
+    "version": "v1"
+  },
+  "servers": [
+    {
+      "url": "http://localhost:8085",
+      "description": "Local Setup"
+    }
+  ],
+  "paths": {
+    "/api/v1/training": {
+      "put": {
+        "tags": ["Training"],
+        "summary": "Manually train syntax highlighting models",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TrainingRequestDTO"
+              },
+              "examples": {
+                "All":  {
+                    "value": {
+                        "model": "all"
+                    }
+                },
+                "Java":  {
+                    "value": {
+                        "model": "java"
+                    }
+                },
+                "Kotlin":  {
+                    "value": {
+                        "model": "kotlin"
+                    }
+                },
+                "Python3":  {
+                    "value": {
+                        "model": "python3"
+                    }
+                }
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200":{
+            "description": "Output message of training process",
+            "schema": {
+              "$ref":"#/components/schemas/TrainingResponseDTO"
+            }
+          }
+        }
+      }
+    }
+  },
+   "components": {
+        "schemas": {
+            "TrainingRequestDTO": {
+                "required": [
+                    "model"
+                ],
+                "type": "object",
+                "properties": {
+                    "model": {
+                        "type": "string",
+                        "enum": [
+                            "java",
+                            "kotlin",
+                            "python3",
+                            "all"
+                        ]
+                    }
+                }
+            },
+            "TrainingResponseDTO": {
+                "type": "object",
+                "properties": {
+                    "msg": {
+                        "type": "string"
+                    }
+                }
+            }
+        }
+    }
+}

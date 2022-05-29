@@ -1,0 +1,44 @@
+version: '3.7'
+
+services:
+    dev:
+        container_name: web_api_dev
+        image: syntax-highlighting-web-api:latest
+        build:
+            context: .
+            target: development
+            dockerfile: ./Dockerfile
+        command: npm run start:debug
+        env_file:
+            - .env
+        ports:
+            - "${WEB_API_PORT}:${WEB_API_PORT}"
+            - 9229:9229
+        networks:
+            - nestjs-network
+        volumes:
+            - .:/usr/src/app
+            - /usr/src/app/node_modules
+        restart: unless-stopped
+    prod:
+        container_name: web_api_prod
+        image: syntax-highlighting-web-api:latest
+        build:
+            context: .
+            target: production
+            dockerfile: ./Dockerfile
+        command: npm run start:prod
+        env_file:
+            - .env
+        ports:
+            - "${WEB_API_PORT}:${WEB_API_PORT}"
+            - 9229:9229
+        networks:
+            - nestjs-network
+        volumes:
+            - .:/usr/src/app
+            - /usr/src/app/node_modules
+        restart: unless-stopped
+
+networks:
+    nestjs-network:

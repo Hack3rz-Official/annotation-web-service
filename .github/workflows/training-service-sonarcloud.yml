@@ -1,0 +1,47 @@
+name: Training Service SonarCloud
+on:
+  push:
+    branches:
+      - develop
+    paths:
+      - 'training-service/**'
+  pull_request:
+    types: [opened, synchronize, reopened]
+jobs:
+  sonarcloud:
+    name: SonarCloud
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of analysis
+      - name: Build docker
+        run: docker-compose up -d mongodb
+      - name: Set up Python
+        run: sudo apt-get install python3
+        working-directory: training-service
+      - name: Install dependencies
+        run: |
+           sudo pip install coverage
+           python3 -m pip install --upgrade pip
+           pip install -r requirements.txt
+        working-directory: training-service
+      - name: Test with unittest
+        run: |
+           export PYTHONPATH="$PWD"
+           cd test
+           coverage run --omit=*_test.py,test_*.py,*SHModelUtils.py -m unittest discover
+        working-directory: training-service
+      - name: Generate Coverage Report
+        run: |
+           cd test
+           coverage xml
+           sed -i 's@'$GITHUB_WORKSPACE'@/github/workspace/@g' coverage.xml
+        working-directory: training-service
+      - name: SonarCloud Scan
+        uses: SonarSource/sonarcloud-github-action@master
+        with:
+          projectBaseDir: training-service
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Needed to get PR information, if any
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}

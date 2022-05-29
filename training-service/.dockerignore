@@ -1,0 +1,12 @@
+.DS_Store
+.idea
+.vscode
+.venv
+
+.gitignore
+README.md
+venv.sh
+
+# no predict model files
+*.pt
+*openapi.json

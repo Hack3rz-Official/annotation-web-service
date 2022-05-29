@@ -1,0 +1,10 @@
+version: '3.8'
+
+services:
+    demo-frontend:
+        build:
+            context: .
+            args:
+                - VITE_HIGHLIGHT_URL=http://localhost:${WEB_API_PORT}/api/v1/highlight
+        ports: 
+            - "${DEMO_FRONTEND_PORT}:${DEMO_FRONTEND_PORT}"
