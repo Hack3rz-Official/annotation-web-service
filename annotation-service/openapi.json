@@ -6,7 +6,8 @@
   },
   "servers": [
     {
-      "url": "http://localhost:4000"
+      "url": "http://localhost:4000",
+      "description": "Local Setup through Load Balancer"
     }
   ],
   "paths": {
@@ -39,12 +40,6 @@
                     "value": {
                         "language": "PYTHON3",
                         "code": "print(\"Hello World\")"
-                    }
-                },
-                "Unsupported Language": {
-                    "value": {
-                        "language": "GO",
-                        "code": "func main() { fmt.Println(\"hello world\") }"
                     }
                 }
               }

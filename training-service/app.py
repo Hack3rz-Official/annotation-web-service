@@ -29,9 +29,6 @@ def create_app():
     """
     app = Flask(__name__)
 
-    # allow swagger-ui
-    CORS(app, resources={r"/api/*": {"origins": "http://localhost:" + os.environ.get('SWAGGER_UI_PORT', "0"), "send_wildcard": "False"}})
-
     # Connect to database
     connect(host=os.environ.get('DB_CONNECTION_STRING'))
 
