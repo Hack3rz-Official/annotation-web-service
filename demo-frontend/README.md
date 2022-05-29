@@ -7,7 +7,7 @@ This demo was created to show the capabilities of our Annotation Service in acti
 - Edit source files to see how the API responds to semantically invalid code snippets
 - Change language of files, including invalid languages
 - Analyze response times with visualized Statistics
-- Simulate up to 10 concurrent requests
+- Simulate up to 10 concurrent requests (some browsers like Google Chrome only support 6 concurrent requests)
 
 A more detailed documentation can be found in the [demo part of our Wiki](https://github.com/Hack3rz-Official/annotation-web-service/wiki/Demo).
 

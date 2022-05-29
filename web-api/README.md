@@ -69,8 +69,8 @@ $ curl -X 'POST' \
 **Sample Body:**
 ```json
 {
-  "language": "java"
-  "code": "public class Test { public void test() { System.out.println('Hello World'); } }",
+  "language": "java",
+  "code": "public class Test { public void test() { System.out.println('Hello World'); } }"
 }
 ```
 **Sample Response:**
