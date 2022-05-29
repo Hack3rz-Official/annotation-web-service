@@ -1,39 +1,38 @@
 package com.hack3rz.annotationservice.service;
 
+import com.hack3rz.annotationservice.model.Annotation;
 import com.hack3rz.annotationservice.repository.AnnotationRepository;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.data.mongo.DataMongoTest;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.ComponentScan;
-import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
 import static com.hack3rz.annotationservice.enumeration.SupportedLanguage.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.when;
 
-@DataMongoTest
 @ComponentScan("com.hack3rz.annotationservice")
 @ExtendWith(SpringExtension.class)
+@SpringBootTest
 @ActiveProfiles(profiles = "test")
 class AnnotationServiceTest {
 
     @Autowired
     private AnnotationService annotationService;
 
-    @Autowired
-    MongoTemplate mongoTemplate;
+    @MockBean
+    AnnotationRepository repository;
 
-    @AfterEach
-    void afterEach() {
-        mongoTemplate.getDb().drop();
-    }
 
     @Test
     void whenValidJavaCode_thenReturnLexedTokens() {
@@ -131,10 +130,40 @@ class AnnotationServiceTest {
     }
 
     @Test
-    void persistAnnotationToDatabase(@Autowired AnnotationRepository repository) {
+    void persistAnnotationToDatabase() {
+
+        List<Annotation> mockDb = new ArrayList<Annotation>();
+
+        // mock repository.save(annotation);
+        when(repository.save(Mockito.any(Annotation.class))).then(i -> {
+            Annotation argument = i.getArgument(0);
+            mockDb.add(argument);
+            return argument;
+        });
+
+        // mock repository.existsAnnotationBySourceCode
+        when(repository.existsAnnotationBySourceCode(Mockito.anyString())).then(i -> {
+           String code =  i.getArgument(0);
+           return mockDb.stream().anyMatch(o -> o.getSourceCode().equals(code));
+        });
+
+        // mock repository.findAnnotationBySourceCode
+        when(repository.findAnnotationBySourceCode(Mockito.anyString())).then(i -> {
+            String code =  i.getArgument(0);
+            return mockDb.stream().filter(o-> o.getSourceCode().equals(code))
+                    .findFirst().orElse(null);
+        });
+
         String code = "public static void main(String[] args) {}";
         annotationService.persistCode(code, JAVA);
+
         Assertions.assertTrue(repository.existsAnnotationBySourceCode(code));
+
+        Annotation storedAnnotation = repository.findAnnotationBySourceCode(code);
+
+        Assertions.assertNotNull(storedAnnotation);
+        Assertions.assertNotNull(storedAnnotation.getHighlightingCode());
+        Assertions.assertNotNull(storedAnnotation.getHighlightingTokens());
     }
 
 }
