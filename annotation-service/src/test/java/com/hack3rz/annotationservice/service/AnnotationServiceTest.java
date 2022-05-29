@@ -147,9 +147,23 @@ class AnnotationServiceTest {
            return mockDb.stream().anyMatch(o -> o.getSourceCode().equals(code));
         });
 
+        // mock repository.findAnnotationBySourceCode
+        when(repository.findAnnotationBySourceCode(Mockito.anyString())).then(i -> {
+            String code =  i.getArgument(0);
+            return mockDb.stream().filter(o-> o.getSourceCode().equals(code))
+                    .findFirst().orElse(null);
+        });
+
         String code = "public static void main(String[] args) {}";
         annotationService.persistCode(code, JAVA);
+
         Assertions.assertTrue(repository.existsAnnotationBySourceCode(code));
+        
+        Annotation storedAnnotation = repository.findAnnotationBySourceCode(code);
+
+        Assertions.assertNotNull(storedAnnotation);
+        Assertions.assertNotNull(storedAnnotation.getHighlightingCode());
+        Assertions.assertNotNull(storedAnnotation.getHighlightingTokens());
     }
 
 }
