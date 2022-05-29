@@ -16,7 +16,6 @@ The service expects the following environment variables:
 | `MODEL_NAME`               | The prefix used when storing a model locally on the disk.                  | `best`                                                                                          |
 | `MIN_TRAINING_BATCH_SIZE`  | The minimum amount of annotations required before a training is started.   | `100`                                                                                           |
 | `TRAINING_SERVICE_PORT`    | The port on which the training service runs.                               | `8085`                                                                                          |
-| `SWAGGER_UI_PORT`          | The port on which the Swagger UI runs.                                     | `8082`                                                                                          |
 
 
 Please make sure that these environment variables are present when running the service. If you run it using the global `docker-compose` then they will automatically be passed to the service.
