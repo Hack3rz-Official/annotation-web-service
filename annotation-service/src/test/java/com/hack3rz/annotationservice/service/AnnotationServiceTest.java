@@ -158,7 +158,7 @@ class AnnotationServiceTest {
         annotationService.persistCode(code, JAVA);
 
         Assertions.assertTrue(repository.existsAnnotationBySourceCode(code));
-        
+
         Annotation storedAnnotation = repository.findAnnotationBySourceCode(code);
 
         Assertions.assertNotNull(storedAnnotation);
