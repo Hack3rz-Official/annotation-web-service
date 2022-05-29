@@ -12,6 +12,7 @@ import java.util.List;
  */
 @Document("annotations")
 @Builder
+@Getter
 public class Annotation {
 
     @Id
