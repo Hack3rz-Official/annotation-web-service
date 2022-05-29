@@ -14,7 +14,7 @@
 ## Introduction
 Annotation Web Service (AWS) is a syntax highlighting web service based on a [deep learning (DL) model](https://github.com/MEPalma/UZH-ASE-AnnotationWS-BaseLearner). The goal was to build an API that uses the DL model to provide syntax highlighting for Java, Kotlin and Python3. Furthermore, the incoming requests should be used to train the DL model and to further improve its accuracy. 
 
-This `README.md` focuses on the technical aspects and the running and configuration of the services. A more in-depth description of the functionalities, technologies and our development process please consult our [Wiki](https://github.com/Hack3rz-Official/annotation-web-service/wiki). The original motivation and requirements for this project can be found in the [project instructions](https://seal-uzh.notion.site/Annotation-WebService-b9621a3b1b5943cba21ede82d2fcbfe3) provided by the lecturers of the course.
+This `README.md` focuses on the technical aspects and the running and configuration of the services. For a more in-depth description of the functionalities, technologies and our development process please consult our [Wiki](https://github.com/Hack3rz-Official/annotation-web-service/wiki). The original motivation and requirements for this project can be found in the [project instructions](https://seal-uzh.notion.site/Annotation-WebService-b9621a3b1b5943cba21ede82d2fcbfe3) provided by the lecturers of the course.
 
 ## Microservices
 The Annotation Web Service consists of the following microservices:
@@ -60,7 +60,7 @@ The microservices rely on a number of environment variables for their configurat
 | `ANNOTATION_SERVICE_PORT`  | The port on which the annotation service runs.                             | `8083`                                                                                          |
 | `PREDICTION_SERVICE_PORT`  | The port on which the prediction service runs.                             | `8084`                                                                                          |
 | `TRAINING_SERVICE_PORT`    | The port on which the training service runs.                               | `8085`                                                                                          |
-| `NGINX_PORT=4000`          | The port on which the nginx load-balancer runs.                            | `4000`                                                                                          |
+| `NGINX_PORT`          | The port on which the nginx load-balancer runs.                            | `4000`                                                                                          |
 
 
 ## Docker Containers
