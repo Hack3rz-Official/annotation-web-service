@@ -6,7 +6,8 @@
     },
     "servers": [
         {
-        "url": "http://localhost:8081"
+            "url": "http://localhost:8081",
+            "description": "Local Setup"
         }
     ],
     "paths": {
@@ -54,6 +55,16 @@
                 "responses": {
                     "200": {
                         "description": "HTML output"
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        }
                     }
                 }
             }
@@ -83,6 +94,24 @@
             },
             "HighlightResponse": {
                 "type": "string"
+            },
+            "Error": {
+                "type": "object",
+                "properties": {
+                    "statusCode:": {
+                        "type": "integer",
+                        "format": "int32"
+                    },
+                    "message": {
+                        "type": "array",
+                        "items" : {
+                            "type": "string"
+                        }
+                    },
+                    "error": {
+                        "type": "string"
+                    }
+                }
             }
         }
     }

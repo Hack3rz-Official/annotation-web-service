@@ -42,7 +42,7 @@ $ ./gradlew clean test --info
 - use `--info` if you want to see test output
 
 Finally, the function should be accessible via `http://localhost:8083/api/api/v1/annotation`.
-For the tests, the service will automatically configure and run an in-memory MongoDB.
+
 
 ## **REST API Documentation**
 
